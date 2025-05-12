@@ -134,3 +134,12 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# idea workspace files
+/.idea/*
+/.idea/.gitignore
+/.idea/checkstyle-idea.xml
+/.idea/jabmap.iml
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/vcs.xml
