@@ -23,5 +23,5 @@ jobs:
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: /JabMap
+          publish_dir: JabMap/
           force_orphan: true
