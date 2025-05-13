@@ -18,6 +18,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - name: Deploy to GH pages
         uses: peaceiris/actions-gh-pages@v4
         with:
