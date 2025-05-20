@@ -4,6 +4,7 @@ import 'jsmind/style/jsmind.css';
 
 import jsMind from 'jsmind';
 
+// "load" mindmap data
 const mind = {
     meta: {
         name: "jsMind remote",
@@ -38,12 +39,12 @@ const mind = {
         ]
     }
 };
-
+// specify creation options
 const options = {
     container: 'jsmind_container',
     theme: 'orange',
     editable: true
 };
-
+// create and render mindmap
 const jm = new jsMind(options);
 jm.show(mind);
