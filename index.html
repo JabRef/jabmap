@@ -44,8 +44,18 @@
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
-      <div class="d-flex mx-auto">
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <!--Save and Open buttons-->
+      <div class="d-flex ms-2 justify-content-start">
+        <button class="btn btn-secondary me-2" id="saveBtn" type="button" data-bs-toggle="tooltip" title="Save">
+          <i class="bi bi-save"></i>
+        </button>
+        <button class="btn btn-secondary me-2" id="loadBtn" type="button" data-bs-toggle="tooltip" title="Open">
+          <i class="bi bi-folder2-open"></i>
+        </button>
+      </div>
+      <!--Editor buttons-->
+      <div class="d-flex mx-auto  justify-content-center">
         <!--Button class explanation: class = "btn colortheme margin to the right (me-2)"-->
         <!--undo Button-->
         <button class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="Undo">
