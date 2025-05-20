@@ -8,7 +8,9 @@
     "bootstrap-icons": "^1.13.1",
     "jsmind": "^0.8.7"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "vite": "^6.3.5"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
