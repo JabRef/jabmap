@@ -1,0 +1,27 @@
+{
+  "name": "jabmap",
+  "version": "1.0.0",
+  "description": "next-generation scientific mind mapping",
+  "main": "index.js",
+  "dependencies": {
+    "bootstrap": "^5.3.6",
+    "bootstrap-icons": "^1.13.1",
+    "jsmind": "^0.8.7"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JabRef/jabmap.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/JabRef/jabmap/issues"
+  },
+  "homepage": "https://github.com/JabRef/jabmap#readme"
+}
