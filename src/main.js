@@ -3,6 +3,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'jsmind/style/jsmind.css';
 
 import jsMind from 'jsmind';
+import './draggableNodes';
 
 // "load" mindmap data
 const mind = {
@@ -41,10 +42,45 @@ const mind = {
 };
 // specify creation options
 const options = {
-    container: 'jsmind_container',
-    theme: 'orange',
-    editable: true
-};
+        container : 'jsmind_container', 			// [required] ID of the container
+        editable : true, 		// Is editing enabled?
+        theme : null, 			// theme
+        mode :'full', 			// display mode
+        support_html : true, 	// Does it support HTML elements in the node?
+        view:{
+            engine: 'canvas', 	// engine for drawing lines between nodes in the mindmap
+            hmargin:100, 		// Minimum horizontal distance of the mindmap from the outer frame of the container
+            vmargin:50, 			// Minimum vertical distance of the mindmap from the outer frame of the container
+            line_width:6, 		// thickness of the mindmap line
+            line_color:'#555', 	// Thought mindmap line color
+            line_style:'straight', // line style, straight or curved
+            custom_line_render: null,  // customized line render function
+            draggable: true,    // Drag the mind map with your mouse, when it's larger that the container
+            hide_scrollbars_when_draggable: false, // Hide container scrollbars, when mind map is larger than container and draggable option is true.
+            node_overflow: 'hidden' // Text overflow style in node
+        },
+        layout:{
+            hspace:30, 			// Horizontal spacing between nodes
+            vspace:20, 			// Vertical spacing between nodes
+            pspace:13,			// Horizontal spacing between node and connection line (to place node expander)
+            cousin_space:0			// Additional vertical spacing between child nodes of neighbor nodes
+        },
+        shortcut:{
+            enable:true, 		// whether to enable shortcut
+            handles:{}, 			// Named shortcut key event processor
+            mapping:{ 			// shortcut key mapping
+                addchild : [45, 4096+13], 	// <Insert>, <Ctrl> + <Enter>
+                addbrother : 13, // <Enter>
+                editnode : 113, 	// <F2>
+                delnode : 46, 	// <Delete>
+                toggle : 32, 	// <Space>
+                left : 37, 		// <Left>
+                up : 38, 		// <Up>
+                right : 39, 		// <Right>
+                down : 40, 		// <Down>
+            }
+        },
+    };
 // create and render mindmap
 const jm = new jsMind(options);
 jm.show(mind);
