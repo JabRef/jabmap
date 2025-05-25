@@ -1,9 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
-import 'jsmind/style/jsmind.css';
-
-import jsMind from 'jsmind';
-import './draggableNodes';
+import jsMind from './jsmind/src/jsmind.js';
+import './jsmind/src/plugins/jsmind.draggable-node.js';
 
 // "load" mindmap data
 const mind = {

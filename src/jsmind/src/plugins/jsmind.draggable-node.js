@@ -1,10 +1,12 @@
-/* --- drag and drop nodes code ---
- * ## why is this here?
- * While switching from using a cdn to installing and running everything locally with npm I noticed that there was no
- * npm package for the drag-and-drop-nodes script. My workaround for now is to paste the code in the extra file here
- * and reference it in main.js
+/**
+ * @license BSD
+ * @copyright 2014-2025 hizzgdev@163.com
+ *
+ * Project Home:
+ *   https://github.com/hizzgdev/jsmind/
  */
-import jsMind from 'jsmind';
+
+import jsMind from '../jsmind.js';
 
 if (!jsMind) {
     throw new Error('jsMind is not defined');
@@ -15,11 +17,11 @@ const $ = jsMind.$;
 const clear_selection =
     'getSelection' in $.w
         ? function () {
-            $.w.getSelection().removeAllRanges();
-        }
+              $.w.getSelection().removeAllRanges();
+          }
         : function () {
-            $.d.selection.empty();
-        };
+              $.d.selection.empty();
+          };
 
 const DEFAULT_OPTIONS = {
     line_width: 5,
@@ -32,7 +34,7 @@ const DEFAULT_OPTIONS = {
     shadow_node_class_name: 'jsmind-draggable-shadow-node',
 };
 
-class DraggableNode {
+export class DraggableNode {
     constructor(jm, options) {
         var opts = {};
         jsMind.util.json.merge(opts, DEFAULT_OPTIONS);
@@ -227,9 +229,9 @@ class DraggableNode {
             } else if (
                 this.view_panel_rect.bottom - e.clientY < this.options.scrolling_trigger_width &&
                 this.view_panel.scrollTop <
-                this.view_panel.scrollHeight -
-                this.view_panel_rect.height -
-                this.options.scrolling_step_length
+                    this.view_panel.scrollHeight -
+                        this.view_panel_rect.height -
+                        this.options.scrolling_step_length
             ) {
                 this.view_panel.scrollBy(0, this.options.scrolling_step_length);
                 this.offset_y -= this.options.scrolling_step_length / jview.zoom_current;
@@ -244,9 +246,9 @@ class DraggableNode {
             } else if (
                 this.view_panel_rect.right - e.clientX < this.options.scrolling_trigger_width &&
                 this.view_panel.scrollLeft <
-                this.view_panel.scrollWidth -
-                this.view_panel_rect.width -
-                this.options.scrolling_step_length
+                    this.view_panel.scrollWidth -
+                        this.view_panel_rect.width -
+                        this.options.scrolling_step_length
             ) {
                 this.view_panel.scrollBy(this.options.scrolling_step_length, 0);
                 this.offset_x -= this.options.scrolling_step_length / jview.zoom_current;
