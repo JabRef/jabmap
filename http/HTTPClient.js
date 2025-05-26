@@ -18,10 +18,11 @@ class HTTPClient {
         const requestUrl = this.#host.concat(url);
         // Setting default options
         // * Note: this includes only cases when options are null or undefined
-        options = {
+        options = options ??
+        {
             method: "PUT",
             headers: { "Content-Type": "application/json" }
-        } ?? options;
+        };
 
         // Sending the request and waiting for the response
         try {
