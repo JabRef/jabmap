@@ -4,20 +4,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>JabMap</title>
   <!--Bootstrap Stylesheet-->
-  <link
-          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css"
-          rel="stylesheet"
-          integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT"
-          crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <!--Bootstrap-Icons Stylesheet-->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
   <!--jsmind Stylesheet-->
-  <link
-          type="text/css"
-          rel="stylesheet"
-          href="//cdn.jsdelivr.net/npm/jsmind@0.8.7/style/jsmind.css"/>
+  <link type="text/css" rel="stylesheet" href="//cdn.jsdelivr.net/npm/jsmind@0.8.7/style/jsmind.css"/>
   <style>
     html, body {
       height: 100%;
@@ -41,63 +34,54 @@
 </head>
 <body>
 <!--Reference to jsmind-->
-<script
-        type="text/javascript"
-        src="//cdn.jsdelivr.net/npm/jsmind@0.8.7/es6/jsmind.js"
-></script>
+<script type="text/javascript" src="//cdn.jsdelivr.net/npm/jsmind@0.8.7/es6/jsmind.js"></script>
 
 <!--Reference to script which enables drag and drop for nodes with the mouse-->
 <script type="text/javascript" src="https://unpkg.com/jsmind@0.8.7/es6/jsmind.draggable-node.js"></script>
 
 <!--Reference to Bootstrap-->
-<script
-        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO"
-        crossorigin="anonymous">
-</script>
+<script type ="text/javascript" src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
 
 <!--Navbar with Buttons-->
-<nav class="navbar navbar-expand-lg bg-body-tertiary">
+<nav class="navbar bg-body-tertiary">
   <div class="container-fluid">
+
+    <!-- Dropdown for saving and loading Mindmaps -->
+    <div class="dropdown">
+      <button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+      </button>
+      <ul class="dropdown-menu">
+        <li><a class="dropdown-item" href="#" id="saveDropdown"><i class="bi bi-save"></i> Save</a></li>
+        <li><a class="dropdown-item" href="#" id="loadDropdown"><i class="bi bi-folder2-open"></i> Load</a></li>
+      </ul>
+    </div>
+
+    <!--Jabmap-->
     <a class="navbar-brand" href="#">JabMap</a>
-    <!--Collapse functionality: will hide the "data-bs-target" when the window is not wide enough-->
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <!--Save and Open buttons-->
-      <div class="d-flex ms-2 justify-content-start">
-        <button class="btn btn-secondary me-2" id="saveBtn" type="button" data-bs-toggle="tooltip" title="Save">
-          <i class="bi bi-save"></i>
-        </button>
-        <button class="btn btn-secondary me-2" id="loadBtn" type="button" data-bs-toggle="tooltip" title="Open">
-          <i class="bi bi-folder2-open"></i>
-        </button>
-      </div>
-      <!--Editor buttons-->
-      <div class="d-flex mx-auto  justify-content-center">
-        <!--Button class explanation: class = "btn colortheme margin to the right (me-2)"-->
-        <!--undo Button-->
-        <button class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="Undo">
-          <i class="bi bi-arrow-counterclockwise"></i>
-        </button>
-        <!--redo Button-->
-        <button class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="Redo">
-          <i class="bi bi-arrow-clockwise"></i>
-        </button>
-        <!--new topic (sibling node) Button-->
-        <button class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="New sibling node">
-          <i class="bi bi-node-plus-fill"></i>
-        </button>
-        <!--new subtopic (child node) button (Icon rotated 90 degrees)-->
-        <button class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="New child node">
-          <i class="bi bi-diagram-2-fill" style="transform: rotate(-90deg); display: inline-block;"></i>
-        </button>
-        <!--tags button-->
-        <button class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="Tags">
-          <i class="bi bi-tags"></i>
-        </button>
-      </div>
+
+    <!--Editor buttons-->
+    <div class="d-flex mx-auto  justify-content-center">
+      <!--Button class explanation: class = "btn colortheme margin to the right (me-2)"-->
+      <!--undo Button-->
+      <button class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="Undo">
+        <i class="bi bi-arrow-counterclockwise"></i>
+      </button>
+      <!--redo Button-->
+      <button class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="Redo">
+        <i class="bi bi-arrow-clockwise"></i>
+      </button>
+      <!--new topic (sibling node) Button-->
+      <button class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="New sibling node">
+        <i class="bi bi-node-plus-fill"></i>
+      </button>
+      <!--new subtopic (child node) button (Icon rotated 90 degrees)-->
+      <button class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="New child node">
+        <i class="bi bi-diagram-2-fill" style="transform: rotate(-90deg); display: inline-block;"></i>
+      </button>
+      <!--tags button-->
+      <button class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="Tags">
+        <i class="bi bi-tags"></i>
+      </button>
     </div>
   </div>
 </nav>
