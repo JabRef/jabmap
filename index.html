@@ -27,24 +27,24 @@
 </head>
 <body>
 <!--Navbar with Buttons-->
-<nav class="navbar bg-body-tertiary">
+<nav class="navbar bg-body-tertiary position-relative">
   <div class="container-fluid">
 
-    <!-- Dropdown for saving and loading Mindmaps -->
-    <div class="dropdown">
-      <button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+    <div>
+      <!--Jabmap-->
+      <a class="navbar-brand" href="#">JabMap</a>
+
+      <!--Save and Load Buttons-->
+      <button class="btn btn-light me-2" type="button" data-bs-toggle="tooltip" title="Save">
+        <i class="bi bi-save"></i> Save
       </button>
-      <ul class="dropdown-menu">
-        <li><a class="dropdown-item" href="#" id="saveDropdown"><i class="bi bi-save"></i> Save</a></li>
-        <li><a class="dropdown-item" href="#" id="loadDropdown"><i class="bi bi-folder2-open"></i> Load</a></li>
-      </ul>
+      <button class="btn btn-light me-2" type="button" data-bs-toggle="tooltip" title="Open">
+        <i class="bi bi-folder2-open"></i> Open
+      </button>
     </div>
 
-    <!--Jabmap-->
-    <a class="navbar-brand" href="#">JabMap</a>
-
     <!--Editor buttons-->
-    <div class="d-flex mx-auto  justify-content-center">
+    <div class="position-absolute top-50 start-50 translate-middle d-flex justify-content-center">
       <!--Button class explanation: class = "btn colortheme margin to the right (me-2)"-->
       <!--undo Button-->
       <button class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="Undo">
@@ -63,7 +63,7 @@
         <i class="bi bi-diagram-2-fill" style="transform: rotate(-90deg); display: inline-block;"></i>
       </button>
       <!--tags button-->
-      <button class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="Tags">
+      <button class="btn btn-secondary" type="button" data-bs-toggle="tooltip" title="Tags">
         <i class="bi bi-tags"></i>
       </button>
     </div>
