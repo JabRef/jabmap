@@ -1,55 +1,12 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <link
-          type="text/css"
-          rel="stylesheet"
-          href="//cdn.jsdelivr.net/npm/jsmind@0.8.7/style/jsmind.css"
-  />
-  <script
-          type="text/javascript"
-          src="//cdn.jsdelivr.net/npm/jsmind@0.8.7/es6/jsmind.js"
-  ></script>
+  <meta charset="UTF-8" />
+  <title>JabMap</title>
+  <link rel="stylesheet" href="src/jsmind/style/jsmind.css" />
 </head>
 <body>
-<div id="jsmind_container"></div>
-<script type="text/javascript" src="https://unpkg.com/jsmind@0.8.7/es6/jsmind.draggable-node.js"></script>
-<script type="text/javascript">
-  var mind = {
-    "meta":{
-      "name":"jsMind remote",
-      "author":"hizzgdev@163.com",
-      "version":"0.2"
-    },
-    "format":"node_tree",
-    "data":{"id":"root","topic":"jsMind","children":[
-        {"id":"easy","topic":"Easy","direction":"left","children":[
-            {"id":"easy1","topic":"Easy to show"},
-            {"id":"easy2","topic":"Easy to edit"},
-            {"id":"easy3","topic":"Easy to store"},
-            {"id":"easy4","topic":"Easy to embed"}
-          ]},
-        {"id":"open","topic":"Open Source","direction":"right","children":[
-            {"id":"open1","topic":"on GitHub"},
-            {"id":"open2","topic":"BSD License"}
-          ]},
-        {"id":"powerful","topic":"Powerful","direction":"right","children":[
-            {"id":"powerful1","topic":"Base on Javascript"},
-            {"id":"powerful2","topic":"Base on HTML5"},
-            {"id":"powerful3","topic":"Depends on you"}
-          ]},
-        {"id":"other","topic":"test node","direction":"left","children":[
-            {"id":"other1","topic":"I'm from local variable"},
-            {"id":"other2","topic":"I can do everything"}
-          ]}
-      ]}
-  };
-  var options = {
-    container: 'jsmind_container',
-    theme: 'orange',
-    editable: true,
-  };
-  var jm = new jsMind(options);
-  jm.show(mind);
-</script>
+<div id="jsmind_container" style="width:100%;height:100vh;background:#f4f4f4;"></div>
+<script type="module" src="/src/main.js"></script>
 </body>
 </html>
