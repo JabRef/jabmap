@@ -17,9 +17,10 @@ class HTTPClient {
      */
     async #performFetch(url, options = null) {
         let fetchResult = "";
+        let logMessage = "";
 
         const requestUrl = this.#host.concat(url);
-        // Setting default options
+        // Setting default options if none's been provided
         // * Note: this includes only cases when options are null or undefined
         options = options ??
         {
@@ -30,16 +31,38 @@ class HTTPClient {
         // Sending the request and waiting for the response
         try {
             const response = await fetch(requestUrl, options);
-            if (!response.ok)
-                throw new Error(`Response status: ${response.status}`);
+            if (!response.ok) {
+                throw new Error("Request's result is not ok ( -.-)");
+            }
 
-            const json = await response.json();
-            console.log(json);
+            // Defining default resulting output
+            fetchResult = "No data received back.";
+            // If some output is awaited, save it instead
+            if (options.method !== "PUT") {
+                fetchResult = await response.json();
+            }
 
-            fetchResult = json;
+            // Providing infos about the request
+            logMessage =
+                `${options.method} ${url} Request succeeded (~ UwU)~(${response.status}).\n` +
+                `Output:\n` +
+                `${JSON.stringify(fetchResult, null, 2)}`;
         } catch (e) {
-            console.error(e.message);
+            // Logging basic information about the error
+            console.error(e);
+            logMessage = `${options.method} ${url} Request failed (.'T_T)`;
+
+            // If connection was present, provide more details
+            if (typeof(response) !== "undefined") {
+                logMessage +=
+                    `-(${response.status}).\n` +
+                    `Options:\n` +
+                    `${options}`;
+            }
         }
+
+        // Finally showing the resulting log
+        console.log(logMessage);
 
         return fetchResult;
     }
