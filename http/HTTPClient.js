@@ -73,6 +73,7 @@ class HTTPClient {
      * @returns { object } - The requested mind map object.
     */
     async LoadMap(path = "") {
+        // The path will probably be included into url definition (coming in sprint 2)
         const url = "libraries/demo/map";
         const options = {
             method: "GET",
@@ -88,6 +89,8 @@ class HTTPClient {
      * @returns { string } - A string of the request's result.
     */
     async SaveMap(mindMap) {
+        // The url will provably be modified according to mindMap's properties (name, id, whatsoever)
+        // (coming in sprint 2) 
         const url = "libraries/demo/map";
         const options = {
             method: "PUT",
