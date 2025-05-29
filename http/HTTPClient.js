@@ -10,7 +10,10 @@ class HTTPClient {
      * Sends a HTTP-request to the JabRef's server.
      * @param { string } url - The server's URL to make a request to. 
      * @param { any } options - Optional request's options.
-     * @returns { string } - A JSON string of the request's result.
+     * @returns { object | string }
+     * - An **object** in case of a `GET request` or
+     * - A **string** in case of a `PUT request` or
+     * - An **empty string** `""`, if any request failed.
      */
     async #performFetch(url, options = null) {
         let fetchResult = "";
@@ -42,9 +45,9 @@ class HTTPClient {
     }
 
     /**
-     * Requests a .jmp file with the saved mind map from JabRef's server.
-     * @param { string } path - The path of a requested map.
-     * @returns { string } - A JSON string of the request's result.
+     * Requests a mind map (.jmp file) from JabRef's server.
+     * @param { string } path - The path to the requested map.
+     * @returns { object } - The requested mind map object.
     */
     async LoadMap(path = "") {
         const url = "libraries/demo/map";
@@ -59,7 +62,7 @@ class HTTPClient {
     /**
      * Sends a mind map to JabRef's server to save.
      * @param { map } mindMap - The mind map to save.
-     * @returns { string } - A JSON string of the request's result.
+     * @returns { string } - A string of the request's result.
     */
     async SaveMap(mindMap) {
         const url = "libraries/demo/map";
@@ -69,6 +72,20 @@ class HTTPClient {
             body: JSON.stringify({ map: mindMap })
         }
         
+        return this.#performFetch(url, options)
+    }
+
+    /**
+     * Requests a list of stored mind maps saved on the server.
+     * @returns { object } - A list of available mind maps stored on the server.
+     */
+    async ListMaps() {
+        const url = "libraries";
+        const options = {
+            method: "GET",
+            headers: { "Content-Type": "application/json" }
+        }
+
         return this.#performFetch(url, options)
     }
 }
