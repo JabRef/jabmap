@@ -83,3 +83,44 @@ const options = {
 // create and render mindmap
 const jm = new jsMind(options);
 jm.show(mind);
+
+//--- Button click handlers ---
+
+// saving
+saveBtn.onclick = function(){
+    // saving jabmaps magic here..
+}
+
+// open
+openBtn.onclick = function(){
+    // opening jabmaps magic here..
+}
+
+// undo
+undoBtn.onclick = function(){
+    // undo magic here..
+}
+
+// redo
+redoBtn.onclick = function(){
+    // redo magic here..
+}
+
+// new sibling node
+newSiblingBtn.onclick = function(){
+    if(!!jm){
+        jm.shortcut.handle_addbrother(jm, null); //call the shortcut-handler for adding a sibling node
+    }
+}
+
+// new child node
+newChildBtn.onclick = function(){
+    if(!!jm){
+        jm.shortcut.handle_addchild(jm, null); //call the shortcut-handler for adding a child node
+    }
+}
+
+// tags
+tagsBtn.onclick = function(){
+    // tags magic here..
+}

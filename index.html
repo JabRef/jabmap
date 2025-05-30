@@ -35,10 +35,10 @@
       <a class="navbar-brand" href="#">JabMap</a>
 
       <!--Save and Load Buttons-->
-      <button class="btn btn-light me-2" type="button" data-bs-toggle="tooltip" title="Save">
+      <button id = "saveBtn" class="btn btn-light me-2" type="button" data-bs-toggle="tooltip" title="Save">
         <i class="bi bi-save"></i> Save
       </button>
-      <button class="btn btn-light me-2" type="button" data-bs-toggle="tooltip" title="Open">
+      <button id = "openBtn" class="btn btn-light me-2" type="button" data-bs-toggle="tooltip" title="Open">
         <i class="bi bi-folder2-open"></i> Open
       </button>
     </div>
@@ -47,23 +47,23 @@
     <div class="position-absolute top-50 start-50 translate-middle d-flex justify-content-center">
       <!--Button class explanation: class = "btn colortheme margin to the right (me-2)"-->
       <!--undo Button-->
-      <button class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="Undo">
+      <button id = "undoBtn" class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="Undo">
         <i class="bi bi-arrow-counterclockwise"></i>
       </button>
       <!--redo Button-->
-      <button class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="Redo">
+      <button id = "redoBtn" class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="Redo">
         <i class="bi bi-arrow-clockwise"></i>
       </button>
       <!--new topic (sibling node) Button-->
-      <button class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="New sibling node">
+      <button id = "newSiblingBtn" class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="New sibling node">
         <i class="bi bi-node-plus-fill"></i>
       </button>
       <!--new subtopic (child node) button (Icon rotated 90 degrees)-->
-      <button class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="New child node">
+      <button id = "newChildBtn" class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="New child node">
         <i class="bi bi-diagram-2-fill" style="transform: rotate(-90deg); display: inline-block;"></i>
       </button>
       <!--tags button-->
-      <button class="btn btn-secondary" type="button" data-bs-toggle="tooltip" title="Tags">
+      <button id = "tagsBtn" class="btn btn-secondary" type="button" data-bs-toggle="tooltip" title="Tags">
         <i class="bi bi-tags"></i>
       </button>
     </div>
