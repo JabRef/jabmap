@@ -83,3 +83,15 @@ const options = {
 // create and render mindmap
 const jm = new jsMind(options);
 jm.show(mind);
+
+//--- Button click handlers ---
+
+// new sibling node
+newSiblingBtn.onclick = function(){
+    jm.shortcut.handle_addbrother(jm, null); //call the shortcut-handler for adding a sibling node
+}
+
+// new child node
+newChildBtn.onclick = function(){
+    jm.shortcut.handle_addchild(jm, null); //call the shortcut-handler for adding a child node
+}
