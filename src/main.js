@@ -89,9 +89,8 @@ const options = {
 // create and render mindmap
 const jm = new jsMind(options);
 jm.show(mind);
-
-// init Actionstack for undo/redo
-let as = new ActionStack();
+// add initial state to action stack
+jm.actionStack.add(mind);
 
 //--- Button click handlers ---
 
@@ -107,8 +106,8 @@ openBtn.onclick = function(){
 
 // undo
 undoBtn.onclick = function(){
-    // undo magic here..
-    let undoRes = as.undo()
+    // undo operation and display result (mindmap in previous state)
+    let undoRes = jm.actionStack.undo()
     if(!!undoRes){
         jm.show(undoRes);
     }
@@ -116,8 +115,8 @@ undoBtn.onclick = function(){
 
 // redo
 redoBtn.onclick = function(){
-    // redo magic here..
-    let redoRes = as.redo()
+    // redo operation and display result (mindmap in previous state)
+    let redoRes = jm.actionStack.redo()
     if(!!redoRes){
         jm.show(redoRes);
     }

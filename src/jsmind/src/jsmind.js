@@ -1,7 +1,7 @@
 /**
  * @license BSD
- * @copyright 2014-2025 hizzgdev@163.com
- *
+ * @copyright 2014-2025 hizzgdev@163.com - slightly altered
+ * altered lines are marked with '// altered lines: --- //end'
  * Project Home:
  *   https://github.com/hizzgdev/jsmind/
  */
@@ -18,6 +18,10 @@ import { Plugin, register as _register_plugin, apply as apply_plugins } from './
 import { format } from './jsmind.format.js';
 import { $ } from './jsmind.dom.js';
 import { util as _util } from './jsmind.util.js';
+
+// altered lines:
+import { ActionStack } from '../../ActionStack.js';
+// end
 
 export default class jsMind {
     static mind = Mind;
@@ -37,6 +41,10 @@ export default class jsMind {
         this.initialized = false;
         this.mind = null;
         this.event_handles = [];
+        // altered lines:
+        // added actionstack to jsmind
+        this.actionStack = new ActionStack();
+        // end
         this.init();
     }
 
@@ -428,6 +436,11 @@ export default class jsMind {
                 data: [node_id],
                 node: parent_id,
             });
+            // altered lines:
+            // save current state to actionstack after removing a node
+            var mindmapState = this.get_data('node_tree');
+            this.actionStack.add(mindmapState);
+            // end
             return true;
         } else {
             logger.error('fail, this mind map is not editable');
@@ -475,6 +488,11 @@ export default class jsMind {
                     data: [node_id, before_id, parent_id, direction],
                     node: node_id,
                 });
+                // altered lines:
+                // save current state to actionstack after moving a node
+                var mindmapState = this.get_data('node_tree');
+                this.actionStack.add(mindmapState);
+                // end
             }
         } else {
             logger.error('fail, this mind map is not editable');
