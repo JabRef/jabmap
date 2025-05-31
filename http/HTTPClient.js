@@ -74,9 +74,9 @@ class HTTPClient {
      * @param { string } path - The path to the requested map.
      * @returns { object } - The requested mind map object.
     */
-    async loadMap(path = "") {
+    async loadMap(path = "libraries/demo/map") {
         // The path will probably be included into url definition (coming in sprint 2)
-        const url = "libraries/demo/map";
+        const url = path;
         const options = {
             method: "GET",
             headers: { "Content-Type": "application/json" }
@@ -88,12 +88,13 @@ class HTTPClient {
     /**
      * Sends a mind map to JabRef's server to save.
      * @param { map } mindMap - The mind map to save.
+     * @param { string } path - The path to save mind map into.
      * @returns { string } - A string of the request's result.
     */
-    async saveMap(mindMap) {
+    async saveMap(mindMap, path = "libraries/demo/map") {
         // The url will provably be modified according to mindMap's properties (name, id, whatsoever)
         // (coming in sprint 2) 
-        const url = "libraries/demo/map";
+        const url = path;
         const options = {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
