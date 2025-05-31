@@ -3,6 +3,7 @@
  */
 class HTTPClient {
     #host = "http://localhost:6050/";
+    NULL_MAP = { map: }
 
     constructor() { }
 
@@ -72,7 +73,7 @@ class HTTPClient {
      * @param { string } path - The path to the requested map.
      * @returns { object } - The requested mind map object.
     */
-    async LoadMap(path = "") {
+    async loadMap(path = "") {
         // The path will probably be included into url definition (coming in sprint 2)
         const url = "libraries/demo/map";
         const options = {
@@ -88,7 +89,7 @@ class HTTPClient {
      * @param { map } mindMap - The mind map to save.
      * @returns { string } - A string of the request's result.
     */
-    async SaveMap(mindMap) {
+    async saveMap(mindMap) {
         // The url will provably be modified according to mindMap's properties (name, id, whatsoever)
         // (coming in sprint 2) 
         const url = "libraries/demo/map";
@@ -105,7 +106,7 @@ class HTTPClient {
      * Requests a list of stored mind maps saved on the server.
      * @returns { object } - A list of available mind maps stored on the server.
      */
-    async ListMaps() {
+    async listMaps() {
         const url = "libraries";
         const options = {
             method: "GET",

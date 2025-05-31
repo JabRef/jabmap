@@ -4,6 +4,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import jsMind from './jsmind/src/jsmind.js';
 import './jsmind/src/plugins/jsmind.draggable-node.js';
 import "./ActionStack.js";
+import '../http/HTTPClient.js';
 
 // "load" mindmap data
 const mind = {
@@ -98,6 +99,8 @@ const jm = new jsMind(options);
 jm.show(mind);
 // add initial state to action stack
 jm.actionStack.add(mind);
+// create a HTTP client instance
+const httpClient = new HTTPClient();
 
 //--- Button click handlers ---
 
