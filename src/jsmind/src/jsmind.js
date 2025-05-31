@@ -93,6 +93,20 @@ export default class jsMind {
 
         apply_plugins(this, this.options.plugin);
     }
+    // altered lines:
+    undo(){
+        let undoRes = this.actionStack.undo()
+        if(!!undoRes){
+            this.show(undoRes);
+        }
+    }
+    redo() {
+        let redoRes = this.actionStack.redo()
+        if (!!redoRes) {
+            this.show(redoRes);
+        }
+    }
+    // end
     get_editable() {
         return this.options.editable;
     }

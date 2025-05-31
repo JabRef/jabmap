@@ -4,9 +4,6 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import jsMind from './jsmind/src/jsmind.js';
 import './jsmind/src/plugins/jsmind.draggable-node.js';
 import "./ActionStack.js";
-import {
-    ActionStack
-} from "./ActionStack";
 
 // "load" mindmap data
 const mind = {
@@ -55,9 +52,9 @@ const options = {
             engine: 'canvas', 	// engine for drawing lines between nodes in the mindmap
             hmargin:100, 		// Minimum horizontal distance of the mindmap from the outer frame of the container
             vmargin:50, 			// Minimum vertical distance of the mindmap from the outer frame of the container
-            line_width:6, 		// thickness of the mindmap line
+            line_width:3, 		// thickness of the mindmap line
             line_color:'#555', 	// Thought mindmap line color
-            line_style:'straight', // line style, straight or curved
+            line_style:'curved', // line style, straight or curved
             custom_line_render: null,  // customized line render function
             draggable: true,    // Drag the mind map with your mouse, when it's larger that the container
             hide_scrollbars_when_draggable: false, // Hide container scrollbars, when mind map is larger than container and draggable option is true.
@@ -71,7 +68,15 @@ const options = {
         },
         shortcut:{
             enable:true, 		// whether to enable shortcut
-            handles:{}, 			// Named shortcut key event processor
+            handles:{
+                'undo': function(jm, e) {
+                    // undo operation and display result (mindmap in previous state)
+                    jm.undo();                },
+                'redo': function(jm, e) {
+                    // redo operation and display result (mindmap in previous state)
+                    jm.redo();
+                }
+            }, 			// Named shortcut key event processor
             mapping:{ 			// shortcut key mapping
                 addchild : [45, 4096+13], 	// <Insert>, <Ctrl> + <Enter>
                 addbrother : 13, // <Enter>
@@ -82,6 +87,8 @@ const options = {
                 up : 38, 		// <Up>
                 right : 39, 		// <Right>
                 down : 40, 		// <Down>
+                undo : 4096 + 90,
+                redo : 4096 + 1024 + 90
             }
         },
     };
@@ -107,19 +114,13 @@ openBtn.onclick = function(){
 // undo
 undoBtn.onclick = function(){
     // undo operation and display result (mindmap in previous state)
-    let undoRes = jm.actionStack.undo()
-    if(!!undoRes){
-        jm.show(undoRes);
-    }
+    jm.undo();
 }
 
 // redo
 redoBtn.onclick = function(){
     // redo operation and display result (mindmap in previous state)
-    let redoRes = jm.actionStack.redo()
-    if(!!redoRes){
-        jm.show(redoRes);
-    }
+    jm.redo();
 }
 
 // new sibling node
