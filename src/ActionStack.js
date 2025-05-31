@@ -2,7 +2,7 @@
  * Provides Undo and Redo functionalities to cancel
  * and reapply latest changes made to a mind map.
  */
-class ActionStack {
+export class ActionStack {
     // The maximum amount of actions to cancel/reapply
     #STACK_SIZE = 10;
 

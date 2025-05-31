@@ -3,6 +3,10 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import jsMind from './jsmind/src/jsmind.js';
 import './jsmind/src/plugins/jsmind.draggable-node.js';
+import "./ActionStack.js";
+import {
+    ActionStack
+} from "./ActionStack";
 
 // "load" mindmap data
 const mind = {
@@ -39,6 +43,7 @@ const mind = {
         ]
     }
 };
+
 // specify creation options
 const options = {
         container : 'jsmind_container', 			// [required] ID of the container
@@ -80,9 +85,13 @@ const options = {
             }
         },
     };
+
 // create and render mindmap
 const jm = new jsMind(options);
 jm.show(mind);
+
+// init Actionstack for undo/redo
+let as = new ActionStack();
 
 //--- Button click handlers ---
 
@@ -99,11 +108,19 @@ openBtn.onclick = function(){
 // undo
 undoBtn.onclick = function(){
     // undo magic here..
+    let undoRes = as.undo()
+    if(!!undoRes){
+        jm.show(undoRes);
+    }
 }
 
 // redo
 redoBtn.onclick = function(){
     // redo magic here..
+    let redoRes = as.redo()
+    if(!!redoRes){
+        jm.show(redoRes);
+    }
 }
 
 // new sibling node
