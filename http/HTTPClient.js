@@ -104,6 +104,17 @@ export class HTTPClient {
         return this.#performFetch(url, options)
     }
 
+    async saveNewMap(mindMap, path = "libraries/demo/map") {
+        const url = path;
+        const options = {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({map: mindMap})
+        }
+
+        return this.#performFetch(url, options)
+    }
+
     /**
      * Requests a list of stored mind maps saved on the server.
      * @returns { object } - A list of available mind maps stored on the server.

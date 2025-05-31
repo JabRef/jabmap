@@ -108,14 +108,15 @@ let httpClient = new HTTPClient();
 
 // saving
 saveBtn.onclick = function(){
-    // saving jabmaps magic here..
+    // sends mindmap content to JabRef's http server to save
     httpClient.saveMap(jm.get_data());
 }
 
 // open
 openBtn.onclick = async function(){
-    // opening jabmaps magic here..
+    // requests mindmap data from JabRef's http server
     let response = await httpClient.loadMap();
+    // getting the map that will be displayed by jsMind
     let map = response.map;
     if (!!map) {
         jm.show(map);
