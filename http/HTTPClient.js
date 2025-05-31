@@ -1,7 +1,7 @@
 /**
  * Provides HTTP-connection functionality.
  */
-class HTTPClient {
+export class HTTPClient {
     #host = "http://localhost:6050/";
 
     constructor() {
