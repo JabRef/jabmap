@@ -4,6 +4,9 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import jsMind from './jsmind/src/jsmind.js';
 import './jsmind/src/plugins/jsmind.draggable-node.js';
 import "./ActionStack.js";
+import { HTTPClient } from "../http/HTTPClient";
+
+'../http/HTTPClient.js';
 
 // "load" mindmap data
 const mind = {
@@ -98,17 +101,43 @@ const jm = new jsMind(options);
 jm.show(mind);
 // add initial state to action stack
 jm.actionStack.add(mind);
+// create a HTTP client instance
+let httpClient = new HTTPClient();
 
 //--- Button click handlers ---
 
 // saving
 saveBtn.onclick = function(){
-    // saving jabmaps magic here..
+    // sends mindmap content to JabRef's http server to save
+    httpClient.saveMap(jm.get_data());
 }
 
-// open
-openBtn.onclick = function(){
-    // opening jabmaps magic here..
+// open - opens a dialog to select available mindmaps
+openBtn.onclick = async function(){
+    // request list of available mindmaps from JabRef's http server
+    let response = await httpClient.listMaps();
+
+    let select = document.getElementById('openMindmapSelect');
+    // reset select options
+    select.innerHTML = '';
+
+    // populate select element with options
+    for (let i = 0; i < response.length; i++) {
+        select.innerHTML += '<option value="' + response[i] + '">' + response[i] + '</option>';
+    }
+}
+
+// Modal dialog confirmation button
+openSelectedMapBtn.onclick = async function(){
+    // get selected mindmap name
+    let select = document.getElementById('openMindmapSelect');
+    let selectedMindmap = select.options[select.selectedIndex].value;
+
+    // get mindmap data from server
+    let responseMindmap = await httpClient.loadMap("libraries/" + selectedMindmap + "/map");
+
+    // display mindmap
+    jm.show(responseMindmap.map);
 }
 
 // undo

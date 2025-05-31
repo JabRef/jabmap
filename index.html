@@ -38,7 +38,7 @@
       <button id = "saveBtn" class="btn btn-light me-2" type="button" data-bs-toggle="tooltip" title="Save">
         <i class="bi bi-save"></i> Save
       </button>
-      <button id = "openBtn" class="btn btn-light me-2" type="button" data-bs-toggle="tooltip" title="Open">
+      <button id = "openBtn" class="btn btn-light me-2" type="button" data-bs-toggle="modal" title="Open" data-bs-target="#selectMindmapModal">
         <i class="bi bi-folder2-open"></i> Open
       </button>
     </div>
@@ -69,7 +69,29 @@
     </div>
   </div>
 </nav>
+
+<!--mindmap environment-->
 <div id="jsmind_container" style="width:100%;height:100vh;background:#f4f4f4;"></div>
+
+<!-- Modal for the "open" dialog-->
+<div class="modal fade" id="selectMindmapModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Choose a JabMap to open</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <select class="form-select" id="openMindmapSelect" size="10">
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id = "openSelectedMapBtn" class="btn btn-outline-secondary" data-bs-dismiss="modal">Open</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script type="module" src="/src/main.js"></script>
 </body>
 </html>
