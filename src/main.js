@@ -112,15 +112,32 @@ saveBtn.onclick = function(){
     httpClient.saveMap(jm.get_data());
 }
 
-// open
+// open - opens a dialog to select available mindmaps
 openBtn.onclick = async function(){
-    // requests mindmap data from JabRef's http server
-    let response = await httpClient.loadMap();
-    // getting the map that will be displayed by jsMind
-    let map = response.map;
-    if (!!map) {
-        jm.show(map);
+    // request list of available mindmaps from JabRef's http server
+    let response = await httpClient.listMaps();
+
+    let select = document.getElementById('openMindmapSelect');
+    // reset select options
+    select.innerHTML = '';
+
+    // populate select element with options
+    for (let i = 0; i < response.length; i++) {
+        select.innerHTML += '<option value="' + response[i] + '">' + response[i] + '</option>';
     }
+}
+
+// Modal dialog confirmation button
+openSelectedMapBtn.onclick = async function(){
+    // get selected mindmap name
+    let select = document.getElementById('openMindmapSelect');
+    let selectedMindmap = select.options[select.selectedIndex].value;
+
+    // get mindmap data from server
+    let responseMindmap = await httpClient.loadMap("libraries/" + selectedMindmap + "/map");
+
+    // display mindmap
+    jm.show(responseMindmap.map);
 }
 
 // undo
