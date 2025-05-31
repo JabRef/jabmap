@@ -4,7 +4,9 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import jsMind from './jsmind/src/jsmind.js';
 import './jsmind/src/plugins/jsmind.draggable-node.js';
 import "./ActionStack.js";
-import '../http/HTTPClient.js';
+import { HTTPClient } from "../http/HTTPClient";
+
+'../http/HTTPClient.js';
 
 // "load" mindmap data
 const mind = {
@@ -100,18 +102,24 @@ jm.show(mind);
 // add initial state to action stack
 jm.actionStack.add(mind);
 // create a HTTP client instance
-const httpClient = new HTTPClient();
+let httpClient = new HTTPClient();
 
 //--- Button click handlers ---
 
 // saving
 saveBtn.onclick = function(){
     // saving jabmaps magic here..
+    httpClient.saveMap(jm.get_data());
 }
 
 // open
-openBtn.onclick = function(){
+openBtn.onclick = async function(){
     // opening jabmaps magic here..
+    let response = await httpClient.loadMap();
+    let map = response.map;
+    if (!!map) {
+        jm.show(map);
+    }
 }
 
 // undo
