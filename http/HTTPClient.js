@@ -3,21 +3,22 @@
  */
 class HTTPClient {
     #host = "http://localhost:6050/";
-    NULL_MAP = { map: }
 
-    constructor() { }
+    constructor() {
+        this.NULL_MAP = { map: {} };
+    }
 
     /**
      * Sends a HTTP-request to the JabRef's server.
      * @param { string } url - The server's URL to make a request to. 
      * @param { any } options - Optional request's options.
-     * @returns { object | string }
+     * @returns { object }
      * - An **object** in case of a `GET request` or
-     * - A **string** in case of a `PUT request` or
-     * - An **empty string** `""`, if any request failed.
+     * - A **object** { map: {} } in case of a `PUT request`
+     * if any request failed.
      */
     async #performFetch(url, options = null) {
-        let fetchResult = "";
+        let fetchResult = this.NULL_MAP;
         let logMessage = "";
 
         const requestUrl = this.#host.concat(url);
