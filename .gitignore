@@ -1,3 +1,5 @@
+src/jsmind/src/package-lock.json
+
 # Logs
 logs
 *.log
@@ -103,6 +105,10 @@ dist
 # vuepress v2.x temp and cache directory
 .temp
 .cache
+
+# Build output
+dist/
+.vite/
 
 # vitepress build output
 **/.vitepress/dist
