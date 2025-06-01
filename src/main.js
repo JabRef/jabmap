@@ -109,32 +109,36 @@ saveBtn.onclick = function () {
     httpClient.saveMap(jm.get_data());
 }
 
-// open - opens a dialog to select available mindmaps
-openBtn.onclick = async function(){
-    // request list of available mindmaps from JabRef's http server
-    let response = await httpClient.listMaps();
+// opening - opens a dialog to select available mind maps
+openBtn.onclick = async function () {
+    // request a list of available mind maps from JabRef's HTTP server
+    let availableMaps = await httpClient.listMaps();
 
-    let select = document.getElementById('openMindmapSelect');
-    // reset select options
-    select.innerHTML = '';
-
-    // populate select element with options
-    for (let i = 0; i < response.length; i++) {
-        select.innerHTML += '<option value="' + response[i] + '">' + response[i] + '</option>';
+    // access bootstrap's <form-select> element
+    let bsSelect = document.getElementById('openMindmapSelect');
+    // and replace it's options with retrieved ones
+    bsSelect.innerHTML = '';
+    for (let i = 0; i < availableMaps.length; i++) {
+        bsSelect.innerHTML +=
+            '<option value="' + availableMaps[i] + '">'
+            + availableMaps[i]
+            + '</option>';
     }
 }
 
-// Modal dialog confirmation button
-openSelectedMapBtn.onclick = async function(){
-    // get selected mindmap name
-    let select = document.getElementById('openMindmapSelect');
-    let selectedMindmap = select.options[select.selectedIndex].value;
+// <modal> dialog confirmation button
+openSelectedMapBtn.onclick = async function () {
+    // access bootstrap's <form-select> element
+    let bsSelect = document.getElementById('openMindmapSelect');
 
-    // get mindmap data from server
-    let responseMindmap = await httpClient.loadMap("libraries/" + selectedMindmap + "/map");
+    // get selected mind map's name and it's data from server
+    let selectedOption = bsSelect.options[bsSelect.selectedIndex].value;
 
-    // display mindmap
-    jm.show(responseMindmap.map);
+    let mindMapPath = "libraries/" + selectedOption + "/map";
+    let loadResponse = await httpClient.loadMap(mindMapPath);
+
+    // display the retrieved mind map
+    jm.show(loadResponse.map);
 }
 
 // undo - discard the last operation (display the previous state)
