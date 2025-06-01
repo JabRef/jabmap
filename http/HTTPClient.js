@@ -5,17 +5,18 @@ export class HTTPClient {
     #host = "http://localhost:6050/";
 
     constructor() {
+        // The default return value for PUT and POST requests
         this.NULL_MAP = { map: {} };
     }
 
     /**
      * Sends a HTTP-request to the JabRef's server.
      * @param { string } url - The server's URL to make a request to. 
-     * @param { any } options - Optional request's options.
-     * @returns { object }
+     * @param { object } options - Optional request's options.
+     * @returns
      * - An **object** in case of a `GET request` or
-     * - A **object** { map: {} } in case of a `PUT request`
-     * if any request failed.
+     * - An **object** { map: {} } in case of a `PUT / POST request`
+     * or if any request failed.
      */
     async #performFetch(url, options = null) {
         let fetchResult = this.NULL_MAP;
@@ -37,9 +38,7 @@ export class HTTPClient {
                 throw new Error("Request's result is not ok ( -.-)");
             }
 
-            // Defining default resulting output
-            fetchResult = "No data received back.";
-            // If some output is awaited, save it instead
+            // If some output is awaited, save it
             if (options.method !== "PUT") {
                 fetchResult = await response.json();
             }
@@ -55,7 +54,7 @@ export class HTTPClient {
             logMessage = `${options.method} ${url} Request failed (.'T_T)`;
 
             // If connection was present, provide more details
-            if (typeof(response) !== "undefined") {
+            if (typeof (response) !== "undefined") {
                 logMessage +=
                     `-(${response.status}).\n` +
                     `Options:\n` +
@@ -71,11 +70,10 @@ export class HTTPClient {
 
     /**
      * Requests a mind map (.jmp file) from JabRef's server.
-     * @param { string } path - The path to the requested map.
-     * @returns { object } - The requested mind map object.
+     * @param { string } path - The path to the requested mind map.
+     * @returns The requested mind map object.
     */
     async loadMap(path = "libraries/demo/map") {
-        // The path will probably be included into url definition (coming in sprint 2)
         const url = path;
         const options = {
             method: "GET",
@@ -87,29 +85,35 @@ export class HTTPClient {
 
     /**
      * Sends a mind map to JabRef's server to save.
-     * @param { map } mindMap - The mind map to save.
-     * @param { string } path - The path to save mind map into.
-     * @returns { string } - A string of the request's result.
+     * @param { object } mindMap - The mind map to save.
+     * @param { string } path - The path to save the mind map to.
+     * @returns An empty map object (NULL_MAP).
     */
     async saveMap(mindMap, path = "libraries/demo/map") {
-        // The url will provably be modified according to mindMap's properties (name, id, whatsoever)
-        // (coming in sprint 2) 
+        // The url will probably be modified according to mindMap's properties (coming in sprint 2)
         const url = path;
         const options = {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ map: mindMap })
         }
-        
+
         return this.#performFetch(url, options)
     }
 
+    /**
+     * Sends a mind map to JabRef's server to save for the first time.
+     * @param { object } mindMap - The mind map to save.
+     * @param { string } path - The path to save the mind map to.
+     * @returns An empty map object (NULL_MAP).
+     */
     async saveNewMap(mindMap, path = "libraries/demo/map") {
+        // The url will probably be modified according to mindMap's properties (coming in sprint 2)
         const url = path;
         const options = {
             method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({map: mindMap})
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ map: mindMap })
         }
 
         return this.#performFetch(url, options)
@@ -117,7 +121,7 @@ export class HTTPClient {
 
     /**
      * Requests a list of stored mind maps saved on the server.
-     * @returns { object } - A list of available mind maps stored on the server.
+     * @returns A list of available mind maps stored on the server.
      */
     async listMaps() {
         const url = "libraries";
