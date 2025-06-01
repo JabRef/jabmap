@@ -11,18 +11,18 @@ The current state of the application is hosted on [github pages](https://jabref.
 ## 💾 Installation
 ### Building the app
 Currently, there is no production build available for download so you have to build it yourself.
-To do this, you need to have npm and node.js installed. Installing them with [nvm](https://github.com/nvm-sh/nvm) is the recommended way. 
+To do this, you need to have `npm` and `node.js` installed. Installing them with [nvm](https://github.com/nvm-sh/nvm) is the recommended way.
 
-Installation Guide: https://docs.npmjs.com/downloading-and-installing-node-js-and-npm
+Installation Guide for Windows and Linux / OS X is available [here](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm).
 
-Then, clone this repo onto your machine and open a terminal session at the project root.
+Then, clone this repository onto your machine and open a terminal session at the project root.
 
-Run the following commands:
-1. ```npm install``` this will install all necessary packages in a 'node_modules' directory. You may run this command to update existing packages.
-2. ```npm run build``` to build the app. This will bundle the app and dependencies into a 'dist' directory.
-3. ```npm run preview``` to preview the build-output in your browser. (click on the link in the terminal)
+Then, run the following commands:
+1. ```npm install```  - this will install all necessary packages in a `./node_modules` directory. You may run this command to update existing packages.
+2. ```npm run build``` - this will bundle the app and dependencies into a `./dist` directory.
+3. ```npm run preview``` - this will run the preview of the build-output in your browser (_click on the link in the terminal_).
 
-Alternatively, you can simply open the index.html file in the dist directory after building to run the application.
+Alternatively, you can simply open the `index.html` file (_using IDEA_) in the `./dist` directory after building and choose a browser (_in the top right corner_) to run the application.
 
 ### Getting the server
 As mentioned above, saving and loading of mind maps are handled by JabRef's HTTP server. Currently you have to start it manually:
