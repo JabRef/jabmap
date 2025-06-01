@@ -104,8 +104,8 @@ export default class jsMind {
         this.actionStack.add(mindMapState);
     }
     /**
-     * Discards latest change (relative to current state)
-     * made by showing the previous mind map's state.
+     * Discards latest change made (relative to current state)
+     * by showing the previous mind map's state.
      */
     undo() {
         let undoRes = this.actionStack.undo();
@@ -115,7 +115,7 @@ export default class jsMind {
     }
     /**
      * Reapplies latest change made (relative to current state)
-     * by showing the previous mind map's state.
+     * by showing the following mind map's state.
      */
     redo() {
         let redoRes = this.actionStack.redo();

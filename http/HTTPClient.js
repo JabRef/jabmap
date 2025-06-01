@@ -38,9 +38,7 @@ export class HTTPClient {
                 throw new Error("Request's result is not ok ( -.-)");
             }
 
-            // Defining default resulting output
-            fetchResult = "No data received back.";
-            // If some output is awaited, save it instead
+            // If some output is awaited, save it
             if (options.method !== "PUT") {
                 fetchResult = await response.json();
             }
