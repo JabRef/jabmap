@@ -3,12 +3,9 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import jsMind from './jsmind/src/jsmind.js';
 import './jsmind/src/plugins/jsmind.draggable-node.js';
-import "./ActionStack.js";
-import { HTTPClient } from "../http/HTTPClient";
+import { HTTPClient } from '../http/HTTPClient';
 
-'../http/HTTPClient.js';
-
-// "load" mindmap data
+// "load" initial mind map data
 const mind = {
     meta: {
         name: "jsMind remote",
@@ -96,11 +93,12 @@ const options = {
         },
     };
 
-// create and render mindmap
+// create a render for mind maps and display the initial one
 const jm = new jsMind(options);
 jm.show(mind);
-// add initial state to action stack
-jm.actionStack.add(mind);
+// add the initial state to the action stack
+jm.saveState();
+
 // create a HTTP client instance
 let httpClient = new HTTPClient();
 
