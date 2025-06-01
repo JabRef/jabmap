@@ -6,7 +6,7 @@ Next-Generation scientific mind mapping.
  <img width="1549" alt="JabMap opening a mindmap example" src="https://github.com/user-attachments/assets/23aa56d0-4432-4e5f-957b-8797d36a22fd" />
 
 ## 🌟 Try It Out!
-The current state of the application is hosted on [github pages](https://jabref.github.io/jabmap/) for you to try out. Note that saving and loading does not work when running the app like this. This is because both require communcation with JabRef's HTTP server which will get blocked for security reasons by your browser. 
+The current state of the application is hosted on [github pages](https://jabref.github.io/jabmap/) for you to try out. Note that saving and loading mind maps does not work when running the app like this. This is because both require communication with the [JabRef's HTTP server](#getting-the-server) which will be restricted by your browser for security reasons. 
 
 ## 💾 Installation
 ### Building the app
@@ -25,12 +25,14 @@ Run the following commands:
 Alternatively, you can simply open the index.html file in the dist directory after building to run the application.
 
 ### Getting the server
-As mentioned above, saving and opening are handled by JabRef through it's HTTP server. Currently you have to start it manually.
+As mentioned above, saving and loading of mind maps are handled by JabRef's HTTP server. Currently you have to start it manually:
 
-First clone the repo at https://github.com/iloveskittles82/jabref
+First clone our [JabRef's fork repository](https://github.com/iloveskittles82/jabref) (_Note: It is recommended to complete this step of_ [_JabRef's setup guide_](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-12-build.html)).
 
-Then, open it in your editor of choice (IDEA works well for this) and locate the 'rest-api.http' file at 'jabsrv/src/test/rest-api.http'
+After you cloned the repository, open it in editor of your choice (_IDEA works well for this_) and locate the `jabsrv/src/test/rest-api.http` file.
 
 Follow the steps described at the top of the file to start the server.
 
-(Note: also see https://devdocs.jabref.org/code-howtos/http-server.html for more information on how to start the server)
+_Alternatively_ you can start it with the `main()` method of `org.jabref.http.server.cli.ServerCli` package located at `./jabsrv-cli.src.main.java`.
+
+More about starting the server in [JabRef's server documentation](https://devdocs.jabref.org/code-howtos/http-server.html)
