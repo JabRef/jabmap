@@ -107,7 +107,7 @@ export class HTTPClient {
     async saveNewMap(mindMap, path = "libraries/demo/map") {
         const url = path;
         const options = {
-            method: "POST",
+            method: "PUT",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({map: mindMap})
         }
