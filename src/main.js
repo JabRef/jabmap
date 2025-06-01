@@ -41,7 +41,7 @@ const mind = {
     }
 };
 
-// specify creation options
+// specify editor (jsMind's) options
 const options = {
         container : 'jsmind_container', 			// [required] ID of the container
         editable : true, 		// Is editing enabled?
@@ -104,9 +104,8 @@ let httpClient = new HTTPClient();
 
 //--- Button click handlers ---
 
-// saving
-saveBtn.onclick = function(){
-    // sends mindmap content to JabRef's http server to save
+// saving - sends mind map's content to JabRef's HTTP server
+saveBtn.onclick = function () {
     httpClient.saveMap(jm.get_data());
 }
 
@@ -138,33 +137,31 @@ openSelectedMapBtn.onclick = async function(){
     jm.show(responseMindmap.map);
 }
 
-// undo
-undoBtn.onclick = function(){
-    // undo operation and display result (mindmap in previous state)
+// undo - discard the last operation (display the previous state)
+undoBtn.onclick = function () {
     jm.undo();
 }
 
-// redo
-redoBtn.onclick = function(){
-    // redo operation and display result (mindmap in previous state)
+// redo - reapply the next operation (display the following state)
+redoBtn.onclick = function () {
     jm.redo();
 }
 
-// new sibling node
-newSiblingBtn.onclick = function(){
-    if(!!jm){
-        jm.shortcut.handle_addbrother(jm, null); //call the shortcut-handler for adding a sibling node
+// new sibling node - call the default shortcut-handler
+newSiblingBtn.onclick = function () {
+    if (!!jm) {
+        jm.shortcut.handle_addbrother(jm, null);
     }
 }
 
-// new child node
-newChildBtn.onclick = function(){
-    if(!!jm){
-        jm.shortcut.handle_addchild(jm, null); //call the shortcut-handler for adding a child node
+// new child node - call the default shortcut-handler
+newChildBtn.onclick = function () {
+    if (!!jm) {
+        jm.shortcut.handle_addchild(jm, null);
     }
 }
 
 // tags
-tagsBtn.onclick = function(){
+tagsBtn.onclick = function () {
     // tags magic here..
 }
