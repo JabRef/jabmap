@@ -330,13 +330,13 @@ export class ViewProvider {
             } else {
                 this.jm.update_node(node.id, topic);
             }
+            // altered lines:
+            // Saves current mindmap state on the action stack for undo/redo after confirming topic for a node
+            var mindmapState = this.jm.get_data('node_tree');
+            this.jm.actionStack.add(mindmapState);
+            // end
         }
         this.e_panel.focus();
-        // altered lines:
-        // Saves current mindmap state on the action stack for undo/redo after confirming topic for a node
-        var mindmapState = this.jm.get_data('node_tree');
-        this.jm.actionStack.add(mindmapState);
-        // end
     }
     get_view_offset() {
         var bounds = this.layout.bounds;
