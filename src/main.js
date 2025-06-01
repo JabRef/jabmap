@@ -43,55 +43,56 @@ const mind = {
 
 // specify editor (jsMind's) options
 const options = {
-        container : 'jsmind_container', 			// [required] ID of the container
-        editable : true, 		// Is editing enabled?
-        theme : null, 			// theme
-        mode :'full', 			// display mode
-        support_html : true, 	// Does it support HTML elements in the node?
-        view:{
-            engine: 'canvas', 	// engine for drawing lines between nodes in the mindmap
-            hmargin:100, 		// Minimum horizontal distance of the mindmap from the outer frame of the container
-            vmargin:50, 			// Minimum vertical distance of the mindmap from the outer frame of the container
-            line_width:3, 		// thickness of the mindmap line
-            line_color:'#555', 	// Thought mindmap line color
-            line_style:'curved', // line style, straight or curved
-            custom_line_render: null,  // customized line render function
-            draggable: true,    // Drag the mind map with your mouse, when it's larger that the container
-            hide_scrollbars_when_draggable: false, // Hide container scrollbars, when mind map is larger than container and draggable option is true.
-            node_overflow: 'hidden' // Text overflow style in node
-        },
-        layout:{
-            hspace:30, 			// Horizontal spacing between nodes
-            vspace:20, 			// Vertical spacing between nodes
-            pspace:13,			// Horizontal spacing between node and connection line (to place node expander)
-            cousin_space:0			// Additional vertical spacing between child nodes of neighbor nodes
-        },
-        shortcut:{
-            enable:true, 		// whether to enable shortcut
-            handles:{
-                'undo': function(jm, e) {
-                    // undo operation and display result (mindmap in previous state)
-                    jm.undo();                },
-                'redo': function(jm, e) {
-                    // redo operation and display result (mindmap in previous state)
-                    jm.redo();
-                }
-            }, 			// Named shortcut key event processor
-            mapping:{ 			// shortcut key mapping
-                addchild : [45, 4096+13], 	// <Insert>, <Ctrl> + <Enter>
-                addbrother : 13, // <Enter>
-                editnode : 113, 	// <F2>
-                delnode : 46, 	// <Delete>
-                toggle : 32, 	// <Space>
-                left : 37, 		// <Left>
-                up : 38, 		// <Up>
-                right : 39, 		// <Right>
-                down : 40, 		// <Down>
-                undo : 4096 + 90,
-                redo : 4096 + 1024 + 90
+    container: 'jsmind_container',      // [required] ID of the container
+    editable: true,                     // Is editing enabled?
+    theme: null,                        // Theme
+    mode: 'full',                       // Display mode
+    support_html: true,                 // Does it support HTML elements in the node?
+    view: {
+        engine: 'canvas',               // Engine for drawing lines between nodes in the mind map
+        hmargin: 100,                   // Minimum horizontal distance of the mind map from the outer frame of the container
+        vmargin: 50,                    // Minimum vertical distance of the mind map from the outer frame of the container
+        line_width: 3,                  // Thickness of the mind map line
+        line_color: '#555',             // Thought mind map line color
+        line_style: 'curved',           // Line style, straight or curved
+        custom_line_render: null,       // Customized line render function
+        draggable: true,                // Drag the mind map with your mouse, when it's larger that the container
+        hide_scrollbars_when_draggable: false,  // Hide container scrollbars, when mind map is larger than container and draggable option is true
+        node_overflow: 'hidden'         // Text overflow style in node
+    },
+    layout: {
+        hspace: 30,                     // Horizontal spacing between nodes
+        vspace: 20,                     // Vertical spacing between nodes
+        pspace: 13,                     // Horizontal spacing between node and connection line (to place node expander)
+        cousin_space: 0                 // Additional vertical spacing between child nodes of neighbor nodes
+    },
+    shortcut: {
+        enable: true,                   // Whether to enable shortcut
+        handles: {                      // Named shortcut key event processor
+            'undo': function (jm, e) {
+                // display mind map's previous state (undo the last operation)
+                jm.undo();
+            },
+            'redo': function (jm, e) {
+                // display mind map's next state (redo the next operation)
+                jm.redo();
             }
         },
-    };
+        mapping: { 			            // Shortcut key mapping
+            addchild: [45, 4096 + 13],  // <Insert>, <Ctrl> + <Enter>
+            addbrother: 13,             // <Enter>
+            editnode: 113, 	            // <F2>
+            delnode: 46, 	            // <Delete>
+            toggle: 32, 	            // <Space>
+            left: 37, 		            // <Left>
+            up: 38, 		            // <Up>
+            right: 39, 		            // <Right>
+            down: 40, 		            // <Down>
+            undo: 4096 + 90,            // <Ctrl> + <Z>
+            redo: 4096 + 1024 + 90      // <Ctrl> + <Shift> + <Z>
+        }
+    },
+};
 
 // create a render for mind maps and display the initial one
 const jm = new jsMind(options);
