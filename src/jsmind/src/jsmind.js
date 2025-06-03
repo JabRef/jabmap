@@ -1,7 +1,8 @@
 /**
  * @license BSD
  * @copyright 2014-2025 hizzgdev@163.com - slightly altered
- * altered lines are marked with '// altered lines: --- //end'
+ * Altered lines are marked with '// Altered lines: --- // End'
+ * 
  * Project Home:
  *   https://github.com/hizzgdev/jsmind/
  */
@@ -19,9 +20,9 @@ import { format } from './jsmind.format.js';
 import { $ } from './jsmind.dom.js';
 import { util as _util } from './jsmind.util.js';
 
-// altered lines:
+// Altered lines:
 import { ActionStack } from '../../ActionStack.js';
-// end
+// End
 
 export default class jsMind {
     static mind = Mind;
@@ -41,10 +42,10 @@ export default class jsMind {
         this.initialized = false;
         this.mind = null;
         this.event_handles = [];
-        // altered lines:
-        // added actionstack to jsmind
+        // Altered lines:
+        // Added an external (memento) action stack
         this.actionStack = new ActionStack();
-        // end
+        // End
         this.init();
     }
 
@@ -93,20 +94,36 @@ export default class jsMind {
 
         apply_plugins(this, this.options.plugin);
     }
-    // altered lines:
-    undo(){
-        let undoRes = this.actionStack.undo()
+    // Altered lines:
+    /**
+     * Saves the state of currently displayed mind map
+     * to inner action stack.
+     */
+    saveState() {
+        let mindMapState = this.get_data('node_tree');
+        this.actionStack.add(mindMapState);
+    }
+    /**
+     * Discards latest change made (relative to current state)
+     * by showing the previous mind map's state.
+     */
+    undo() {
+        let undoRes = this.actionStack.undo();
         if(!!undoRes){
             this.show(undoRes);
         }
     }
+    /**
+     * Reapplies latest change made (relative to current state)
+     * by showing the following mind map's state.
+     */
     redo() {
-        let redoRes = this.actionStack.redo()
+        let redoRes = this.actionStack.redo();
         if (!!redoRes) {
             this.show(redoRes);
         }
     }
-    // end
+    // End
     get_editable() {
         return this.options.editable;
     }
@@ -450,11 +467,10 @@ export default class jsMind {
                 data: [node_id],
                 node: parent_id,
             });
-            // altered lines:
-            // save current state to actionstack after removing a node
-            var mindmapState = this.get_data('node_tree');
-            this.actionStack.add(mindmapState);
-            // end
+            // Altered lines:
+            // Save current mind map's state to the action stack
+            this.saveState();
+            // End
             return true;
         } else {
             logger.error('fail, this mind map is not editable');
@@ -502,11 +518,10 @@ export default class jsMind {
                     data: [node_id, before_id, parent_id, direction],
                     node: node_id,
                 });
-                // altered lines:
-                // save current state to actionstack after moving a node
-                var mindmapState = this.get_data('node_tree');
-                this.actionStack.add(mindmapState);
-                // end
+                // Altered lines:
+                // Save current mind map's state to the action stack
+                this.saveState();
+                // End
             }
         } else {
             logger.error('fail, this mind map is not editable');

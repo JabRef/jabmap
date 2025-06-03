@@ -1,97 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <title>JabMap</title>
   <link rel="stylesheet" href="src/jsmind/style/jsmind.css" />
-    <style>
-        html, body {
-            height: 100%;
-            margin: 0;
-        }
+  <style>
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+    }
 
-        body {
-            display: flex;
-            flex-direction: column;
-        }
+    body {
+      display: flex;
+      flex-direction: column;
+    }
 
-        nav.navbar {
-            flex-shrink: 0;
-        }
+    nav.navbar {
+      flex-shrink: 0;
+    }
 
-        #jsmind_container {
-            flex-grow: 1;
-            overflow: auto;
-        }
-    </style>
+    #jsmind_container {
+      flex-grow: 1;
+      overflow: auto;
+    }
+  </style>
 </head>
+
 <body>
-<!--Navbar with Buttons-->
-<nav class="navbar bg-body-tertiary position-relative">
-  <div class="container-fluid">
+  <!--Navbar with Buttons-->
+  <nav class="navbar bg-body-tertiary position-relative">
+    <div class="container-fluid">
 
-    <div>
-      <!--Jabmap-->
-      <a class="navbar-brand" href="#">JabMap</a>
+      <div>
+        <!--JabMap title-->
+        <a class="navbar-brand" href="#">JabMap</a>
 
-      <!--Save and Load Buttons-->
-      <button id = "saveBtn" class="btn btn-light me-2" type="button" data-bs-toggle="tooltip" title="Save">
-        <i class="bi bi-save"></i> Save
-      </button>
-      <button id = "openBtn" class="btn btn-light me-2" type="button" data-bs-toggle="modal" title="Open" data-bs-target="#selectMindmapModal">
-        <i class="bi bi-folder2-open"></i> Open
-      </button>
+        <!--Save and Load Buttons-->
+        <button id="saveBtn" class="btn btn-light me-2" type="button" data-bs-toggle="tooltip" title="Save">
+          <i class="bi bi-save"></i> Save
+        </button>
+        <button id="openBtn" class="btn btn-light me-2" type="button" data-bs-toggle="modal" title="Open" data-bs-target="#selectMindmapModal">
+          <i class="bi bi-folder2-open"></i> Open
+        </button>
+      </div>
+
+      <!--Editor buttons-->
+      <div class="position-absolute top-50 start-50 translate-middle d-flex justify-content-center">
+        <!--Button class explanation: class = "btn color theme margin to the right (me-2)"-->
+        <!--Undo Button-->
+        <button id="undoBtn" class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="Undo">
+          <i class="bi bi-arrow-counterclockwise"></i>
+        </button>
+        <!--Redo Button-->
+        <button id="redoBtn" class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="Redo">
+          <i class="bi bi-arrow-clockwise"></i>
+        </button>
+        <!--New Topic (sibling node) Button-->
+        <button id="newSiblingBtn" class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="New sibling node">
+          <i class="bi bi-node-plus-fill"></i>
+        </button>
+        <!--New Subtopic (child node) Button (icon rotated 90 degrees)-->
+        <button id="newChildBtn" class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="New child node">
+          <i class="bi bi-diagram-2-fill" style="transform: rotate(-90deg); display: inline-block;"></i>
+        </button>
+        <!--Tags Button-->
+        <button id="tagsBtn" class="btn btn-secondary" type="button" data-bs-toggle="tooltip" title="Tags">
+          <i class="bi bi-tags"></i>
+        </button>
+      </div>
     </div>
+  </nav>
 
-    <!--Editor buttons-->
-    <div class="position-absolute top-50 start-50 translate-middle d-flex justify-content-center">
-      <!--Button class explanation: class = "btn colortheme margin to the right (me-2)"-->
-      <!--undo Button-->
-      <button id = "undoBtn" class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="Undo">
-        <i class="bi bi-arrow-counterclockwise"></i>
-      </button>
-      <!--redo Button-->
-      <button id = "redoBtn" class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="Redo">
-        <i class="bi bi-arrow-clockwise"></i>
-      </button>
-      <!--new topic (sibling node) Button-->
-      <button id = "newSiblingBtn" class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="New sibling node">
-        <i class="bi bi-node-plus-fill"></i>
-      </button>
-      <!--new subtopic (child node) button (Icon rotated 90 degrees)-->
-      <button id = "newChildBtn" class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="New child node">
-        <i class="bi bi-diagram-2-fill" style="transform: rotate(-90deg); display: inline-block;"></i>
-      </button>
-      <!--tags button-->
-      <button id = "tagsBtn" class="btn btn-secondary" type="button" data-bs-toggle="tooltip" title="Tags">
-        <i class="bi bi-tags"></i>
-      </button>
+  <!--Required jsMind container-->
+  <div id="jsmind_container" style="width:100%;height:100vh;background:#f4f4f4;"></div>
+
+  <!-- Modal for the "Open" dialog-->
+  <div class="modal fade" id="selectMindmapModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Choose a JabMap to open</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <select class="form-select" id="openMindmapSelect" size="10"></select>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="openSelectedMapBtn" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+            Open
+          </button>
+        </div>
+      </div>
     </div>
   </div>
-</nav>
 
-<!--mindmap environment-->
-<div id="jsmind_container" style="width:100%;height:100vh;background:#f4f4f4;"></div>
-
-<!-- Modal for the "open" dialog-->
-<div class="modal fade" id="selectMindmapModal" tabindex="-1" role="dialog">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Choose a JabMap to open</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <select class="form-select" id="openMindmapSelect" size="10">
-        </select>
-      </div>
-      <div class="modal-footer">
-        <button type="button" id = "openSelectedMapBtn" class="btn btn-outline-secondary" data-bs-dismiss="modal">Open</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script type="module" src="/src/main.js"></script>
+  <script type="module" src="/src/main.js"></script>
 </body>
+
 </html>

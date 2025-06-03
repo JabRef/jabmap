@@ -1,7 +1,7 @@
 /**
  * @license BSD
  * @copyright 2014-2025 hizzgdev@163.com - slightly altered
- * altered lines are marked with '// altered lines: --- //end'
+ * Altered lines are marked with '// Altered lines: --- // End'
  *
  * Project Home:
  *   https://github.com/hizzgdev/jsmind/
@@ -330,13 +330,12 @@ export class ViewProvider {
             } else {
                 this.jm.update_node(node.id, topic);
             }
+            // Altered lines:
+            // Save node's changes to related jsMind object after confirming
+            this.jm.saveState();
+            // End
         }
         this.e_panel.focus();
-        // altered lines:
-        // Saves current mindmap state on the action stack for undo/redo after confirming topic for a node
-        var mindmapState = this.jm.get_data('node_tree');
-        this.jm.actionStack.add(mindmapState);
-        // end
     }
     get_view_offset() {
         var bounds = this.layout.bounds;
