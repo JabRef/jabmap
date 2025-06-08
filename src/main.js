@@ -168,5 +168,7 @@ newChildBtn.onclick = function () {
 
 // tags
 tagsBtn.onclick = function () {
-    // tags magic here..
+    console.log(jm.get_root());
+    jm.get_root().data = {"type" : "textnode", "icons" : ["Cycle", "Warning"], "EntryPreviewData" : "blabla"};
+    console.log(jm.get_root());
 }
