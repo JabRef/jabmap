@@ -155,10 +155,6 @@ const options = {
  * @param { string } tagIcon - The path / name of the tag's icon.
  */
 function applyTag (selectedNode, tagIcon) {
-    // if the selected node doesn't have required property, define it
-    selectedNode.data.icons = selectedNode.data.icons ?
-        selectedNode.data.icons : [];
-
     // getting applied tags
     const appliedIcons = selectedNode.data.icons;
     // and toggling the given one
@@ -177,13 +173,29 @@ function applyTag (selectedNode, tagIcon) {
  * @param { string } highlight - The color of the highlight.
  */
 function applyHighlight (selectedNode, highlight) {
-    // if the selected node doesn't have required property, define it
-    selectedNode.data.highlight = selectedNode.data.highlight ?
-        selectedNode.data.highlight : "";
-    
     selectedNode.data.highlight = selectedNode.data.highlight !== highlight ?
         highlight : null;
 }
+
+/**
+ * Adds "icons" and "highlight" properties to a node object
+ * and all its children (this doesn't overwrite existing ones).
+ * @param { object } node - The node object to extend.
+ */
+function extendNode (node) {
+    if (!node) {
+        return;
+    }
+    
+    node.icons = node.icons ?? [];
+    node.highlight = node.highlight ?? null;
+
+    if (!!node.children) {
+        node.children.map((child) => { extendNode(child); });
+    }
+}
+// extend the default mind map
+extendNode(mind.data);
 
 // create a render for mind maps and display the initial one
 const jm = new jsMind(options);
