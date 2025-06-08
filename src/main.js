@@ -168,7 +168,17 @@ newChildBtn.onclick = function () {
 
 // tags
 tagsBtn.onclick = function () {
+   const nodetypes = {"textnode": "text.svg", "bibentrynode" : 1, "pdfnode" : 2, "pdfcommentnode" : 3};
+
+    const TypeIcons = {
+        TEXT: "text.svg",
+        PDF: "pdf.svg"
+    };
     console.log(jm.get_root());
-    jm.get_root().data = {"type" : "textnode", "icons" : ["Cycle", "Warning"], "EntryPreviewData" : "blabla"};
+    jm.get_root().data = {"type" : "textnode", "icons" : [TypeIcons.PDF, TypeIcons.TEXT], "EntryPreviewData" : "blabla"};
     console.log(jm.get_root());
+
+    console.log(jm.get_root().data.EntryPreviewData);
+
+    console.log(nodetypes["textnode"], TypeIcons.TEXT);
 }
