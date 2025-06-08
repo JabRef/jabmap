@@ -5,6 +5,27 @@ import jsMind from './jsmind/src/jsmind.js';
 import './jsmind/src/plugins/jsmind.draggable-node.js';
 import { HTTPClient } from '../http/HTTPClient';
 
+const TYPE_ICONS = {
+    TEXT: null,
+    BIBE: "bibEntry.svg",
+    PDFF: "pdfFile.svg",
+    PDFC: "pdfComment.svg"
+};
+const TAG_ICONS = {
+    1: [ "cycleUnchecked.svg", "CycleChecked.svg" ],
+    2: "star.svg",
+    3: "question.svg",
+    // 4 and 5 are reserved for highlights
+    6: "warning.svg",
+    7: "lamp.svg",
+    8: "greenFlag.svg",
+    9: "redFlag.svg"
+};
+const HIGHLIGHTS = {
+    4: "yellow",
+    5: "green"
+};
+
 // "load" initial mind map data
 const mind = {
     meta: {
@@ -76,6 +97,26 @@ const options = {
             'redo': function (jm, e) {
                 // display mind map's next state (redo the next operation)
                 jm.redo();
+            },
+            'toggleTag': function (jm, e) {
+                let selectedNode = jm.get_selected_node();
+                // if no node's selected -> skip
+                if (!selectedNode) {
+                    return;
+                }
+
+                // apply / remove a tag otherwise
+                applyTag(selectedNode, TAG_ICONS[e.key]);
+            },
+            'toggleHighlight': function (jm, e) {
+                let selectedNode = jm.get_selected_node();
+                // if no node's selected -> skip
+                if (!selectedNode) {
+                    return;
+                }
+
+                // apply / remove a highlight
+                applyHighlight(selectedNode, HIGHLIGHTS[e.key])
             }
         },
         mapping: { 			            // Shortcut key mapping
@@ -89,10 +130,60 @@ const options = {
             right: 39, 		            // <Right>
             down: 40, 		            // <Down>
             undo: 4096 + 90,            // <Ctrl> + <Z>
-            redo: 4096 + 1024 + 90      // <Ctrl> + <Shift> + <Z>
+            redo: 4096 + 1024 + 90,     // <Ctrl> + <Shift> + <Z>
+            toggleTag: [                // <Ctrl> +
+                4096 + 49,              // <1> - Cycle (checkboxes)
+                4096 + 50,              // <2> - Star
+                4096 + 51,              // <3> - Question
+                4096 + 54,              // <6> - Lamp
+                4096 + 55,              // <7> - Warning
+                4096 + 56,              // <8> - Green Flag
+                4096 + 57               // <9> - Red Flag
+            ],
+            toggleHighlight: [
+                4096 + 52,              // <4> - Yellow Highlight
+                4096 + 53,              // <5> - Green Highlight
+            ]
         }
     },
 };
+
+/**
+ * Applies or removes a specific tag icon to / from the selected node.
+ * @param { object } selectedNode - The node a tag should be
+ * applied to / removed from.
+ * @param { string } tagIcon - The path / name of the tag's icon.
+ */
+function applyTag (selectedNode, tagIcon) {
+    // if the selected node doesn't have required property, define it
+    selectedNode.data.icons = selectedNode.data.icons ?
+        selectedNode.data.icons : [];
+
+    // getting applied tags
+    const appliedIcons = selectedNode.data.icons;
+    // and toggling the given one
+    if (appliedIcons.includes(tagIcon)) {
+        selectedNode.data.icons.splice(appliedIcons.indexOf(tagIcon), 1);
+    } else {
+        selectedNode.data.icons.push(tagIcon);
+    }
+}
+
+/**
+ * Applies or removes a specific highlight color to / from
+ * the selected node.
+ * @param { object } selectedNode - The node a highlight should be
+ * applied to / removed from.
+ * @param { string } highlight - The color of the highlight.
+ */
+function applyHighlight (selectedNode, highlight) {
+    // if the selected node doesn't have required property, define it
+    selectedNode.data.highlight = selectedNode.data.highlight ?
+        selectedNode.data.highlight : "";
+    
+    selectedNode.data.highlight = selectedNode.data.highlight !== highlight ?
+        highlight : null;
+}
 
 // create a render for mind maps and display the initial one
 const jm = new jsMind(options);
@@ -183,7 +274,7 @@ tagsBtn.onclick = function () {
     console.log(nodetypes["textnode"], TypeIcons.TEXT);
 }
 
-// disabling default <Ctrl> + <number_key> browser's shortcut
+// disable default <Ctrl> + <number_key> browser's shortcut
 // in case a tag should be toggled
 document.addEventListener("keydown", (e) => {
     if (e.ctrlKey && jm.get_selected_node()) {
