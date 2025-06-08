@@ -182,3 +182,11 @@ tagsBtn.onclick = function () {
 
     console.log(nodetypes["textnode"], TypeIcons.TEXT);
 }
+
+// disabling default <Ctrl> + <number_key> browser's shortcut
+// in case a tag should be toggled
+document.addEventListener("keydown", (e) => {
+    if (e.ctrlKey && jm.get_selected_node()) {
+        e.preventDefault();
+    }
+});
