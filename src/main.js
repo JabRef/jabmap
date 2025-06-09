@@ -135,8 +135,7 @@ openSelectedMapBtn.onclick = async function () {
     // get selected mind map's name and it's data from server
     let selectedOption = bsSelect.options[bsSelect.selectedIndex].value;
 
-    let mindMapPath = "libraries/" + selectedOption + "/map";
-    let loadResponse = await httpClient.loadMap(mindMapPath);
+    let loadResponse = await httpClient.loadMap(selectedOption);
 
     // display the retrieved mind map
     jm.show(loadResponse.map);
