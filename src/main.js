@@ -139,6 +139,8 @@ openSelectedMapBtn.onclick = async function () {
 
     // display the retrieved mind map
     jm.show(loadResponse.map);
+
+    console.log(httpClient.listEntries());
 }
 
 // undo - discard the last operation (display the previous state)

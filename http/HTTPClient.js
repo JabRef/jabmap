@@ -115,7 +115,16 @@ export class HTTPClient {
         return this.#performRequest("", options)
     }
 
+    /*
+    * Requests a list of all entries in the current library.
+    * @returns A list of all entries in the current library in json format.
+    */
     async listEntries(){
-
+        const options = {
+            method: "GET",
+            headers: { "Content-Type": "application/json" }
+        }
+        // TODO - format the list to contain the keys, titles, authors and releases of the entries and return it
+        return this.#performRequest(this.currentLibrary, options)
     }
 }
