@@ -20,12 +20,15 @@ export class ActionStack {
      * a mind map to save.
      */
     add(currentState) {
+        // Copying the state to avoid cross-state references
+        let json = JSON.stringify(currentState);
+        
         // Inserting the state onto current stack's index
         // and removing tail saves since they're invalid
         this.#lastSaves.splice(
             this.#saveIndex + 1,
             this.#lastSaves.length - this.#saveIndex + 1,
-            currentState);
+            json);
 
         // If stack size is exceeded, remove the first state
         // (the earliest change) and shift all elements by 1
@@ -51,7 +54,7 @@ export class ActionStack {
         this.#saveIndex = Math.max(this.#saveIndex - 1, 0);
         console.log(`Performing Undo.` +
             `Current state index: ${this.#saveIndex}`);
-        return this.#lastSaves[this.#saveIndex];
+        return JSON.parse(this.#lastSaves[this.#saveIndex]);
     }
 
     /**
@@ -70,6 +73,6 @@ export class ActionStack {
             Math.max(this.#lastSaves.length - 1, 0));
         console.log(`Performing Redo.` +
             `Current state index: ${this.#saveIndex}`);
-        return this.#lastSaves[this.#saveIndex];
+        return JSON.parse(this.#lastSaves[this.#saveIndex]);
     }
 }
