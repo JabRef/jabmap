@@ -316,7 +316,7 @@ tagRedFlag.onclick = function () {
 // disable default <Ctrl> + <number_key> browser's shortcut
 // in case a tag should be toggled
 document.addEventListener("keydown", (e) => {
-    if (e.ctrlKey && jm.get_selected_node()) {
+    if (e.ctrlKey && (jm.get_selected_node() && !jm.view.editing_node)) {
         e.preventDefault();
     }
 });
