@@ -179,7 +179,7 @@ function extendNode (node) {
     if (!node) {
         return;
     }
-    
+
     node.icons = node.icons ?? [];
     node.highlight = node.highlight ?? null;
 
@@ -238,6 +238,12 @@ openSelectedMapBtn.onclick = async function () {
     jm.show(loadResponse.map);
 }
 
+// debug button prints current mindmap state to console
+printMapToConsoleBtn.onclick = function () {
+    console.log('PrintMapToConsoleBtn');
+    console.log(jm.get_data());
+}
+
 // undo - discard the last operation (display the previous state)
 undoBtn.onclick = function () {
     jm.undo();
@@ -263,8 +269,46 @@ newChildBtn.onclick = function () {
 }
 
 // tags
+tagCycle.onclick = function () {
+    if(jm != null) {
+        applyTag(jm.get_selected_node(),1);
+    }
+}
+
 tagStarBtn.onclick = function () {
-    console.log("star tag button pressed!");
+    if(jm != null) {
+        applyTag(jm.get_selected_node(),2);
+    }
+}
+
+tagQuestion.onclick = function () {
+    if(jm != null) {
+        applyTag(jm.get_selected_node(),3);
+    }
+}
+
+tagWarning.onclick = function () {
+    if(jm != null) {
+        applyTag(jm.get_selected_node(),6);
+    }
+}
+
+tagLamp.onclick = function () {
+    if(jm != null) {
+        applyTag(jm.get_selected_node(),7);
+    }
+}
+
+tagGreenFlag.onclick = function () {
+    if(jm != null) {
+        applyTag(jm.get_selected_node(),8);
+    }
+}
+
+tagRedFlag.onclick = function () {
+    if(jm != null) {
+        applyTag(jm.get_selected_node(),9);
+    }
 }
 
 // disable default <Ctrl> + <number_key> browser's shortcut

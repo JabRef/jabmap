@@ -30,9 +30,9 @@
 
 <body>
   <!--Navbar with Buttons-->
-  <nav class="navbar bg-body-tertiary position-relative">
+  <nav class="navbar bg-body-tertiary">
     <div class="container-fluid">
-      <div>
+      <div class = "d-flex align-items-start" style="flex-basis: 33%; max-width: 33%;">
         <!--JabMap title-->
         <a class="navbar-brand" href="#">JabMap</a>
 
@@ -43,46 +43,49 @@
         <button id="openBtn" class="btn btn-light me-2" type="button" data-bs-toggle="modal" title="Open" data-bs-target="#selectMindmapModal">
           <i class="bi bi-folder2-open"></i> Open
         </button>
+        <!--Debug button-->
+        <button id="printMapToConsoleBtn" class="btn btn-light me-2" type="button" data-bs-toggle="tooltip" title="Debug">
+          Debug
+        </button>
       </div>
 
       <!--Editor buttons-->
-      <div class="position-absolute top-50 start-50 translate-middle d-flex justify-content-center">
-        <!--Button class explanation: class = "btn color theme margin to the right (me-2)"-->
-        <!--Undo Button-->
-        <button id="undoBtn" class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="Undo">
-          <i class="bi bi-arrow-counterclockwise"></i>
-        </button>
-        <!--Redo Button-->
-        <button id="redoBtn" class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="Redo">
-          <i class="bi bi-arrow-clockwise"></i>
-        </button>
-        <!--New Topic (sibling node) Button-->
-        <button id="newSiblingBtn" class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="New sibling node">
-          <i class="bi bi-node-plus-fill"></i>
-        </button>
-        <!--New Subtopic (child node) Button (icon rotated 90 degrees)-->
-        <button id="newChildBtn" class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="New child node">
-          <i class="bi bi-diagram-2-fill" style="transform: rotate(-90deg); display: inline-block;"></i>
-        </button>
-        <!--Tags Dropdown-->
-        <div class="dropdown">
-          <button class="btn btn-secondary dropdown-toggle" type="button" id="tagsDropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="bi bi-tags"></i>
+      <div class="d-flex justify-content-center" style="flex-basis: 33%; max-width: 33%;">
+          <!--Button class explanation: class = "btn color theme margin to the right (me-2)"-->
+          <!--Undo Button-->
+          <button id="undoBtn" class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="Undo">
+            <i class="bi bi-arrow-counterclockwise"></i>
           </button>
-          <ul class="dropdown-menu">
-            <li><a id="tagCycle" class="dropdown-item">Cycle</a></li>
-            <li><button id="tagStarBtn" class="dropdown-item" type="button">Star</button></li>
-            <li><a id="tagQuestion" class="dropdown-item">Question</a></li>
-            <li><a id="tagWarning" class="dropdown-item">Warning</a></li>
-            <li><a id="tagLamp" class="dropdown-item">Lamp</a></li>
-            <li><a id="tagGreenEye" class="dropdown-item">Green Eye</a></li>
-            <li><a id="tagOrangeEye" class="dropdown-item">Orange Eye</a></li>
-            <li><a id="tagGreenFlag" class="dropdown-item">Green Flag</a></li>
-            <li><a id="tagRedFlag" class="dropdown-item">Red Flag</a></li>
-          </ul>
-        </div>
-
+          <!--Redo Button-->
+          <button id="redoBtn" class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="Redo">
+            <i class="bi bi-arrow-clockwise"></i>
+          </button>
+          <!--New Topic (sibling node) Button-->
+          <button id="newSiblingBtn" class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="New sibling node">
+            <i class="bi bi-node-plus-fill"></i>
+          </button>
+          <!--New Subtopic (child node) Button (icon rotated 90 degrees)-->
+          <button id="newChildBtn" class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="New child node">
+            <i class="bi bi-diagram-2-fill" style="transform: rotate(-90deg); display: inline-block;"></i>
+          </button>
+          <!--Tags Dropdown-->
+          <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="tagsDropdownMenuButton" data-bs-toggle="dropdown">
+              <i class="bi bi-tags"></i>
+            </button>
+            <div class="dropdown-menu">
+              <h6 class="dropdown-header">Icons for nodes</h6>
+              <button id="tagCycle" class="dropdown-item">Cycle</button>
+              <button id="tagStarBtn" class="dropdown-item" type="button">Star</button>
+              <button id="tagQuestion" class="dropdown-item" href="#">Question</button>
+              <button id="tagWarning" class="dropdown-item">Warning</button>
+              <button id="tagLamp" class="dropdown-item">Lamp</button>
+              <button id="tagGreenFlag" class="dropdown-item">Green Flag</button>
+              <button id="tagRedFlag" class="dropdown-item">Red Flag</button>
+            </div>
+          </div>
       </div>
+      <div style="flex-basis: 33%; max-width: 33%;"></div>
     </div>
   </nav>
 
