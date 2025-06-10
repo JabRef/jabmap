@@ -318,31 +318,45 @@ newChildBtn.onclick = function () {
 
 // tags
 tagCycle.onclick = function () {
-    // TODO: Handle Cycle
+    if(jm != null) {
+        applyTag(jm.get_selected_node(),1);
+    }
 }
 
 tagStarBtn.onclick = function () {
-    // TODO: Handle Star
+    if(jm != null) {
+        applyTag(jm.get_selected_node(),2);
+    }
 }
 
 tagQuestion.onclick = function () {
-    // TODO: Handle Question
+    if(jm != null) {
+        applyTag(jm.get_selected_node(),3);
+    }
 }
 
 tagWarning.onclick = function () {
-    // TODO: Handle Warning
+    if(jm != null) {
+        applyTag(jm.get_selected_node(),6);
+    }
 }
 
 tagLamp.onclick = function () {
-    // TODO: Handle Lamp
+    if(jm != null) {
+        applyTag(jm.get_selected_node(),7);
+    }
 }
 
 tagGreenFlag.onclick = function () {
-    // TODO: Handle Green Flag
+    if(jm != null) {
+        applyTag(jm.get_selected_node(),8);
+    }
 }
 
 tagRedFlag.onclick = function () {
-    // TODO: Handle Red Flag
+    if(jm != null) {
+        applyTag(jm.get_selected_node(),9);
+    }
 }
 
 // disable default <Ctrl> + <number_key> browser's shortcut
