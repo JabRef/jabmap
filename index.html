@@ -32,7 +32,6 @@
   <!--Navbar with Buttons-->
   <nav class="navbar bg-body-tertiary position-relative">
     <div class="container-fluid">
-
       <div>
         <!--JabMap title-->
         <a class="navbar-brand" href="#">JabMap</a>
@@ -65,10 +64,23 @@
         <button id="newChildBtn" class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="New child node">
           <i class="bi bi-diagram-2-fill" style="transform: rotate(-90deg); display: inline-block;"></i>
         </button>
-        <!--Tags Button-->
-        <button id="tagsBtn" class="btn btn-secondary" type="button" data-bs-toggle="tooltip" title="Tags">
-          <i class="bi bi-tags"></i>
-        </button>
+        <!--Tags Dropdown-->
+        <div class="dropdown">
+          <button class="btn btn-secondary dropdown-toggle" type="button" id="tagsDropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="bi bi-tags"></i>
+          </button>
+          <ul class="dropdown-menu">
+            <li><button id="tagCycle" class="dropdown-item" type="button">Cycle</button></li>
+            <li><button id="tagStar" class="dropdown-item" type="button">Star</button></li>
+            <li><button id="tagQuestion" class="dropdown-item" type="button">Question</button></li>
+            <li><button id="tagWarning" class="dropdown-item" type="button">Warning</button></li>
+            <li><button id="tagLamp" class="dropdown-item" type="button">Lamp</button></li>
+            <li><button id="tagGreenEye" class="dropdown-item" type="button">Green Eye</button></li>
+            <li><button id="tagOrangeEye" class="dropdown-item" type="button">Orange Eye</button></li>
+            <li><button id="tagGreenFlag" class="dropdown-item" type="button">Green Flag</button></li>
+            <li><button id="tagRedFlag" class="dropdown-item" type="button">Red Flag</button></li>
+          </ul>
+        </div>
       </div>
     </div>
   </nav>
