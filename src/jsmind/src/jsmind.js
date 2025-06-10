@@ -485,11 +485,13 @@ export default class jsMind {
             }
             var node = this.get_node(node_id);
             if (!!node) {
-                if (node.topic === topic) {
-                    logger.info('nothing changed');
-                    this.view.update_node(node);
-                    return;
-                }
+                // Altered lines:
+                // if (node.topic === topic) {
+                //     logger.info('nothing changed');
+                //     this.view.update_node(node);
+                //     return;
+                // }
+                // End
                 node.topic = topic;
                 this.view.update_node(node);
                 this.layout.layout();

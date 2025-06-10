@@ -56,8 +56,8 @@ const TAG_ICONS = {
 };
 
 const HIGHLIGHTS = {
-    4: "yellow",
-    5: "green"
+    /* yellow highlight */ 4: "#d4ac0d",
+    /* green  highlight */ 5: "#196F3D"
 };
 
 // "load" initial mind map data
@@ -200,13 +200,12 @@ function applyTag (selectedNode, pressedKey) {
     // getting applied tags
     const appliedIcons = selectedNode.data.icons;
     // and toggling the given one
-    if (appliedIcons.includes(tagIcon)) {
-        selectedNode.data.icons.splice(appliedIcons.indexOf(tagIcon), 1);
+    if (appliedIcons.includes(src)) {
+        selectedNode.data.icons.splice(appliedIcons.indexOf(src), 1);
     } else {
-        selectedNode.data.icons.push(tagIcon);
+        selectedNode.data.icons.push(src);
     }
-
-    console.log(`${selectedNode.topic}'s icons:\n${selectedNode.data.icons}`);
+    jm.update_node(selectedNode.id, selectedNode.topic);
 }
 
 /**
@@ -219,6 +218,7 @@ function applyTag (selectedNode, pressedKey) {
 function applyHighlight (selectedNode, highlight) {
     selectedNode.data.highlight = selectedNode.data.highlight !== highlight ?
         highlight : null;
+    jm.update_node(selectedNode.id, selectedNode.topic);
 }
 
 /**
@@ -328,22 +328,6 @@ var dropdownList = dropdownElementList.map(function (dropdownToggleEl) {
     console.log(dropdownToggleEl);
     // return new bootstrap.Dropdown(dropdownToggleEl)
 })
-
-/*tagsBtn.onclick = function () {
-   const nodetypes = {"textnode": "text.svg", "bibentrynode" : 1, "pdfnode" : 2, "pdfcommentnode" : 3};
-
-    const TypeIcons = {
-        TEXT: "text.svg",
-        PDF: "pdf.svg"
-    };
-    console.log(jm.get_root());
-    jm.get_root().data = {"type" : "textnode", "icons" : [TypeIcons.PDF, TypeIcons.TEXT], "EntryPreviewData" : "blabla"};
-    console.log(jm.get_root());
-
-    console.log(jm.get_root().data.EntryPreviewData);
-
-    console.log(nodetypes["textnode"], TypeIcons.TEXT);
-}*/
 
 // disable default <Ctrl> + <number_key> browser's shortcut
 // in case a tag should be toggled

@@ -495,7 +495,21 @@ export class ViewProvider {
 
     _default_node_render(ele, node) {
         if (this.opts.support_html) {
-            $.h(ele, node.topic);
+            // altered lines:
+            const icons = (node.data.icons || [])
+                .map(iconKey => `<img class="node-icon" src="${iconKey}" style="width:16px; height:16px; margin-right:2px; vertical-align:middle;">`)
+                .join('');
+
+            let highlighting = `${node.data.highlight}`;
+
+            const html = `
+              <div class="node-content">
+                    <span class="node-icons">${icons}</span>
+                    <span class="node-text" style="background: ${highlighting}">${node.topic}</span>
+              </div>
+              `;
+            $.h(ele, html);
+            // end
         } else {
             $.t(ele, node.topic);
         }
