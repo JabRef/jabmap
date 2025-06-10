@@ -199,6 +199,7 @@ function applyTag (selectedNode, iconKey) {
     }
     // redraw the node
     jm.update_node(selectedNode.id, selectedNode.topic);
+    jm.saveState();
 }
 
 /**
@@ -214,6 +215,7 @@ function applyHighlight (selectedNode, highlight) {
         highlight : null;
     // redraw the node
     jm.update_node(selectedNode.id, selectedNode.topic);
+    jm.saveState();
 }
 
 /**
@@ -225,7 +227,7 @@ function extendNode (node) {
     if (!node) {
         return;
     }
-    
+
     node.icons = node.icons ?? [];
     node.highlight = node.highlight ?? null;
 
@@ -315,8 +317,32 @@ newChildBtn.onclick = function () {
 }
 
 // tags
+tagCycle.onclick = function () {
+    // TODO: Handle Cycle
+}
+
 tagStarBtn.onclick = function () {
-    console.log("star tag button pressed!");
+    // TODO: Handle Star
+}
+
+tagQuestion.onclick = function () {
+    // TODO: Handle Question
+}
+
+tagWarning.onclick = function () {
+    // TODO: Handle Warning
+}
+
+tagLamp.onclick = function () {
+    // TODO: Handle Lamp
+}
+
+tagGreenFlag.onclick = function () {
+    // TODO: Handle Green Flag
+}
+
+tagRedFlag.onclick = function () {
+    // TODO: Handle Red Flag
 }
 
 // disable default <Ctrl> + <number_key> browser's shortcut
