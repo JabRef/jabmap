@@ -503,6 +503,8 @@ export class ViewProvider {
         if (this.opts.support_html) {
             // Altered lines:
             // Building HTML <img> tags to attach to the node
+            // Altered lines:
+            // Building HTML <img> tags to attach to the node
             const icons = (node.data.icons || [])
                 .map(iconKey => `<img src="${this.resourceManager.TAG_ICONS[iconKey]}" style="width: 16px; height: 16px; margin-right: 2px; vertical-align: middle;">`)
                 .join('');
@@ -513,6 +515,7 @@ export class ViewProvider {
             }
 
             // Constructing the node's HTML element to render
+            // Constructing the node's HTML element to render
             const html = `
               <div>
                     <span>${icons}</span>
@@ -520,6 +523,7 @@ export class ViewProvider {
               </div>`;
             // Rendering the node
             $.h(ele, html);
+            // End
             // End
         } else {
             $.t(ele, node.topic);

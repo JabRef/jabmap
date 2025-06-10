@@ -78,24 +78,20 @@ const options = {
                 jm.redo();
             },
             'toggleTag': function (jm, e) {
-                console.log(`Toggled Tag: key ${e.key}`);
                 let selectedNode = jm.get_selected_node();
                 // if no node's selected -> skip
                 if (!selectedNode) {
                     return;
                 }
-
                 // apply / remove a tag otherwise
                 applyTag(selectedNode, e.key);
             },
             'toggleHighlight': function (jm, e) {
-                console.log(`Toggled Highlight: key ${e.key}`);
                 let selectedNode = jm.get_selected_node();
                 // if no node's selected -> skip
                 if (!selectedNode) {
                     return;
                 }
-
                 // apply / remove a highlight
                 applyHighlight(selectedNode, e.key);
             }
@@ -120,9 +116,6 @@ const options = {
                 4096 + 55,              // <7> - Warning
                 4096 + 56,              // <8> - Green Flag
                 4096 + 57,              // <9> - Red Flag
-                4096 + 74,              // <j> - BIBE
-                4096 + 75,              // <k> - PDFF
-                4096 + 76               // <l> - PDFC
             ],
             toggleHighlight: [
                 4096 + 52,              // <4> - Yellow Highlight
@@ -136,9 +129,9 @@ const options = {
  * Applies or removes a specific tag icon to / from the selected node.
  * @param { object } selectedNode - The node a tag should be
  * applied to / removed from.
- * @param { string } pressedKey - The related key of the tag's icon.
+ * @param { string } iconKey - The key of the icon in the 'TAGS_ICONS' "dictionary".
  */
-function applyTag (selectedNode, pressedKey) {
+function applyTag (selectedNode, iconKey) {
     // TODO: add check cycling (key 1)
     let keyNames = {
         2: "star",
@@ -149,16 +142,15 @@ function applyTag (selectedNode, pressedKey) {
         9: "red_flag"
     };
 
-    // getting applied tags
+    // getting currently applied tags
     const appliedIcons = selectedNode.data.icons;
     // and toggling the given one
-    if (appliedIcons.includes(keyNames[pressedKey])) {
-        selectedNode.data.icons.splice(appliedIcons.indexOf(keyNames[pressedKey]), 1);
+    if (appliedIcons.includes(keyNames[iconKey])) {
+        selectedNode.data.icons.splice(appliedIcons.indexOf(keyNames[iconKey]), 1);
     } else {
-        selectedNode.data.icons.push(keyNames[pressedKey]);
+        selectedNode.data.icons.push(keyNames[iconKey]);
     }
-
-    // triggering jsMind to update / redraw the node
+    // redraw the node
     jm.update_node(selectedNode.id, selectedNode.topic);
 }
 
@@ -169,10 +161,9 @@ function applyTag (selectedNode, pressedKey) {
  * applied to / removed from.
  * @param { string } highlightKey - The color of the highlight.
  */
-function applyHighlight (selectedNode, highlightKey) {
-    selectedNode.data.highlight = selectedNode.data.highlight !== highlightKey ?
-        highlightKey : null;
-    
+function applyHighlight (selectedNode, highlight) {
+    selectedNode.data.highlight = selectedNode.data.highlight !== highlight ?
+        highlight : null;
     jm.update_node(selectedNode.id, selectedNode.topic);
 }
 
@@ -270,19 +261,8 @@ newChildBtn.onclick = function () {
 
 // tags
 tagStarBtn.onclick = function () {
-    let currentlySelectedNode = jm.get_selected_node();
-    if(!currentlySelectedNode) {
-        console.log("no node selected, applying nothing");
-        return;
-    }
-    applyTag(currentlySelectedNode, TAG_ICONS["2"]);
+    console.log("star tag button pressed!");
 }
-
-var dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'))
-var dropdownList = dropdownElementList.map(function (dropdownToggleEl) {
-    console.log(dropdownToggleEl);
-    // return new bootstrap.Dropdown(dropdownToggleEl)
-})
 
 // disable default <Ctrl> + <number_key> browser's shortcut
 // in case a tag should be toggled
