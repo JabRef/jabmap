@@ -150,8 +150,9 @@ function applyTag (selectedNode, iconKey) {
     } else {
         selectedNode.data.icons.push(keyNames[iconKey]);
     }
-    // redraw the node
+    // redraw the node and memorize current state
     jm.update_node(selectedNode.id, selectedNode.topic);
+    jm.saveState();
 }
 
 /**
@@ -164,7 +165,9 @@ function applyTag (selectedNode, iconKey) {
 function applyHighlight (selectedNode, highlight) {
     selectedNode.data.highlight = selectedNode.data.highlight !== highlight ?
         highlight : null;
+    // redraw the node and memorize current state
     jm.update_node(selectedNode.id, selectedNode.topic);
+    jm.saveState();
 }
 
 /**
