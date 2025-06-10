@@ -70,17 +70,18 @@
             <i class="bi bi-tags"></i>
           </button>
           <ul class="dropdown-menu">
-            <li><button id="tagCycle" class="dropdown-item" type="button">Cycle</button></li>
-            <li><button id="tagStar" class="dropdown-item" type="button">Star</button></li>
-            <li><button id="tagQuestion" class="dropdown-item" type="button">Question</button></li>
-            <li><button id="tagWarning" class="dropdown-item" type="button">Warning</button></li>
-            <li><button id="tagLamp" class="dropdown-item" type="button">Lamp</button></li>
-            <li><button id="tagGreenEye" class="dropdown-item" type="button">Green Eye</button></li>
-            <li><button id="tagOrangeEye" class="dropdown-item" type="button">Orange Eye</button></li>
-            <li><button id="tagGreenFlag" class="dropdown-item" type="button">Green Flag</button></li>
-            <li><button id="tagRedFlag" class="dropdown-item" type="button">Red Flag</button></li>
+            <li><a id="tagCycle" class="dropdown-item">Cycle</a></li>
+            <li><button id="tagStarBtn" class="dropdown-item" type="button">Star</button></li>
+            <li><a id="tagQuestion" class="dropdown-item">Question</a></li>
+            <li><a id="tagWarning" class="dropdown-item">Warning</a></li>
+            <li><a id="tagLamp" class="dropdown-item">Lamp</a></li>
+            <li><a id="tagGreenEye" class="dropdown-item">Green Eye</a></li>
+            <li><a id="tagOrangeEye" class="dropdown-item">Orange Eye</a></li>
+            <li><a id="tagGreenFlag" class="dropdown-item">Green Flag</a></li>
+            <li><a id="tagRedFlag" class="dropdown-item">Red Flag</a></li>
           </ul>
         </div>
+
       </div>
     </div>
   </nav>
@@ -107,6 +108,15 @@
       </div>
     </div>
   </div>
+<!-- icons and text in node container-->
+  <div class="node-content" style="display: flex; align-items: center;">
+    <div class="icons-container" style="margin-right: 8px;">
+      <img class="node-icon" src="ICON_URL_1" style="width:18px;height:18px;margin-right:2px;">
+      <img class="node-icon" src="ICON_URL_2" style="width:18px;height:18px;margin-right:2px;">
+    </div>
+    <div class="text-container"></div>
+      <span class="node-text"></span>
+    </div>
 
   <script type="module" src="/src/main.js"></script>
 </body>
