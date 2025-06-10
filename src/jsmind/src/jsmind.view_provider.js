@@ -503,7 +503,7 @@ export class ViewProvider {
         if (this.opts.support_html) {
             // Altered lines:
             // Building HTML <img> tags to attach to the node
-            const icons = (node.data.icons)
+            const icons = (node.data.icons || [])
                 .map(iconKey => `<img src="${this.resourceManager.TAG_ICONS[iconKey]}" style="width: 16px; height: 16px; margin-right: 2px; vertical-align: middle;">`)
                 .join('');
             // Also defining text's styling property

@@ -142,6 +142,8 @@ function applyTag (selectedNode, iconKey) {
         9: "red_flag"
     };
 
+    // if the node doesn't have icons list, assign an empty one  
+    selectedNode.data.icons = selectedNode.data.icons ?? [];
     // getting currently applied tags
     const appliedIcons = selectedNode.data.icons;
     // and toggling the given one
