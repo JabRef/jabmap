@@ -288,7 +288,6 @@ openSelectedMapBtn.onclick = async function () {
 
 // debug button prints current mindmap state to console
 printMapToConsoleBtn.onclick = function () {
-    console.log('PrintMapToConsoleBtn');
     console.log(jm.get_data());
 }
 
@@ -316,44 +315,44 @@ newChildBtn.onclick = function () {
     }
 }
 
-// tags
-tagCycle.onclick = function () {
+// icon-dropdown menu button handlers
+iconCycleBtn.onclick = function () {
     if(jm != null) {
         applyTag(jm.get_selected_node(),1);
     }
 }
 
-tagStarBtn.onclick = function () {
+iconStarBtn.onclick = function () {
     if(jm != null) {
         applyTag(jm.get_selected_node(),2);
     }
 }
 
-tagQuestion.onclick = function () {
+iconQuestionBtn.onclick = function () {
     if(jm != null) {
         applyTag(jm.get_selected_node(),3);
     }
 }
 
-tagWarning.onclick = function () {
+iconWarningBtn.onclick = function () {
     if(jm != null) {
         applyTag(jm.get_selected_node(),6);
     }
 }
 
-tagLamp.onclick = function () {
+iconLightbulbBtn.onclick = function () {
     if(jm != null) {
         applyTag(jm.get_selected_node(),7);
     }
 }
 
-tagGreenFlag.onclick = function () {
+iconGreenFlagBtn.onclick = function () {
     if(jm != null) {
         applyTag(jm.get_selected_node(),8);
     }
 }
 
-tagRedFlag.onclick = function () {
+iconRedFlagBtn.onclick = function () {
     if(jm != null) {
         applyTag(jm.get_selected_node(),9);
     }
