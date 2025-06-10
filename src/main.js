@@ -284,6 +284,12 @@ openSelectedMapBtn.onclick = async function () {
     jm.show(loadResponse.map);
 }
 
+// debug button prints current mindmap state to console
+printMapToConsoleBtn.onclick = function () {
+    console.log('PrintMapToConsoleBtn');
+    console.log(jm.get_data());
+}
+
 // undo - discard the last operation (display the previous state)
 undoBtn.onclick = function () {
     jm.undo();
