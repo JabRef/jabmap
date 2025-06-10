@@ -486,6 +486,9 @@ export default class jsMind {
             var node = this.get_node(node_id);
             if (!!node) {
                 // Altered lines:
+                // This check has to be disabled in order to
+                // resize the mind map upon
+                // adding / removing icons and highlights
                 // if (node.topic === topic) {
                 //     logger.info('nothing changed');
                 //     this.view.update_node(node);

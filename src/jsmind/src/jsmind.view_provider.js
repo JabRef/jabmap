@@ -495,21 +495,23 @@ export class ViewProvider {
 
     _default_node_render(ele, node) {
         if (this.opts.support_html) {
-            // altered lines:
+            // Altered lines:
+            // Building HTML <img> tags to attach to the node
             const icons = (node.data.icons || [])
-                .map(iconKey => `<img class="node-icon" src="${iconKey}" style="width:16px; height:16px; margin-right:2px; vertical-align:middle;">`)
+                .map(iconKey => `<img src="${iconKey}" style="width:16px; height:16px; margin-right:2px; vertical-align:middle;">`)
                 .join('');
+            // Also defining text's styling property
+            const highlighting = `${node.data.highlight}`;
 
-            let highlighting = `${node.data.highlight}`;
-
+            // Constructing the node's HTML element to render
             const html = `
-              <div class="node-content">
-                    <span class="node-icons">${icons}</span>
-                    <span class="node-text" style="background: ${highlighting}">${node.topic}</span>
-              </div>
-              `;
+              <div>
+                <span>${icons}</span>
+                <span style="background: ${highlighting}">${node.topic}</span>
+              </div>`;
+            // Rendering the node
             $.h(ele, html);
-            // end
+            // End
         } else {
             $.t(ele, node.topic);
         }

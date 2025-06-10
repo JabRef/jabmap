@@ -54,7 +54,6 @@ const TAG_ICONS = {
         src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='512' height='512' viewBox='0 0 24 24'%3E%3Crect x='0' y='0' width='24' height='24' rx='8' fill='none'/%3E%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23c01111' x='0' y='0' width='24' height='24'%3E%3Cpath fill='%23c01111' d='M12 9a1 1 0 1 0 1 1a1 1 0 0 0-1-1Zm7-7H5a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h11.59l3.7 3.71A1 1 0 0 0 21 22a.84.84 0 0 0 .38-.08A1 1 0 0 0 22 21V5a3 3 0 0 0-3-3Zm1 16.59l-2.29-2.3A1 1 0 0 0 17 16H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1ZM8 9a1 1 0 1 0 1 1a1 1 0 0 0-1-1Zm8 0a1 1 0 1 0 1 1a1 1 0 0 0-1-1Z'/%3E%3C/svg%3E%3C/svg%3E"
     }
 };
-
 const HIGHLIGHTS = {
     /* yellow highlight */ 4: "#d4ac0d",
     /* green  highlight */ 5: "#196F3D"
@@ -133,24 +132,20 @@ const options = {
                 jm.redo();
             },
             'toggleTag': function (jm, e) {
-                console.log(`Toggled Tag: key ${e.key}`);
                 let selectedNode = jm.get_selected_node();
                 // if no node's selected -> skip
                 if (!selectedNode) {
                     return;
                 }
-
                 // apply / remove a tag otherwise
                 applyTag(selectedNode, e.key);
             },
             'toggleHighlight': function (jm, e) {
-                console.log(`Toggled Highlight: key ${e.key}`);
                 let selectedNode = jm.get_selected_node();
                 // if no node's selected -> skip
                 if (!selectedNode) {
                     return;
                 }
-
                 // apply / remove a highlight
                 applyHighlight(selectedNode, HIGHLIGHTS[e.key]);
             }
@@ -175,9 +170,6 @@ const options = {
                 4096 + 55,              // <7> - Warning
                 4096 + 56,              // <8> - Green Flag
                 4096 + 57,              // <9> - Red Flag
-                4096 + 74,              // <j> - BIBE
-                4096 + 75,              // <k> - PDFF
-                4096 + 76               // <l> - PDFC
             ],
             toggleHighlight: [
                 4096 + 52,              // <4> - Yellow Highlight
@@ -191,13 +183,13 @@ const options = {
  * Applies or removes a specific tag icon to / from the selected node.
  * @param { object } selectedNode - The node a tag should be
  * applied to / removed from.
- * @param { string } pressedKey - The related key of the tag's icon.
+ * @param { string } iconKey - The key of the icon in the 'TAGS_ICONS' "dictionary".
  */
-function applyTag (selectedNode, pressedKey) {
-    let tagIcon = TAG_ICONS[pressedKey].name;
-    let src = TAG_ICONS[pressedKey].src;
+function applyTag (selectedNode, iconKey) {
+    // grab source for icon images
+    let src = TAG_ICONS[iconKey].src;
 
-    // getting applied tags
+    // getting currently applied tags
     const appliedIcons = selectedNode.data.icons;
     // and toggling the given one
     if (appliedIcons.includes(src)) {
@@ -205,6 +197,7 @@ function applyTag (selectedNode, pressedKey) {
     } else {
         selectedNode.data.icons.push(src);
     }
+    // redraw the node
     jm.update_node(selectedNode.id, selectedNode.topic);
 }
 
@@ -216,8 +209,10 @@ function applyTag (selectedNode, pressedKey) {
  * @param { string } highlight - The color of the highlight.
  */
 function applyHighlight (selectedNode, highlight) {
+    // if highlight is already applied, reset; else set new highlight
     selectedNode.data.highlight = selectedNode.data.highlight !== highlight ?
         highlight : null;
+    // redraw the node
     jm.update_node(selectedNode.id, selectedNode.topic);
 }
 
@@ -315,19 +310,8 @@ newChildBtn.onclick = function () {
 
 // tags
 tagStarBtn.onclick = function () {
-    let currentlySelectedNode = jm.get_selected_node();
-    if(!currentlySelectedNode) {
-        console.log("no node selected, applying nothing");
-        return;
-    }
-    applyTag(currentlySelectedNode, TAG_ICONS["2"]);
+    console.log("star tag button pressed!");
 }
-
-var dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'))
-var dropdownList = dropdownElementList.map(function (dropdownToggleEl) {
-    console.log(dropdownToggleEl);
-    // return new bootstrap.Dropdown(dropdownToggleEl)
-})
 
 // disable default <Ctrl> + <number_key> browser's shortcut
 // in case a tag should be toggled
