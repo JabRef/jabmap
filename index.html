@@ -25,6 +25,12 @@
       flex-grow: 1;
       overflow: auto;
     }
+
+    .dropdown-item .shortcut {
+      color: #6c757d;
+      font-size: 0.9em;
+      margin-left: 1rem;
+    }
   </style>
 </head>
 
@@ -75,13 +81,27 @@
             </button>
             <div class="dropdown-menu">
               <h6 class="dropdown-header">Icons for nodes</h6>
-              <button id="iconCycleBtn" class="dropdown-item">Cycle</button>
-              <button id="iconStarBtn" class="dropdown-item" type="button">Star</button>
-              <button id="iconQuestionBtn" class="dropdown-item" href="#">Question</button>
-              <button id="iconWarningBtn" class="dropdown-item">Warning</button>
-              <button id="iconLightbulbBtn" class="dropdown-item">Lamp</button>
-              <button id="iconGreenFlagBtn" class="dropdown-item">Green Flag</button>
-              <button id="iconRedFlagBtn" class="dropdown-item">Red Flag</button>
+              <button id="iconCycleBtn" class="dropdown-item d-flex justify-content-between">
+                <span>Cycle</span><span class="shortcut">Ctrl + 1</span>
+              </button>
+              <button id="iconStarBtn" class="dropdown-item d-flex justify-content-between">
+                <span>Star</span><span class="shortcut">Ctrl + 2</span>
+              </button>
+              <button id="iconQuestionBtn" class="dropdown-item d-flex justify-content-between">
+                <span>Question</span><span class="shortcut">Ctrl + 3</span>
+              </button>
+              <button id="iconWarningBtn" class="dropdown-item d-flex justify-content-between">
+                <span>Warning</span><span class="shortcut">Ctrl + 6</span>
+              </button>
+              <button id="iconLightbulbBtn" class="dropdown-item d-flex justify-content-between">
+                <span>Lightbulb</span><span class="shortcut">Ctrl + 7</span>
+              </button>
+              <button id="iconGreenFlagBtn" class="dropdown-item d-flex justify-content-between">
+                <span>Green Flag</span><span class="shortcut">Ctrl + 8</span>
+              </button>
+              <button id="iconRedFlagBtn" class="dropdown-item d-flex justify-content-between">
+                <span>Red Flag</span><span class="shortcut">Ctrl + 9</span>
+              </button>
             </div>
           </div>
       </div>
