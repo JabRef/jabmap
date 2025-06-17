@@ -132,25 +132,40 @@ const options = {
  * @param { string } iconKey - The key of the icon in the 'TAGS_ICONS' "dictionary".
  */
 function applyTag (selectedNode, iconKey) {
-    // TODO: add check cycling (key 1)
-    let keyNames = {
-        2: "star",
-        3: "question_mark",
-        6: "warning",
-        7: "light_bulb",
-        8: "green_flag",
-        9: "red_flag"
+    let keyIconSets = {
+        1: ["unchecked", "checked"],
+        2: ["star"],
+        3: ["question_mark"],
+        6: ["warning"],
+        7: ["light_bulb"],
+        8: ["green_flag"],
+        9: ["red_flag"]
     };
 
     // if the node doesn't have icons list, assign an empty one  
     selectedNode.data.icons = selectedNode.data.icons ?? [];
-    // getting currently applied tags
+
+    // getting currently applied tags and the list of toggling ones
     const appliedIcons = selectedNode.data.icons;
-    // and toggling the given one
-    if (appliedIcons.includes(keyNames[iconKey])) {
-        selectedNode.data.icons.splice(appliedIcons.indexOf(keyNames[iconKey]), 1);
+    const iconSet = keyIconSets[iconKey];
+
+    // searching for icon and its index to replace or remove
+    let toggledIcon = appliedIcons.find(function (icon) {
+        return iconSet.includes(icon);
+    });
+    let toggledIndex = appliedIcons.indexOf(toggledIcon);
+
+    // if nothing's found, add the first one of the icon set
+    if (!toggledIcon) {
+        selectedNode.data.icons.push(iconSet[0]);
+    }
+    // if found icon is the last one of the set
+    if (toggledIcon === iconSet[iconSet.length - 1]) {
+        // simply remove it
+        selectedNode.data.icons.splice(toggledIndex, 1);
     } else {
-        selectedNode.data.icons.push(keyNames[iconKey]);
+        // otherwise swap it with the next one of the set
+        selectedNode.data.icons[toggledIndex] = iconSet[iconSet.indexOf(toggledIcon) + 1];
     }
     // redraw the node and memorize current state
     jm.update_node(selectedNode.id, selectedNode.topic);
