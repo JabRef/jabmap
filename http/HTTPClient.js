@@ -111,9 +111,9 @@ export class HTTPClient {
         // The url will probably be modified according to mindMap's properties (coming in sprint 2)
         const url = path;
         const options = {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ map: mindMap })
+            method: "PUT",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({map: mindMap})
         }
 
         return this.#performFetch(url, options)
