@@ -1,55 +1,138 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
+
 <head>
-  <link
-          type="text/css"
-          rel="stylesheet"
-          href="//cdn.jsdelivr.net/npm/jsmind@0.8.7/style/jsmind.css"
-  />
-  <script
-          type="text/javascript"
-          src="//cdn.jsdelivr.net/npm/jsmind@0.8.7/es6/jsmind.js"
-  ></script>
+  <meta charset="UTF-8" />
+  <title>JabMap</title>
+  <link rel="stylesheet" href="src/jsmind/style/jsmind.css" />
+  <style>
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+    }
+
+    nav.navbar {
+      flex-shrink: 0;
+    }
+
+    #jsmind_container {
+      flex-grow: 1;
+      overflow: auto;
+    }
+
+    .dropdown-item .shortcut {
+      color: #6c757d;
+      font-size: 0.9em;
+      margin-left: 1rem;
+    }
+  </style>
 </head>
+
 <body>
-<div id="jsmind_container"></div>
-<script type="text/javascript" src="https://unpkg.com/jsmind@0.8.7/es6/jsmind.draggable-node.js"></script>
-<script type="text/javascript">
-  var mind = {
-    "meta":{
-      "name":"jsMind remote",
-      "author":"hizzgdev@163.com",
-      "version":"0.2"
-    },
-    "format":"node_tree",
-    "data":{"id":"root","topic":"jsMind","children":[
-        {"id":"easy","topic":"Easy","direction":"left","children":[
-            {"id":"easy1","topic":"Easy to show"},
-            {"id":"easy2","topic":"Easy to edit"},
-            {"id":"easy3","topic":"Easy to store"},
-            {"id":"easy4","topic":"Easy to embed"}
-          ]},
-        {"id":"open","topic":"Open Source","direction":"right","children":[
-            {"id":"open1","topic":"on GitHub"},
-            {"id":"open2","topic":"BSD License"}
-          ]},
-        {"id":"powerful","topic":"Powerful","direction":"right","children":[
-            {"id":"powerful1","topic":"Base on Javascript"},
-            {"id":"powerful2","topic":"Base on HTML5"},
-            {"id":"powerful3","topic":"Depends on you"}
-          ]},
-        {"id":"other","topic":"test node","direction":"left","children":[
-            {"id":"other1","topic":"I'm from local variable"},
-            {"id":"other2","topic":"I can do everything"}
-          ]}
-      ]}
-  };
-  var options = {
-    container: 'jsmind_container',
-    theme: 'orange',
-    editable: true,
-  };
-  var jm = new jsMind(options);
-  jm.show(mind);
-</script>
+  <!--Navbar with Buttons-->
+  <nav class="navbar bg-body-tertiary">
+    <div class="container-fluid">
+      <div class = "d-flex align-items-start" style="flex-basis: 33%; max-width: 33%;">
+        <!--JabMap title-->
+        <a class="navbar-brand" href="#">JabMap</a>
+
+        <!--Save and Load Buttons-->
+        <button id="saveBtn" class="btn btn-light me-2" type="button" data-bs-toggle="tooltip" title="Save">
+          <i class="bi bi-save"></i> Save
+        </button>
+        <button id="openBtn" class="btn btn-light me-2" type="button" data-bs-toggle="modal" title="Open" data-bs-target="#selectMindmapModal">
+          <i class="bi bi-folder2-open"></i> Open
+        </button>
+        <!--Debug button-->
+        <button id="printMapToConsoleBtn" class="btn btn-light me-2" type="button" data-bs-toggle="tooltip" title="Debug">
+          Debug
+        </button>
+      </div>
+
+      <!--Editor buttons-->
+      <div class="d-flex justify-content-center" style="flex-basis: 33%; max-width: 33%;">
+          <!--Button class explanation: class = "btn color theme margin to the right (me-2)"-->
+          <!--Undo Button-->
+          <button id="undoBtn" class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="Undo">
+            <i class="bi bi-arrow-counterclockwise"></i>
+          </button>
+          <!--Redo Button-->
+          <button id="redoBtn" class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="Redo">
+            <i class="bi bi-arrow-clockwise"></i>
+          </button>
+          <!--New Topic (sibling node) Button-->
+          <button id="newSiblingBtn" class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="New sibling node">
+            <i class="bi bi-node-plus-fill"></i>
+          </button>
+          <!--New Subtopic (child node) Button (icon rotated 90 degrees)-->
+          <button id="newChildBtn" class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="New child node">
+            <i class="bi bi-diagram-2-fill" style="transform: rotate(-90deg); display: inline-block;"></i>
+          </button>
+          <!--Tags Dropdown-->
+          <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="tagsDropdownMenuButton" data-bs-toggle="dropdown">
+              <i class="bi bi-tags"></i>
+            </button>
+            <div class="dropdown-menu">
+              <h6 class="dropdown-header">Icons for nodes</h6>
+              <button id="iconCycleBtn" class="dropdown-item d-flex justify-content-between">
+                <span>Cycle</span><span class="shortcut">Ctrl + 1</span>
+              </button>
+              <button id="iconStarBtn" class="dropdown-item d-flex justify-content-between">
+                <span>Star</span><span class="shortcut">Ctrl + 2</span>
+              </button>
+              <button id="iconQuestionBtn" class="dropdown-item d-flex justify-content-between">
+                <span>Question</span><span class="shortcut">Ctrl + 3</span>
+              </button>
+              <button id="iconWarningBtn" class="dropdown-item d-flex justify-content-between">
+                <span>Warning</span><span class="shortcut">Ctrl + 6</span>
+              </button>
+              <button id="iconLightbulbBtn" class="dropdown-item d-flex justify-content-between">
+                <span>Lightbulb</span><span class="shortcut">Ctrl + 7</span>
+              </button>
+              <button id="iconGreenFlagBtn" class="dropdown-item d-flex justify-content-between">
+                <span>Green Flag</span><span class="shortcut">Ctrl + 8</span>
+              </button>
+              <button id="iconRedFlagBtn" class="dropdown-item d-flex justify-content-between">
+                <span>Red Flag</span><span class="shortcut">Ctrl + 9</span>
+              </button>
+            </div>
+          </div>
+      </div>
+      <div style="flex-basis: 33%; max-width: 33%;"></div>
+    </div>
+  </nav>
+
+  <!--Required jsMind container-->
+  <div id="jsmind_container" style="width:100%;height:100vh;background:#f4f4f4;"></div>
+
+  <!-- Modal for the "Open" dialog-->
+  <div class="modal fade" id="selectMindmapModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Choose a JabMap to open</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <select class="form-select" id="openMindmapSelect" size="10"></select>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="openSelectedMapBtn" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+            Open
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
 </body>
+
 </html>
