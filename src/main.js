@@ -238,6 +238,11 @@ openBtn.onclick = async function () {
             + availableMaps[i]
             + '</option>';
     }
+
+    if(bsSelect.innerHTML != '') {
+        // select first element
+        bsSelect.selectedIndex = 0;
+    }
 }
 
 // <modal> dialog confirmation button
@@ -245,14 +250,16 @@ openSelectedMapBtn.onclick = async function () {
     // access bootstrap's <form-select> element
     let bsSelect = document.getElementById('openMindmapSelect');
 
-    // get selected mind map's name and it's data from server
-    let selectedOption = bsSelect.options[bsSelect.selectedIndex].value;
+    try {
+        // get selected mind map's name and it's data from server
+        let selectedOption = bsSelect.options[bsSelect.selectedIndex].value;
+        let loadResponse = await httpClient.loadMap(selectedOption);
 
-    let mindMapPath = "libraries/" + selectedOption + "/map";
-    let loadResponse = await httpClient.loadMap(mindMapPath);
-
-    // display the retrieved mind map
-    jm.show(loadResponse.map);
+        // display the retrieved mind map
+        jm.show(loadResponse.map);
+    } catch (e) {
+        console.log(`Couldnt open map - no libary selected`);
+    }
 }
 
 // debug button prints current mindmap state to console
