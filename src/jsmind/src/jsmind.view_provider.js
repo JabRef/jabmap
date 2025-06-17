@@ -6,6 +6,9 @@
  * Project Home:
  *   https://github.com/hizzgdev/jsmind/
  */
+// Altered lines:
+import { ResourceManager } from '../../ResourceManager.js';
+// End
 import { logger, EventType } from './jsmind.common.js';
 import { $ } from './jsmind.dom.js';
 import { init_graph } from './jsmind.graph.js';
@@ -35,6 +38,9 @@ export class ViewProvider {
             ? $.w.devicePixelRatio || 1
             : 1;
         this._initialized = false;
+        // Altered lines:
+        this.resourceManager = new ResourceManager();
+        // End
     }
     init() {
         logger.debug(this.opts);
@@ -495,7 +501,26 @@ export class ViewProvider {
 
     _default_node_render(ele, node) {
         if (this.opts.support_html) {
-            $.h(ele, node.topic);
+            // Altered lines:
+            // Building HTML <img> tags to attach to the node
+            const icons = (node.data.icons || [])
+                .map(iconKey => `<img src="${this.resourceManager.TAG_ICONS[iconKey]}" style="width: 16px; height: 16px; margin-right: 2px; vertical-align: middle;">`)
+                .join('');
+            // Also defining text's styling property
+            let highlighting = node.data.highlight;
+            if (!!highlighting) {
+                highlighting = this.resourceManager.HIGHLIGHTS[highlighting];
+            }
+
+            // Constructing the node's HTML element to render
+            const html = `
+              <div>
+                    <span>${icons}</span>
+                    <span style="background: ${highlighting}">${node.topic}</span>
+              </div>`;
+            // Rendering the node
+            $.h(ele, html);
+            // End
         } else {
             $.t(ele, node.topic);
         }
