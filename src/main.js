@@ -76,6 +76,24 @@ const options = {
             'redo': function (jm, e) {
                 // display mind map's next state (redo the next operation)
                 jm.redo();
+            },
+            'toggleTag': function (jm, e) {
+                let selectedNode = jm.get_selected_node();
+                // if no node's selected -> skip
+                if (!selectedNode) {
+                    return;
+                }
+                // apply / remove a tag otherwise
+                applyTag(selectedNode, e.key);
+            },
+            'toggleHighlight': function (jm, e) {
+                let selectedNode = jm.get_selected_node();
+                // if no node's selected -> skip
+                if (!selectedNode) {
+                    return;
+                }
+                // apply / remove a highlight
+                applyHighlight(selectedNode, e.key);
             }
         },
         mapping: { 			            // Shortcut key mapping
@@ -89,10 +107,105 @@ const options = {
             right: 39, 		            // <Right>
             down: 40, 		            // <Down>
             undo: 4096 + 90,            // <Ctrl> + <Z>
-            redo: 4096 + 1024 + 90      // <Ctrl> + <Shift> + <Z>
+            redo: 4096 + 1024 + 90,     // <Ctrl> + <Shift> + <Z>
+            toggleTag: [                // <Ctrl> +
+                4096 + 49,              // <1> - Cycle (checkboxes)
+                4096 + 50,              // <2> - Star
+                4096 + 51,              // <3> - Question
+                4096 + 54,              // <6> - Lamp
+                4096 + 55,              // <7> - Warning
+                4096 + 56,              // <8> - Green Flag
+                4096 + 57,              // <9> - Red Flag
+            ],
+            toggleHighlight: [
+                4096 + 52,              // <4> - Yellow Highlight
+                4096 + 53,              // <5> - Green Highlight
+            ]
         }
     },
 };
+
+/**
+ * Applies or removes a specific tag icon to / from the selected node.
+ * @param { object } selectedNode - The node a tag should be
+ * applied to / removed from.
+ * @param { string } iconKey - The key of the icon in the 'TAGS_ICONS' "dictionary".
+ */
+function applyTag (selectedNode, iconKey) {
+    let keyIconSets = {
+        1: ["unchecked", "checked"],
+        2: ["star"],
+        3: ["question_mark"],
+        6: ["warning"],
+        7: ["light_bulb"],
+        8: ["green_flag"],
+        9: ["red_flag"]
+    };
+
+    // if the node doesn't have icons list, assign an empty one  
+    selectedNode.data.icons = selectedNode.data.icons ?? [];
+
+    // getting currently applied tags and the list of toggling ones
+    const appliedIcons = selectedNode.data.icons;
+    const iconSet = keyIconSets[iconKey];
+
+    // searching for icon and its index to replace or remove
+    let toggledIcon = appliedIcons.find(function (icon) {
+        return iconSet.includes(icon);
+    });
+    let toggledIndex = appliedIcons.indexOf(toggledIcon);
+
+    // if nothing's found, add the first one of the icon set
+    if (!toggledIcon) {
+        selectedNode.data.icons.push(iconSet[0]);
+    }
+    // if found icon is the last one of the set
+    if (toggledIcon === iconSet[iconSet.length - 1]) {
+        // simply remove it
+        selectedNode.data.icons.splice(toggledIndex, 1);
+    } else {
+        // otherwise swap it with the next one of the set
+        selectedNode.data.icons[toggledIndex] = iconSet[iconSet.indexOf(toggledIcon) + 1];
+    }
+    // redraw the node and memorize current state
+    jm.update_node(selectedNode.id, selectedNode.topic);
+    jm.saveState();
+}
+
+/**
+ * Applies or removes a specific highlight color to / from
+ * the selected node.
+ * @param { object } selectedNode - The node a highlight should be
+ * applied to / removed from.
+ * @param { string } highlightKey - The color of the highlight.
+ */
+function applyHighlight (selectedNode, highlight) {
+    selectedNode.data.highlight = selectedNode.data.highlight !== highlight ?
+        highlight : null;
+    // redraw the node and memorize current state
+    jm.update_node(selectedNode.id, selectedNode.topic);
+    jm.saveState();
+}
+
+/**
+ * Adds "icons" and "highlight" properties to a node object
+ * and all its children (this doesn't overwrite existing ones).
+ * @param { object } node - The node object to extend.
+ */
+function extendNode (node) {
+    if (!node) {
+        return;
+    }
+
+    node.icons = node.icons ?? [];
+    node.highlight = node.highlight ?? null;
+
+    if (!!node.children) {
+        node.children.map((child) => { extendNode(child); });
+    }
+}
+// extend the default mind map
+extendNode(mind.data);
 
 // create a render for mind maps and display the initial one
 const jm = new jsMind(options);
@@ -142,6 +255,11 @@ openSelectedMapBtn.onclick = async function () {
     jm.show(loadResponse.map);
 }
 
+// debug button prints current mindmap state to console
+printMapToConsoleBtn.onclick = function () {
+    console.log(jm.get_data());
+}
+
 // undo - discard the last operation (display the previous state)
 undoBtn.onclick = function () {
     jm.undo();
@@ -166,7 +284,53 @@ newChildBtn.onclick = function () {
     }
 }
 
-// tags
-tagsBtn.onclick = function () {
-    // tags magic here..
+// icon-dropdown menu button handlers
+iconCycleBtn.onclick = function () {
+    if(jm != null) {
+        applyTag(jm.get_selected_node(),1);
+    }
 }
+
+iconStarBtn.onclick = function () {
+    if(jm != null) {
+        applyTag(jm.get_selected_node(),2);
+    }
+}
+
+iconQuestionBtn.onclick = function () {
+    if(jm != null) {
+        applyTag(jm.get_selected_node(),3);
+    }
+}
+
+iconWarningBtn.onclick = function () {
+    if(jm != null) {
+        applyTag(jm.get_selected_node(),6);
+    }
+}
+
+iconLightbulbBtn.onclick = function () {
+    if(jm != null) {
+        applyTag(jm.get_selected_node(),7);
+    }
+}
+
+iconGreenFlagBtn.onclick = function () {
+    if(jm != null) {
+        applyTag(jm.get_selected_node(),8);
+    }
+}
+
+iconRedFlagBtn.onclick = function () {
+    if(jm != null) {
+        applyTag(jm.get_selected_node(),9);
+    }
+}
+
+// disable default <Ctrl> + <number_key> browser's shortcut
+// in case a tag should be toggled
+document.addEventListener("keydown", (e) => {
+    if (e.ctrlKey && (jm.get_selected_node() && !jm.view.editing_node)) {
+        e.preventDefault();
+    }
+});
