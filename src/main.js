@@ -252,13 +252,17 @@ openSelectedMapBtn.onclick = async function () {
 
     // display the retrieved mind map
     jm.show(loadResponse.map);
-
-    console.log(httpClient.listEntries());
 }
 
 // debug button prints current mindmap state to console
-printMapToConsoleBtn.onclick = function () {
+printMapToConsoleBtn.onclick = async function () {
+    // print mindmap data
     console.log(jm.get_data());
+    // print currently active library
+    console.log(httpClient.currentLibrary);
+    // Get preview string for "Tokede_2011" current library (has to be demo to deliver result)
+    let preview = await httpClient.getPreviewString("Tokede_2011");
+    console.log(preview);
 }
 
 // undo - discard the last operation (display the previous state)

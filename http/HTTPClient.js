@@ -41,7 +41,14 @@ export class HTTPClient {
 
             // If some output is awaited, save it
             if (options.method !== "PUT") {
-                result = await response.json();
+                // when requesting a json (e.g. a mindmap)
+                if(options.headers["Content-Type"] === "application/json") {
+                    result = await response.json();
+                }
+                // when requesting a plain text (e.g. an entry preview string)
+                else if (options.headers["Content-Type"] === "text/plain") {
+                    result = await response.text();
+                }
             }
 
             // Providing infos about the request
@@ -82,7 +89,7 @@ export class HTTPClient {
         }
         // change current library
         this.currentLibrary = library;
-        console.log(this.currentLibrary);
+        console.log(`current library is now: ${this.currentLibrary}`);
         return this.#performRequest(url, options);
     }
 
@@ -126,5 +133,19 @@ export class HTTPClient {
         }
         // TODO - format the list to contain the keys, titles, authors and releases of the entries and return it
         return this.#performRequest(this.currentLibrary, options)
+    }
+
+    /*
+    * Request the preview for a certain BibEntry from the current library.
+    * @param {string} citationKey - The citation key (identifier) of the entry
+    * @returns A string containing the preview with relevant information about the entry (e.g. author, title, release date ...)
+    * */
+    async getPreviewString(citationKey = ""){
+        const options = {
+            method: "GET",
+            headers: { "Content-Type": "text/plain" }
+        }
+        console.log(`${this.#host}${this.currentLibrary}/entries/${citationKey}`);
+        return this.#performRequest(`${this.currentLibrary}/entries/${citationKey}`, options);
     }
 }
