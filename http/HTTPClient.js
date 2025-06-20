@@ -5,9 +5,18 @@ export class HTTPClient {
     #host = "http://localhost:6050/libraries/";
 
     constructor() {
-        // The default return value for PUT and POST requests
+        /**
+         * The default return value for PUT requests.
+         */
         this.NULL_MAP = { map: {} };
         this.currentLibrary = "demo";
+
+        /**
+         * The default GET response types to await:
+         * - **application/json** for objects (e.g. a mind map)
+         * - **text/plain** for strings and HTML tags (e.g. an entry preview)
+         */
+        this.GET_RESPONSE_TYPES = ["application/json", "text/plain"];
     }
 
     /**
@@ -41,13 +50,8 @@ export class HTTPClient {
 
             // If some output is awaited, save it
             if (options.method !== "PUT") {
-                // when requesting a json (e.g. a mindmap)
-                if(options.headers["Content-Type"] === "application/json") {
+                if (this.GET_RESPONSE_TYPES.includes(options.headers["Content-Type"])) {
                     result = await response.json();
-                }
-                // when requesting a plain text (e.g. an entry preview string)
-                else if (options.headers["Content-Type"] === "text/plain") {
-                    result = await response.text();
                 }
             }
 
