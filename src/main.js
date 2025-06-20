@@ -289,6 +289,69 @@ newChildBtn.onclick = function () {
     }
 }
 
+newBibEntryButton.onclick = async function () {
+    // prepare a placeholder for the list of mind map's BibEntries
+    let availableEntries;
+    // and for a message for the case selection should be interrupted
+    let denyMessage;
+
+    // access bootstrap's <form-select> element and confirm buttons
+    let bsSelect = document.getElementById('addBibEntriesSelect');
+    let addChildBtn = document.getElementById('addChildBibEntriesBtn');
+    let addSiblingBtn = document.getElementById('addSiblingBibEntriesBtn');
+
+    // if a node is selected, get BibEntries
+    if (jm.get_selected_node()) {
+        availableEntries = await httpClient.listEntries();
+        // if there're no Entries, set a deny message
+        denyMessage = availableEntries.length !== 0 ? denyMessage :
+            `There\'re no BibEntries currently stored in ` +
+            `${httpClient.currentLibrary.slice(0, httpClient.currentLibrary.length - 13)}.`
+    } else {
+        // if no node's selected, set a deny message
+        denyMessage = 'Please select a node first.';
+    }
+
+    // if selection should be interrupted
+    if (!!denyMessage) {
+        // show the message and disable related buttons
+        bsSelect.innerHTML = `<div>${denyMessage}</div>`;
+        toggleButtonsEnabled([addChildBtn, addSiblingBtn], false);
+        
+        return;
+    }
+    
+    // otherwise ensure add-buttons are enabled 
+    toggleButtonsEnabled([addChildBtn, addSiblingBtn], true);
+    // and replace select's options with retrieved ones
+    bsSelect.innerHTML = '';
+    for (let i = 0; i < availableEntries.length; i++) {
+        bsSelect.innerHTML +=
+            `<option value=${availableEntries[i].id}>` +
+            `${availableEntries[i].id}: ` +
+            `${availableEntries[i].title}` +
+            `</option>`;
+    }
+}
+
+/**
+ * Turns on and off given buttons using their .disabled property.
+ * * Note: buttons (*even a single one*) should be passed as an array / list.
+ * @param {Array} buttons - The list of bootstrap buttons to toggle.
+ * @param {boolean} isEnabled - The flag to set buttons' .disabled property to.
+ */
+function toggleButtonsEnabled(buttons, isEnabled) {
+    buttons.forEach(b => b.disabled = !isEnabled);
+}
+
+addChildBibEntriesBtn.onclick = function () {
+    console.log('Added BibEntries as children');
+}
+
+addSiblingBibEntriesBtn.onclick = function () {
+    console.log('Added BibEntries as siblings');
+}
+
 // icon-dropdown menu button handlers
 iconCycleBtn.onclick = function () {
     if(jm != null) {
