@@ -53,13 +53,13 @@ export class HTTPClient {
 
             // Providing infos about the request
             logMessage =
-                `${options.method} ${url} Request succeeded (~ UwU)~(${response.status}).\n` +
+                `${options.method} ${requestUrl} Request succeeded (~ UwU)~(${response.status}).\n` +
                 `Output:\n` +
                 `${JSON.stringify(result, null, 2)}`;
         } catch (e) {
             // Logging basic information about the error
             console.error(e);
-            logMessage = `${options.method} ${url} Request failed (.'T_T)`;
+            logMessage = `${options.method} ${requestUrl} Request failed (.'T_T)`;
 
             // If connection was present, provide more details
             if (typeof (response) !== "undefined") {
@@ -80,16 +80,17 @@ export class HTTPClient {
      * Requests a mind map (.jmp file) from JabRef's server.
      * @param { string } library - The library of the requested mind map.
      * @returns The requested mind map object.
-    */
+     */
     async loadMap(library = "demo") {
         const url = library + "/map";
         const options = {
             method: "GET",
             headers: { "Content-Type": "application/json" }
         }
-        // change current library
+        // Changing current library
         this.currentLibrary = library;
-        console.log(`current library is now: ${this.currentLibrary}`);
+
+        console.log(`Current library is now: ${this.currentLibrary}`);
         return this.#performRequest(url, options);
     }
 
@@ -97,7 +98,7 @@ export class HTTPClient {
      * Sends a mind map to JabRef's server to save next to currently active library.
      * @param { object } mindMap - The mind map to save.
      * @returns An empty map object (NULL_MAP).
-    */
+     */
     async saveMap(mindMap) {
         const url = this.currentLibrary + "/map";
         const options = {
@@ -122,11 +123,11 @@ export class HTTPClient {
         return this.#performRequest("", options)
     }
 
-    /*
-    * Requests a list of all entries in the current library.
-    * @returns A list of all entries in the current library in json format.
-    */
-    async listEntries(){
+    /**
+     * Requests a list of all entries in the current library.
+     * @returns A list of all entries in the current library in json format.
+     */
+    async listEntries() {
         const options = {
             method: "GET",
             headers: { "Content-Type": "application/json" }
@@ -135,17 +136,18 @@ export class HTTPClient {
         return this.#performRequest(this.currentLibrary, options)
     }
 
-    /*
-    * Request the preview for a certain BibEntry from the current library.
-    * @param {string} citationKey - The citation key (identifier) of the entry
-    * @returns A string containing the preview with relevant information about the entry (e.g. author, title, release date ...)
-    * */
-    async getPreviewString(citationKey = ""){
+    /**
+     * Requests the preview for a certain BibEntry from the current library.
+     * @param {string} citationKey - The citation key (identifier) of the entry.
+     * @returns A string containing the preview with relevant information
+     * about the entry (e.g. author, title, release date, etc.).
+     */
+    async getPreviewString(citationKey = "") {
         const options = {
             method: "GET",
             headers: { "Content-Type": "text/plain" }
         }
-        console.log(`${this.#host}${this.currentLibrary}/entries/${citationKey}`);
+        
         return this.#performRequest(`${this.currentLibrary}/entries/${citationKey}`, options);
     }
 }
