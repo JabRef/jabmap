@@ -234,9 +234,9 @@ openBtn.onclick = async function () {
     bsSelect.innerHTML = '';
     for (let i = 0; i < availableMaps.length; i++) {
         bsSelect.innerHTML +=
-            '<option value="' + availableMaps[i] + '">'
-            + availableMaps[i]
-            + '</option>';
+            `<option value=${availableMaps[i]}>` +
+            `${availableMaps[i]}` +
+            `</option>`;
     }
 }
 
@@ -249,6 +249,9 @@ openSelectedMapBtn.onclick = async function () {
     let selectedOption = bsSelect.options[bsSelect.selectedIndex].value;
 
     let loadResponse = await httpClient.loadMap(selectedOption);
+
+    // if no mind map exists, show the default one
+    loadResponse = loadResponse ?? mind;
 
     // display the retrieved mind map
     jm.show(loadResponse.map);
