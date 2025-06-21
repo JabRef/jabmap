@@ -5,12 +5,15 @@ export class HTTPClient {
     #host = "http://localhost:6050/";
 
     constructor() {
-        // The default return value for PUT and POST requests
+        /**
+         * The default return value for PUT requests.
+         */
         this.NULL_MAP = { map: {} };
+        this.currentLibrary = "demo";
     }
 
     /**
-     * Sends a HTTP-request to the JabRef's server.
+     * Sends a HTTP-request to JabRef's server.
      * @param { string } url - The server's URL to make a request to. 
      * @param { object } options - Optional request's options.
      * @returns
@@ -18,8 +21,8 @@ export class HTTPClient {
      * - An **object** { map: {} } in case of a `PUT / POST request`
      * or if any request failed.
      */
-    async #performFetch(url, options = null) {
-        let fetchResult = this.NULL_MAP;
+    async #performRequest(url, options = null) {
+        let result = this.NULL_MAP;
         let logMessage = "";
 
         const requestUrl = this.#host.concat(url);
@@ -40,18 +43,26 @@ export class HTTPClient {
 
             // If some output is awaited, save it
             if (options.method !== "PUT") {
-                fetchResult = await response.json();
+                if (options.headers["Content-Type"] === 'application/json') {
+                    result = await response.json();
+                }
+                if (options.headers["Accept"] === 'text/plain') {
+                    result = await response.text();
+                }
+                if (options.headers["Accept"] === 'text/html') {
+                    result = await response.text();
+                }
             }
 
             // Providing infos about the request
             logMessage =
-                `${options.method} ${url} Request succeeded (~ UwU)~(${response.status}).\n` +
+                `${options.method} ${requestUrl} Request succeeded (~ UwU)~(${response.status}).\n` +
                 `Output:\n` +
-                `${JSON.stringify(fetchResult, null, 2)}`;
+                `${JSON.stringify(result, null, 2)}`;
         } catch (e) {
             // Logging basic information about the error
             console.error(e);
-            logMessage = `${options.method} ${url} Request failed (.'T_T)`;
+            logMessage = `${options.method} ${requestUrl} Request failed (.'T_T)`;
 
             // If connection was present, provide more details
             if (typeof (response) !== "undefined") {
@@ -65,58 +76,42 @@ export class HTTPClient {
         // Finally showing the resulting log
         console.log(logMessage);
 
-        return fetchResult;
+        return result;
     }
 
     /**
      * Requests a mind map (.jmp file) from JabRef's server.
-     * @param { string } path - The path to the requested mind map.
+     * @param { string } library - The library of the requested mind map.
      * @returns The requested mind map object.
-    */
-    async loadMap(path = "libraries/demo/map") {
-        const url = path;
+     */
+    async loadMap(library = "demo") {
+        const url = `libraries/${library}/map`;
         const options = {
             method: "GET",
             headers: { "Content-Type": "application/json" }
         }
 
-        return this.#performFetch(url, options);
+        // Changing current library
+        this.currentLibrary = library;
+        console.log(`Current library is now: ${this.currentLibrary}`);
+
+        return this.#performRequest(url, options);
     }
 
     /**
-     * Sends a mind map to JabRef's server to save.
+     * Sends a mind map to JabRef's server to save next to currently active library.
      * @param { object } mindMap - The mind map to save.
-     * @param { string } path - The path to save the mind map to.
      * @returns An empty map object (NULL_MAP).
-    */
-    async saveMap(mindMap, path = "libraries/demo/map") {
-        // The url will probably be modified according to mindMap's properties (coming in sprint 2)
-        const url = path;
+     */
+    async saveMap(mindMap) {
+        const url = `libraries/${this.currentLibrary}/map`;
         const options = {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ map: mindMap })
         }
 
-        return this.#performFetch(url, options)
-    }
-
-    /**
-     * Sends a mind map to JabRef's server to save for the first time.
-     * @param { object } mindMap - The mind map to save.
-     * @param { string } path - The path to save the mind map to.
-     * @returns An empty map object (NULL_MAP).
-     */
-    async saveNewMap(mindMap, path = "libraries/demo/map") {
-        // The url will probably be modified according to mindMap's properties (coming in sprint 2)
-        const url = path;
-        const options = {
-            method: "PUT",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({map: mindMap})
-        }
-
-        return this.#performFetch(url, options)
+        return this.#performRequest(url, options)
     }
 
     /**
@@ -124,12 +119,72 @@ export class HTTPClient {
      * @returns A list of available mind maps stored on the server.
      */
     async listMaps() {
-        const url = "libraries";
+        const url = 'libraries'
         const options = {
             method: "GET",
             headers: { "Content-Type": "application/json" }
         }
 
-        return this.#performFetch(url, options)
+        return this.#performRequest(url, options)
+    }
+
+    /**
+     * Requests a list of all entries in the current library.
+     * @returns A list of all entries in the current library in json format.
+     */
+    async listEntries() {
+        const options = {
+            method: "GET",
+            headers: { "Content-Type": "application/json" }
+        }
+        // TODO - format the list to contain the keys, titles, authors and releases of the entries and return it
+        return this.#performRequest(this.currentLibrary, options)
+    }
+
+    /**
+     * Sends a request to open a cite-as-you-write window
+     * to select saved citation keys.
+     * @returns A list of selected citation keys.
+     */
+    async getCiteKeysWithCAYW() {
+        const url = 'better-bibtex/cayw';
+        const options = {
+            method: "GET",
+            headers: { "Content-Type": "application/json" }
+        }
+
+        return this.#performRequest(url, options)
+    }
+
+    /**
+     * Requests the preview for a certain BibEntry from the current library.
+     * @param { string } citationKey - The citation key (identifier) of the entry.
+     * @returns A string containing the preview with relevant information
+     * about the entry (e.g. author, title, release date, etc.).
+     */
+    async getPreviewString(citationKey) {
+        const url = `libraries/${this.currentLibrary}/entries/${citationKey}`;
+        const options = {
+            method: "GET",
+            headers: { "Accept": "text/plain" }
+        }
+
+        return this.#performRequest(url, options);
+    }
+
+    /**
+     * Requests the preview for a certain BibEntry from the current library.
+     * @param { string } citationKey - The citation key (identifier) of the entry.
+     * @returns A string containing the preview with relevant information
+     * about the entry (e.g. author, title, release date, etc.).
+     */
+    async getPreviewHTML(citationKey) {
+        const url = `libraries/${this.currentLibrary}/entries/${citationKey}`;
+        const options = {
+            method: "GET",
+            headers: { "Accept": "text/html" }
+        }
+
+        return this.#performRequest(url, options);
     }
 }

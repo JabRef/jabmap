@@ -74,9 +74,10 @@
           <button id="newChildBtn" class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="New child node">
             <i class="bi bi-diagram-2-fill" style="transform: rotate(-90deg); display: inline-block;"></i>
           </button>
+
           <!--Tags Dropdown-->
           <div class="dropdown">
-            <button class="btn btn-secondary dropdown-toggle" type="button" id="tagsDropdownMenuButton" data-bs-toggle="dropdown">
+            <button class="btn btn-secondary dropdown-toggle me-2" type="button" id="tagsDropdownMenuButton" data-bs-toggle="dropdown">
               <i class="bi bi-tags"></i>
             </button>
             <div class="dropdown-menu">
@@ -101,6 +102,22 @@
               </button>
               <button id="iconRedFlagBtn" class="dropdown-item d-flex justify-content-between">
                 <span>Red Flag</span><span class="shortcut">Ctrl + 9</span>
+              </button>
+            </div>
+          </div>
+
+          <!--BibEntry nodes Dropdown-->
+          <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle me-2" id="BibEntryDropdownMenuButton" data-bs-toggle="dropdown">
+              <i class="bi bi-file-earmark-text"></i>
+            </button>
+            <div class="dropdown-menu">
+              <h6 class="dropdown-header">New BibEntry node</h6>
+              <button id="addBibEntryAsSiblingBtn" class="btn dropdown-item">
+                <i class="bi bi-node-plus-fill"> </i> As sibling node
+              </button>
+              <button id="addBibEntryAsChildBtn" class="btn dropdown-item">
+                <i class="bi bi-diagram-2-fill" style="transform: rotate(-90deg); display: inline-block;"> </i> As child node
               </button>
             </div>
           </div>
