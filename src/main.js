@@ -291,11 +291,11 @@ openSelectedMapBtn.onclick = async function () {
 printMapToConsoleBtn.onclick = async function () {
     // print mindmap data
     console.log(jm.get_data());
-    // print currently active library
+    /*// print currently active library
     console.log(httpClient.currentLibrary);
     // Get preview string for "Tokede_2011" current library (has to be demo to deliver result)
     let preview = await httpClient.getPreviewString("Tokede_2011");
-    console.log(preview);
+    console.log(preview);*/
 }
 
 // undo - discard the last operation (display the previous state)
@@ -395,6 +395,8 @@ addBibEntryAsChildBtn.onclick = async function () {
                 preview: bibProperties.preview
             });
     });
+    // save map state for undo/redo
+    jm.saveState();
 }
 
 addBibEntryAsSiblingBtn.onclick = async function () {
@@ -422,6 +424,8 @@ addBibEntryAsSiblingBtn.onclick = async function () {
                 preview: bibProperties.preview
             });
     });
+    // save map state for undo/redo
+    jm.saveState();
 }
 
 // icon-dropdown menu button handlers
