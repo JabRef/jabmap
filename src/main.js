@@ -258,6 +258,11 @@ openBtn.onclick = async function () {
             `${availableMaps[i]}` +
             `</option>`;
     }
+
+    if(bsSelect.innerHTML != '') {
+        // select first element
+        bsSelect.selectedIndex = 0;
+    }
 }
 
 // <modal> dialog confirmation button
@@ -275,10 +280,10 @@ openSelectedMapBtn.onclick = async function () {
 
     let loadResponse = await httpClient.loadMap(selectedOption.value);
     // if no mind map exists, show the default one
-    loadResponse = loadResponse.map ?? mind;
+    let loadedMap = loadResponse.map ?? mind;
 
     // display the retrieved mind map
-    jm.show(loadResponse.map);
+    jm.show(loadedMap);
     jm.resetStack();
 }
 
