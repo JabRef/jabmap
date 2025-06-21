@@ -206,7 +206,7 @@ function extendNode(node) {
     node.highlight = node.highlight ?? null;
 
     node.citeKey = node.citeKey ?? null;
-    node.bibPreview = node.bibPreview ?? null;
+    node.preview = node.preview ?? null;
 
     assignNodeType(node);
 
@@ -265,7 +265,7 @@ function hidePopovers() {
         if (bsToggle.getAttribute('data-bs-toggle') !== 'popover') {
             return;
         }
-        
+
         // otherwise hiding the toggle manually
         const popover = Popover.getInstance(bsToggle);
         if (popover) {
@@ -331,7 +331,7 @@ openBtn.onclick = async function () {
             `</option>`;
     }
 
-    if(bsSelect.innerHTML != '') {
+    if (bsSelect.innerHTML != '') {
         // select first element
         bsSelect.selectedIndex = 0;
     }
@@ -407,7 +407,7 @@ newChildBtn.onclick = function () {
 async function getBibNodesProperties() {
     // open cayw window and retrieve selected keys
     let selectedKeys = await httpClient.getCiteKeysWithCAYW();
-    
+
     // and get preview string for each selected key
     let bibNodesProperties = [];
     for (let i = 0; i < selectedKeys.length; i++) {
@@ -510,44 +510,44 @@ addBibEntryAsSiblingBtn.onclick = async function () {
 
 // icon-dropdown menu button handlers
 iconCycleBtn.onclick = function () {
-    if(jm != null) {
-        applyTag(jm.get_selected_node(),1);
+    if (jm != null) {
+        applyTag(jm.get_selected_node(), 1);
     }
 }
 
-iconStarBtn.onclick = function () {q
-    if(jm != null) {
-        applyTag(jm.get_selected_node(),2);
+iconStarBtn.onclick = function () {
+    if (jm != null) {
+        applyTag(jm.get_selected_node(), 2);
     }
 }
 
 iconQuestionBtn.onclick = function () {
-    if(jm != null) {
-        applyTag(jm.get_selected_node(),3);
+    if (jm != null) {
+        applyTag(jm.get_selected_node(), 3);
     }
 }
 
 iconWarningBtn.onclick = function () {
-    if(jm != null) {
-        applyTag(jm.get_selected_node(),6);
+    if (jm != null) {
+        applyTag(jm.get_selected_node(), 6);
     }
 }
 
 iconLightbulbBtn.onclick = function () {
-    if(jm != null) {
-        applyTag(jm.get_selected_node(),7);
+    if (jm != null) {
+        applyTag(jm.get_selected_node(), 7);
     }
 }
 
 iconGreenFlagBtn.onclick = function () {
-    if(jm != null) {
-        applyTag(jm.get_selected_node(),8);
+    if (jm != null) {
+        applyTag(jm.get_selected_node(), 8);
     }
 }
 
 iconRedFlagBtn.onclick = function () {
-    if(jm != null) {
-        applyTag(jm.get_selected_node(),9);
+    if (jm != null) {
+        applyTag(jm.get_selected_node(), 9);
     }
 }
 
