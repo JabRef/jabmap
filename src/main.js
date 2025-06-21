@@ -1,10 +1,13 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import 'bootstrap-icons/font/bootstrap-icons.css';
+import * as bootstrap from 'bootstrap';
+import Popover from 'bootstrap/js/dist/popover';
+import Dropdown from 'bootstrap/js/dist/dropdown';
 import jsMind from './jsmind/src/jsmind.js';
 import './jsmind/src/plugins/jsmind.draggable-node.js';
 import { HTTPClient } from '../http/HTTPClient';
-import * as bootstrap from 'bootstrap';
+
 
 
 // "load" initial mind map data
@@ -338,70 +341,82 @@ document.addEventListener("keydown", (e) => {
     }
 });
 
-// Static BibTeX entry example
-const entry = {
-    author: "R. Corti, A. J. Flammer, N. K. Hollenberg, and T. F. Lüscher",
-    title: "Cocoa and Cardiovascular Health",
-    journal: "Circulation, vol. 119, no. 10",
-    pages: "pp. 1433–1441",
-    releasedOn: "Mar. 2009"
+const entry = { // BibTeX entry object
+    author: "R. Corti, A. J. Flammer, N. K. Hollenberg, and T. F. Lüscher", // Author name
+    title: "Cocoa and Cardiovascular Health", // Article title
+    journal: "Circulation, vol. 119, no. 10", // Journal details
+    pages: "pp. 1433–1441", // Page numbers
+    releasedOn: "Mar. 2009" // Publication date
 };
 
-//  BibTeX-style entry object into popovers
-function getBibTeXEntry(entry) {
-    return `<strong>Author:</strong> ${entry.author},<br>
+function getBibTeXEntry(entry) { // Returns formatted BibTeX preview
+    return `
+<!--Author field-->
+<strong>Author:</strong> ${entry.author},<br> 
+<!--Title field-->
 <strong>Title:</strong> “${entry.title}”,<br>
-<strong>Journal:</strong> ${entry.journal},<br>
-<strong>Pages:</strong> ${entry.pages},<br>
+<!-- Journal field-->
+<strong>Journal:</strong> ${entry.journal},<br> 
+<!--Pages field-->
+<strong>Pages:</strong> ${entry.pages},<br> 
+<!-- Release date field-->
 <strong>Released on:</strong> ${entry.releasedOn},`;
 }
 
-// Creates a dummy BibTeX entry for a given node, using the node’s topic as the title
-function generateBibTeXEntry(node) {
+function generateBibTeXEntry(node) { // Generates a BibTeX entry based on the node's topic
     return {
-        author: `Auto Author for ${node.topic}`,
-        title: `${node.topic}`,
-        journal: `Auto Journal`,
-        pages: `pp. 1–10`,
-        releasedOn: `2025`
+        author: `Auto Author for ${node.topic}`, // Auto-generated author using node topic
+        title: `${node.topic}`, // Node topic as title
+        journal: `Auto Journal`, // Placeholder journal
+        pages: `pp. 1–10`, // Placeholder pages
+        releasedOn: `2025` // Placeholder release year
     };
 }
 
-// Attaches Bootstrap popovers to all elements with a 'nodeid' attribute,
-// showing BibTeX-style information when hovered or focused
-function addPopoversToNodes() {
-    document.querySelectorAll('[nodeid]').forEach(nodeElem => {
-        // Avoid re-initializing popovers
-        if (nodeElem.getAttribute('data-bs-toggle') === 'popover') return;
-
-        // Get node ID and corresponding node data from the mind map (jm)
-        const nodeId = nodeElem.getAttribute('nodeid');
-        const node = jm.get_node(nodeId);
-        const entry = generateBibTeXEntry(node);
-
-        // Set up popover attributes
-        nodeElem.setAttribute('data-bs-toggle', 'popover');
-        nodeElem.setAttribute('data-bs-trigger', 'hover focus');
-        nodeElem.setAttribute('data-bs-placement', 'right');
-        nodeElem.setAttribute('data-bs-html', 'true');
-        nodeElem.setAttribute('title', 'Entry Preview');
-        nodeElem.setAttribute('data-bs-content', getBibTeXEntry(entry));
-
-        // Initialize the Bootstrap popover
-        new bootstrap.Popover(nodeElem, { container: 'body' });
+function addPopoversToNodes() { // Attaches Bootstrap popovers to all mind map nodes
+    document.querySelectorAll('[nodeid]').forEach(nodeElem => { // Loop through all elements with node_id attribute
+        if (nodeElem.getAttribute('data-bs-toggle') === 'popover') return; // Skip if popover already attached
+        const nodeId = nodeElem.getAttribute('nodeid'); // Get node id
+        const node = jm.get_node(nodeId); // Get node object from jsMind
+        const entry = generateBibTeXEntry(node); // Generate BibTeX entry for this node
+        nodeElem.setAttribute('data-bs-toggle', 'popover'); // Enable popover
+        nodeElem.setAttribute('data-bs-trigger', 'hover focus'); // Show on hover
+        nodeElem.setAttribute('data-bs-placement', 'bottom'); // Always show popover below the node
+        nodeElem.setAttribute('data-bs-html', 'true'); // Allow HTML content in popover
+        nodeElem.setAttribute('title', 'Entry Preview'); // Popover title
+        nodeElem.setAttribute('data-bs-content', getBibTeXEntry(entry)); // Popover content
+        new bootstrap.Popover(nodeElem, { container: 'body' }); // Initialize Bootstrap popover
     });
 }
 
-// Once the DOM is fully loaded, attach popovers to all mind map nodes
-window.addEventListener('DOMContentLoaded', () => {
-    addPopoversToNodes();
+window.addEventListener('DOMContentLoaded', () => { // When DOM is fully loaded
+    addPopoversToNodes(); // Attach popovers to all nodes
 });
 
-// Re-add popovers when certain mind map events occur (e.g. showing or modifying nodes)
-jm.add_event_listener(function(type, data) {
-    if (['show', 'update', 'select_node', 'expand_node', 'collapse_node'].includes(type)) {
-        // Delay ensures the DOM updates are complete before attaching popovers
-        setTimeout(addPopoversToNodes, 100);
+jm.add_event_listener(function(type, data) { // Listen for jsMind events that update the mind map
+    if ([
+        'show',
+        'add_node',
+        'update',
+        'select_node',
+        'expand_node',
+        'collapse_node'
+    ].includes(type)) { // If event is one that changes the nodes
+        setTimeout(addPopoversToNodes, 100); // Re-attach popovers after a short delay
     }
 });
+
+// Adding Entry Preview to the Child Nodes
+const container = document.getElementById('jsmind_container'); // Get the mind map container
+new MutationObserver(muts => { // Observe DOM changes in the container
+    muts.forEach(m => {
+        m.addedNodes.forEach(n => {
+            if (n.nodeType === 1 && n.hasAttribute('nodeid')) { // If a new node element is added
+                addPopoversToNodes(); // Attach popover to the new node
+            }
+        });
+    });
+}).observe(container, { childList: true, subtree: true }); // Observe all child nodes and subtrees
+
+
 
