@@ -139,17 +139,33 @@ export class HTTPClient {
     }
 
     /**
+     * Sends a request to open a cite-as-you-write window
+     * to select saved citation keys.
+     * @returns A list of selected citation keys.
+     */
+    async getCiteKeysWithCAYW() {
+        const url = 'better-bibtex/cayw';
+        const options = {
+            method: "GET",
+            headers: { "Content-Type": "application/json" }
+        }
+
+        return this.#performRequest(url, options)
+    }
+
+    /**
      * Requests the preview for a certain BibEntry from the current library.
-     * @param {string} citationKey - The citation key (identifier) of the entry.
+     * @param { string } citationKey - The citation key (identifier) of the entry.
      * @returns A string containing the preview with relevant information
      * about the entry (e.g. author, title, release date, etc.).
      */
-    async getPreviewString(citationKey = "") {
+    async getPreviewString(citationKey) {
+        const url = `libraries/${this.currentLibrary}/entries/${citationKey}`;
         const options = {
             method: "GET",
             headers: { "Content-Type": "text/plain" }
         }
-        
-        return this.#performRequest(`${this.currentLibrary}/entries/${citationKey}`, options);
+
+        return this.#performRequest(url, options);
     }
 }

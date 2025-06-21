@@ -2,6 +2,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import jsMind from './jsmind/src/jsmind.js';
+// * Note: this import is important for proper manual node creation / addition
+import { util } from './jsmind/src/jsmind.util.js';
 import './jsmind/src/plugins/jsmind.draggable-node.js';
 import { HTTPClient } from '../http/HTTPClient';
 
@@ -200,6 +202,11 @@ function extendNode (node) {
     node.icons = node.icons ?? [];
     node.highlight = node.highlight ?? null;
 
+    node.citeKey = node.citeKey ?? null;
+    node.bibPreview = node.bibPreview ?? null;
+
+    node.type = node.type ?? 'TEXT';
+
     if (!!node.children) {
         node.children.map((child) => { extendNode(child); });
     }
@@ -292,49 +299,26 @@ newChildBtn.onclick = function () {
     }
 }
 
-newBibEntryButton.onclick = async function () {
-    // prepare a placeholder for the list of mind map's BibEntries
-    let availableEntries;
-    // and for a message for the case selection should be interrupted
-    let denyMessage;
-
-    // access bootstrap's <form-select> element and confirm buttons
-    let bsSelect = document.getElementById('addBibEntriesSelect');
-    let addChildBtn = document.getElementById('addChildBibEntriesBtn');
-    let addSiblingBtn = document.getElementById('addSiblingBibEntriesBtn');
-
-    // if a node is selected, get BibEntries
-    if (jm.get_selected_node()) {
-        availableEntries = await httpClient.listEntries();
-        // if there're no Entries, set a deny message
-        denyMessage = availableEntries.length !== 0 ? denyMessage :
-            `There\'re no BibEntries currently stored in ` +
-            `${httpClient.currentLibrary.slice(0, httpClient.currentLibrary.length - 13)}.`
-    } else {
-        // if no node's selected, set a deny message
-        denyMessage = 'Please select a node first.';
-    }
-
-    // if selection should be interrupted
-    if (!!denyMessage) {
-        // show the message and disable related buttons
-        bsSelect.innerHTML = `<div>${denyMessage}</div>`;
-        toggleButtonsEnabled([addChildBtn, addSiblingBtn], false);
-        
-        return;
-    }
+/**
+ * Opens a cite-as-you-write window to select citation keys and
+ * loads related previews upon confirmation.
+ * @returns A list of objects representing retrieved BibEntry properties
+ * structured as {key:<>, preview:<>}.
+ */
+async function getBibNodesProperties() {
+    // open cayw window and retrieve selected keys
+    let selectedKeys = await httpClient.getCiteKeysWithCAYW();
     
-    // otherwise ensure add-buttons are enabled 
-    toggleButtonsEnabled([addChildBtn, addSiblingBtn], true);
-    // and replace select's options with retrieved ones
-    bsSelect.innerHTML = '';
-    for (let i = 0; i < availableEntries.length; i++) {
-        bsSelect.innerHTML +=
-            `<option value=${availableEntries[i].id}>` +
-            `${availableEntries[i].id}: ` +
-            `${availableEntries[i].title}` +
-            `</option>`;
+    // and get preview string for each selected key
+    let bibNodesProperties = [];
+    for (let i = 0; i < selectedKeys.length; i++) {
+        bibNodesProperties.push({
+            key: selectedKeys[i],
+            preview: await httpClient.getPreviewString(selectedKeys[i])
+        });
     }
+
+    return bibNodesProperties;
 }
 
 /**
@@ -363,8 +347,58 @@ BibEntryDropdownMenuButton.onclick = function () {
     }
 }
 
-addSiblingBibEntriesBtn.onclick = function () {
-    console.log('Added BibEntries as siblings');
+addBibEntryAsChildBtn.onclick = async function () {
+    // * Note: one node is initially selected
+
+    // ask user to select some citation keys
+    // and retrieve related preview strings
+    const bibData = await getBibNodesProperties();
+
+    // if node's selection was revoked, break the process
+    let selectedNode = jm.get_selected_node();
+    if (!selectedNode) {
+        console.log('Fail: No node\'s selected to add BibEntries as children :(');
+        return;
+    }
+
+    // otherwise add extended nodes as children
+    bibData.forEach((bibProperties) => {
+        jm.add_node(selectedNode,
+            util.uuid.newid(),
+            bibProperties.key,
+            {
+                type: 'BIBE',
+                citeKey: bibProperties.key,
+                preview: bibProperties.preview
+            });
+    });
+}
+
+addBibEntryAsSiblingBtn.onclick = async function () {
+    // * Note: one node is initially selected
+
+    // ask user to select some citation keys
+    // and retrieve related preview strings
+    const bibData = await getBibNodesProperties();
+
+    // if node's selection was revoked, break the process
+    let selectedNode = jm.get_selected_node();
+    if (!selectedNode) {
+        console.log('Fail: No node\'s selected to add BibEntries as siblings :(');
+        return;
+    }
+
+    // otherwise add extended nodes as siblings
+    bibData.forEach((bibProperties) => {
+        jm.insert_node_after(selectedNode,
+            util.uuid.newid(),
+            bibProperties.key,
+            {
+                type: 'BIBE',
+                citeKey: bibProperties.key,
+                preview: bibProperties.preview
+            });
+    });
 }
 
 // icon-dropdown menu button handlers
