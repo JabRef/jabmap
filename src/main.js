@@ -133,7 +133,7 @@ const options = {
  * applied to / removed from.
  * @param { string } iconKey - The key of the icon in the 'TAGS_ICONS' "dictionary".
  */
-function applyTag (selectedNode, iconKey) {
+function applyTag(selectedNode, iconKey) {
     let keyIconSets = {
         1: ["unchecked", "checked"],
         2: ["star"],
@@ -181,7 +181,7 @@ function applyTag (selectedNode, iconKey) {
  * applied to / removed from.
  * @param { string } highlightKey - The color of the highlight.
  */
-function applyHighlight (selectedNode, highlight) {
+function applyHighlight(selectedNode, highlight) {
     selectedNode.data.highlight = selectedNode.data.highlight !== highlight ?
         highlight : null;
     // redraw the node and memorize current state
@@ -194,7 +194,7 @@ function applyHighlight (selectedNode, highlight) {
  * and all its children (this doesn't overwrite existing ones).
  * @param { object } node - The node object to extend.
  */
-function extendNode (node) {
+function extendNode(node) {
     if (!node) {
         return;
     }
@@ -205,11 +205,24 @@ function extendNode (node) {
     node.citeKey = node.citeKey ?? null;
     node.bibPreview = node.bibPreview ?? null;
 
-    node.type = node.type ?? 'TEXT';
+    assignNodeType(node);
 
     if (!!node.children) {
         node.children.map((child) => { extendNode(child); });
     }
+}
+/**
+ * Defines the type of a node depending on its properties.
+ * @param { object } node - The node to assign to a certain type.
+ */
+function assignNodeType(node) {
+    let type = 'TEXT';
+    if (!!node.citeKey) {
+        type = 'BIBE';
+    }
+
+    // * Note: this will probably be extended to handle PDFF / PDFC types 
+    node.type = type;
 }
 // extend the default mind map
 extendNode(mind.data);
