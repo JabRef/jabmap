@@ -4,6 +4,8 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import jsMind from './jsmind/src/jsmind.js';
 import './jsmind/src/plugins/jsmind.draggable-node.js';
 import { HTTPClient } from '../http/HTTPClient';
+import * as bootstrap from 'bootstrap';
+
 
 // "load" initial mind map data
 const mind = {
@@ -292,7 +294,7 @@ iconCycleBtn.onclick = function () {
     }
 }
 
-iconStarBtn.onclick = function () {
+iconStarBtn.onclick = function () {q
     if(jm != null) {
         applyTag(jm.get_selected_node(),2);
     }
@@ -335,3 +337,71 @@ document.addEventListener("keydown", (e) => {
         e.preventDefault();
     }
 });
+
+// Static BibTeX entry example
+const entry = {
+    author: "R. Corti, A. J. Flammer, N. K. Hollenberg, and T. F. Lüscher",
+    title: "Cocoa and Cardiovascular Health",
+    journal: "Circulation, vol. 119, no. 10",
+    pages: "pp. 1433–1441",
+    releasedOn: "Mar. 2009"
+};
+
+//  BibTeX-style entry object into popovers
+function getBibTeXEntry(entry) {
+    return `<strong>Author:</strong> ${entry.author},<br>
+<strong>Title:</strong> “${entry.title}”,<br>
+<strong>Journal:</strong> ${entry.journal},<br>
+<strong>Pages:</strong> ${entry.pages},<br>
+<strong>Released on:</strong> ${entry.releasedOn},`;
+}
+
+// Creates a dummy BibTeX entry for a given node, using the node’s topic as the title
+function generateBibTeXEntry(node) {
+    return {
+        author: `Auto Author for ${node.topic}`,
+        title: `${node.topic}`,
+        journal: `Auto Journal`,
+        pages: `pp. 1–10`,
+        releasedOn: `2025`
+    };
+}
+
+// Attaches Bootstrap popovers to all elements with a 'nodeid' attribute,
+// showing BibTeX-style information when hovered or focused
+function addPopoversToNodes() {
+    document.querySelectorAll('[nodeid]').forEach(nodeElem => {
+        // Avoid re-initializing popovers
+        if (nodeElem.getAttribute('data-bs-toggle') === 'popover') return;
+
+        // Get node ID and corresponding node data from the mind map (jm)
+        const nodeId = nodeElem.getAttribute('nodeid');
+        const node = jm.get_node(nodeId);
+        const entry = generateBibTeXEntry(node);
+
+        // Set up popover attributes
+        nodeElem.setAttribute('data-bs-toggle', 'popover');
+        nodeElem.setAttribute('data-bs-trigger', 'hover focus');
+        nodeElem.setAttribute('data-bs-placement', 'right');
+        nodeElem.setAttribute('data-bs-html', 'true');
+        nodeElem.setAttribute('title', 'Entry Preview');
+        nodeElem.setAttribute('data-bs-content', getBibTeXEntry(entry));
+
+        // Initialize the Bootstrap popover
+        new bootstrap.Popover(nodeElem, { container: 'body' });
+    });
+}
+
+// Once the DOM is fully loaded, attach popovers to all mind map nodes
+window.addEventListener('DOMContentLoaded', () => {
+    addPopoversToNodes();
+});
+
+// Re-add popovers when certain mind map events occur (e.g. showing or modifying nodes)
+jm.add_event_listener(function(type, data) {
+    if (['show', 'update', 'select_node', 'expand_node', 'collapse_node'].includes(type)) {
+        // Delay ensures the DOM updates are complete before attaching popovers
+        setTimeout(addPopoversToNodes, 100);
+    }
+});
+
