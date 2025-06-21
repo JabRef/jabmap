@@ -1,14 +1,12 @@
+import '@popperjs/core';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import { Popover } from 'bootstrap';
 import 'bootstrap-icons/font/bootstrap-icons.css';
-import * as bootstrap from 'bootstrap';
 import jsMind from './jsmind/src/jsmind.js';
 // * Note: this import is important for proper manual node creation / addition
 import { util } from './jsmind/src/jsmind.util.js';
 import './jsmind/src/plugins/jsmind.draggable-node.js';
 import { HTTPClient } from '../http/HTTPClient';
-
-
 
 // "load" initial mind map data
 const mind = {
@@ -231,16 +229,84 @@ function assignNodeType(node) {
 }
 // extend the default mind map
 extendNode(mind.data);
-addPopoversToBibEntryNodes();
 
-// create a render for mind maps and display the initial one
+// create a render for mind maps
 const jm = new jsMind(options);
+
+// add some logic to jsMind's events
+// * Note: this is called after the original logic is performed
+jm.add_event_listener((type, data) => {
+    if (type === jsMind.event_type.show) {
+        addPopoversToBibEntryNodes();
+    }
+    if (type === jsMind.event_type.edit) {
+        hidePopovers();
+    }
+    if (type === jsMind.event_type.select) {
+        hidePopovers();
+    }
+});
+
+// display the initial state and add it to the action stack
 jm.show(mind);
-// add the initial state to the action stack
 jm.resetStack();
 
 // create a HTTP client instance
 let httpClient = new HTTPClient();
+
+/**
+ * Hides all existing Bootsrap's popovers.
+ */
+function hidePopovers() {
+    // iterate through all Bootstrap's toggles as HTML elements
+    let bsToggles = document.querySelectorAll('[data-bs-toggle]');
+    bsToggles.forEach((bsToggle) => {
+        // if one isn't a popover, skip it
+        if (bsToggle.getAttribute('data-bs-toggle') !== 'popover') {
+            return;
+        }
+        
+        // otherwise hiding the toggle manually
+        const popover = Popover.getInstance(bsToggle);
+        if (popover) {
+            popover.hide();
+        }
+    });
+}
+
+/**
+ * Attaches Bootstrap's popovers to all BibEntry nodes.
+ */
+function addPopoversToBibEntryNodes() {
+    // iterate through all nodes as HTML elements
+    const allNodes = document.querySelectorAll('[nodeid]');
+    allNodes.forEach(nodeElem => {
+        // if one already has a popover, skip it
+        if (nodeElem.getAttribute('data-bs-toggle') === 'popover') {
+            return;
+        }
+
+        // get node's instance
+        const nodeId = nodeElem.getAttribute('nodeid');
+        const node = jm.get_node(nodeId);
+        // if one isn't a BibEntry node, skip it
+        if (node?.data?.type !== 'BIBE') {
+            return;
+        }
+
+        // otherwise create a popover for it
+        const previewHTML = node.data.preview;
+
+        nodeElem.setAttribute('data-bs-toggle', 'popover');
+        nodeElem.setAttribute('data-bs-trigger', 'hover focus');
+        nodeElem.setAttribute('data-bs-placement', 'bottom');
+        nodeElem.setAttribute('data-bs-html', 'true');
+        nodeElem.setAttribute('title', 'Entry Preview');
+        nodeElem.setAttribute('data-bs-content', previewHTML);
+
+        new Popover(nodeElem, { container: 'body' });
+    });
+}
 
 //--- Button click handlers ---
 
@@ -273,7 +339,6 @@ openBtn.onclick = async function () {
 
 // <modal> dialog confirmation button
 openSelectedMapBtn.onclick = async function () {
-    hidePopovers();
     // access bootstrap's <form-select> element
     let bsSelect = document.getElementById('openMindmapSelect');
 
@@ -290,7 +355,6 @@ openSelectedMapBtn.onclick = async function () {
     let loadedMap = loadResponse.map ?? mind;
 
     extendNode(loadedMap.data);
-    await addPopoversToBibEntryNodes();
 
     // display the retrieved mind map
     jm.show(loadedMap);
@@ -409,6 +473,8 @@ addBibEntryAsChildBtn.onclick = async function () {
     });
     // save map state for undo/redo
     jm.saveState();
+    // and create popovers for new BibEntry nodes
+    addPopoversToBibEntryNodes();
 }
 
 addBibEntryAsSiblingBtn.onclick = async function () {
@@ -438,6 +504,8 @@ addBibEntryAsSiblingBtn.onclick = async function () {
     });
     // save map state for undo/redo
     jm.saveState();
+    // and create popovers for new BibEntry nodes
+    addPopoversToBibEntryNodes();
 }
 
 // icon-dropdown menu button handlers
@@ -490,65 +558,3 @@ document.addEventListener("keydown", (e) => {
         e.preventDefault();
     }
 });
-
-jm.add_event_listener(function(type, data) { // Listen for jsMind events that update the mind map
-    if ([
-        'show',
-        'add_node',
-        'update',
-        'select_node',
-        'expand_node',
-        'collapse_node',
-        'delete_node'
-    ].includes(type)) { // If event is one that changes the nodes
-        hidePopovers();
-        // Re-attach popovers after a short delay
-        setTimeout(() => addPopoversToBibEntryNodes(), 0);
-    }
-});
-
-function hidePopovers() {
-    let popovers = document.querySelectorAll('[data-bs-toggle="popover"]');
-    console.log(`Amount of popovers to hide: ${popovers.length}`);
-    popovers.forEach((el) => {
-        console.log(`Query selector element: ${el}`);
-        const popover = bootstrap.Popover.getInstance(el);
-        console.log(`Popover instance: ${popover}`);
-        if (popover) popover.dispose();
-    });
-}
-
-// Attaches Bootstrap popovers to all mind map nodes
-function addPopoversToBibEntryNodes() {
-    const allNodes = document.querySelectorAll('[nodeid]');
-    allNodes.forEach(nodeElem => {
-        const nodeId = nodeElem.getAttribute('nodeid');
-        const node = jm.get_node(nodeId);
-
-        if (node?.data?.type !== 'BIBE') {
-            return;
-        }
-
-        const previewHTML = node.data.preview;
-
-        nodeElem.setAttribute('data-bs-toggle', 'popover');
-        nodeElem.setAttribute('data-bs-trigger', 'hover focus');
-        nodeElem.setAttribute('data-bs-placement', 'bottom');
-        nodeElem.setAttribute('data-bs-html', 'true');
-        nodeElem.setAttribute('title', 'Entry Preview');
-        nodeElem.setAttribute('data-bs-content', previewHTML);
-
-        new bootstrap.Popover(nodeElem, { container: 'body' });
-    });
-}
-
-// Adding Entry Preview to the Child Nodes
-// Get the mind map container
-const container = document.getElementById('jsmind_container');
-new MutationObserver(muts => { // Observe DOM changes in the container
-    muts.forEach(m => {
-        m.addedNodes.forEach(n => {
-            addPopoversToBibEntryNodes(); // Attach popover to the new node
-        });
-    });
-}).observe(container, { childList: true, subtree: true }); // Observe all child nodes and subtrees
