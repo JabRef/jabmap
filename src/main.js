@@ -231,7 +231,7 @@ extendNode(mind.data);
 const jm = new jsMind(options);
 jm.show(mind);
 // add the initial state to the action stack
-jm.saveState();
+jm.resetStack();
 
 // create a HTTP client instance
 let httpClient = new HTTPClient();
@@ -275,6 +275,7 @@ openSelectedMapBtn.onclick = async function () {
 
     // display the retrieved mind map
     jm.show(loadResponse.map);
+    jm.resetStack();
 }
 
 // debug button prints current mindmap state to console
