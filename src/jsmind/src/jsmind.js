@@ -96,6 +96,13 @@ export default class jsMind {
     }
     // Altered lines:
     /**
+     * Sets the inner action stack to track currently displayed mind map.
+     */
+    resetStack() {
+        this.actionStack.clear();
+        this.saveState();
+    }
+    /**
      * Saves the state of currently displayed mind map
      * to inner action stack.
      */

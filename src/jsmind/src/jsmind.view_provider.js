@@ -503,9 +503,12 @@ export class ViewProvider {
         if (this.opts.support_html) {
             // Altered lines:
             // Building HTML <img> tags to attach to the node
-            const icons = (node.data.icons || [])
-                .map(iconKey => `<img src="${this.resourceManager.TAG_ICONS[iconKey]}" style="width: 16px; height: 16px; margin-right: 2px; vertical-align: middle;">`)
-                .join('');
+            let icons = (node.data.icons || [])
+            .map(iconKey => `<img src="${this.resourceManager.TAG_ICONS[iconKey]}" style="width: 16px; height: 16px; margin-right: 2px; vertical-align: middle;">`)
+            .join('');
+            if (!!node.data.type && node.data.type !== 'TEXT') {
+                icons = icons.concat(`<img src="${this.resourceManager.TYPE_ICONS[node.data.type]}" style="width: 16px; height: 16px; margin-right: 2px; vertical-align: middle;">`);
+            }
             // Also defining text's styling property
             let highlighting = node.data.highlight;
             if (!!highlighting) {
