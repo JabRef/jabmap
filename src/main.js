@@ -78,10 +78,12 @@ const options = {
         handles: {                      // Named shortcut key event processor
             'undo': function (jm, e) {
                 // display mind map's previous state (undo the last operation)
+                hidePopovers();
                 jm.undo();
             },
             'redo': function (jm, e) {
                 // display mind map's next state (redo the next operation)
+                hidePopovers();
                 jm.redo();
             },
             'toggleTag': function (jm, e) {
@@ -107,7 +109,7 @@ const options = {
             addchild: [45, 4096 + 13],  // <Insert>, <Ctrl> + <Enter>
             addbrother: 13,             // <Enter>
             editnode: 113, 	            // <F2>
-            delnode: 46, 	            // <Delete>
+            delnode: [46, 8], 	            // <Delete>
             toggle: 32, 	            // <Space>
             left: 37, 		            // <Left>
             up: 38, 		            // <Up>
@@ -231,6 +233,7 @@ function assignNodeType(node) {
 }
 // extend the default mind map
 extendNode(mind.data);
+addPopoversToBibEntryNodes();
 
 // create a render for mind maps and display the initial one
 const jm = new jsMind(options);
@@ -272,6 +275,7 @@ openBtn.onclick = async function () {
 
 // <modal> dialog confirmation button
 openSelectedMapBtn.onclick = async function () {
+    hidePopovers();
     // access bootstrap's <form-select> element
     let bsSelect = document.getElementById('openMindmapSelect');
 
@@ -286,6 +290,9 @@ openSelectedMapBtn.onclick = async function () {
     let loadResponse = await httpClient.loadMap(selectedOption.value);
     // if no mind map exists, show the default one
     let loadedMap = loadResponse.map ?? mind;
+
+    extendNode(loadedMap.data);
+    await addPopoversToBibEntryNodes();
 
     // display the retrieved mind map
     jm.show(loadedMap);
@@ -305,11 +312,13 @@ printMapToConsoleBtn.onclick = async function () {
 
 // undo - discard the last operation (display the previous state)
 undoBtn.onclick = function () {
+    hidePopovers();
     jm.undo();
 }
 
 // redo - reapply the next operation (display the following state)
 redoBtn.onclick = function () {
+    hidePopovers();
     jm.redo();
 }
 
@@ -342,7 +351,7 @@ async function getBibNodesProperties() {
     for (let i = 0; i < selectedKeys.length; i++) {
         bibNodesProperties.push({
             key: selectedKeys[i],
-            preview: await httpClient.getPreviewString(selectedKeys[i])
+            preview: await httpClient.getPreviewHTML(selectedKeys[i])
         });
     }
 
@@ -484,58 +493,6 @@ document.addEventListener("keydown", (e) => {
     }
 });
 
-const entry = { // BibTeX entry object
-    author: "R. Corti, A. J. Flammer, N. K. Hollenberg, and T. F. Lüscher", // Author name
-    title: "Cocoa and Cardiovascular Health", // Article title
-    journal: "Circulation, vol. 119, no. 10", // Journal details
-    pages: "pp. 1433–1441", // Page numbers
-    releasedOn: "Mar. 2009" // Publication date
-};
-
-function getBibTeXEntry(entry) { // Returns formatted BibTeX preview
-    return `
-<!--Author field-->
-<strong>Author:</strong> ${entry.author},<br> 
-<!--Title field-->
-<strong>Title:</strong> “${entry.title}”,<br>
-<!-- Journal field-->
-<strong>Journal:</strong> ${entry.journal},<br> 
-<!--Pages field-->
-<strong>Pages:</strong> ${entry.pages},<br> 
-<!-- Release date field-->
-<strong>Released on:</strong> ${entry.releasedOn},`;
-}
-
-function generateBibTeXEntry(node) { // Generates a BibTeX entry based on the node's topic
-    return {
-        author: `Auto Author for ${node.topic}`, // Auto-generated author using node topic
-        title: `${node.topic}`, // Node topic as title
-        journal: `Auto Journal`, // Placeholder journal
-        pages: `pp. 1–10`, // Placeholder pages
-        releasedOn: `2025` // Placeholder release year
-    };
-}
-
-function addPopoversToNodes() { // Attaches Bootstrap popovers to all mind map nodes
-    document.querySelectorAll('[nodeid]').forEach(nodeElem => { // Loop through all elements with node_id attribute
-        if (nodeElem.getAttribute('data-bs-toggle') === 'popover') return; // Skip if popover already attached
-        const nodeId = nodeElem.getAttribute('nodeid'); // Get node id
-        const node = jm.get_node(nodeId); // Get node object from jsMind
-        const entry = generateBibTeXEntry(node); // Generate BibTeX entry for this node
-        nodeElem.setAttribute('data-bs-toggle', 'popover'); // Enable popover
-        nodeElem.setAttribute('data-bs-trigger', 'hover focus'); // Show on hover
-        nodeElem.setAttribute('data-bs-placement', 'bottom'); // Always show popover below the node
-        nodeElem.setAttribute('data-bs-html', 'true'); // Allow HTML content in popover
-        nodeElem.setAttribute('title', 'Entry Preview'); // Popover title
-        nodeElem.setAttribute('data-bs-content', getBibTeXEntry(entry)); // Popover content
-        new bootstrap.Popover(nodeElem, { container: 'body' }); // Initialize Bootstrap popover
-    });
-}
-
-window.addEventListener('DOMContentLoaded', () => { // When DOM is fully loaded
-    addPopoversToNodes(); // Attach popovers to all nodes
-});
-
 jm.add_event_listener(function(type, data) { // Listen for jsMind events that update the mind map
     if ([
         'show',
@@ -543,23 +500,57 @@ jm.add_event_listener(function(type, data) { // Listen for jsMind events that up
         'update',
         'select_node',
         'expand_node',
-        'collapse_node'
+        'collapse_node',
+        'delete_node'
     ].includes(type)) { // If event is one that changes the nodes
-        setTimeout(addPopoversToNodes, 100); // Re-attach popovers after a short delay
+        hidePopovers();
+        // Re-attach popovers after a short delay
+        setTimeout(() => addPopoversToBibEntryNodes(), 0);
     }
 });
 
+function hidePopovers() {
+    let popovers = document.querySelectorAll('[data-bs-toggle="popover"]');
+    console.log(`Amount of popovers to hide: ${popovers.length}`);
+    popovers.forEach((el) => {
+        console.log(`Query selector element: ${el}`);
+        const popover = bootstrap.Popover.getInstance(el);
+        console.log(`Popover instance: ${popover}`);
+        if (popover) popover.dispose();
+    });
+}
+
+// Attaches Bootstrap popovers to all mind map nodes
+function addPopoversToBibEntryNodes() {
+    const allNodes = document.querySelectorAll('[nodeid]');
+    allNodes.forEach(nodeElem => {
+        const nodeId = nodeElem.getAttribute('nodeid');
+        const node = jm.get_node(nodeId);
+
+        if (node?.data?.type !== 'BIBE') {
+            return;
+        }
+
+        const previewHTML = node.data.preview;
+
+        nodeElem.setAttribute('data-bs-toggle', 'popover');
+        nodeElem.setAttribute('data-bs-trigger', 'hover focus');
+        nodeElem.setAttribute('data-bs-placement', 'bottom');
+        nodeElem.setAttribute('data-bs-html', 'true');
+        nodeElem.setAttribute('title', 'Entry Preview');
+        nodeElem.setAttribute('data-bs-content', previewHTML);
+
+        new bootstrap.Popover(nodeElem, { container: 'body' });
+    });
+}
+
 // Adding Entry Preview to the Child Nodes
-const container = document.getElementById('jsmind_container'); // Get the mind map container
+// Get the mind map container
+const container = document.getElementById('jsmind_container');
 new MutationObserver(muts => { // Observe DOM changes in the container
     muts.forEach(m => {
         m.addedNodes.forEach(n => {
-            if (n.nodeType === 1 && n.hasAttribute('nodeid')) { // If a new node element is added
-                addPopoversToNodes(); // Attach popover to the new node
-            }
+            addPopoversToBibEntryNodes(); // Attach popover to the new node
         });
     });
 }).observe(container, { childList: true, subtree: true }); // Observe all child nodes and subtrees
-
-
-
