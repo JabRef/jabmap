@@ -2,8 +2,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import * as bootstrap from 'bootstrap';
-import Popover from 'bootstrap/js/dist/popover';
-import Dropdown from 'bootstrap/js/dist/dropdown';
 import jsMind from './jsmind/src/jsmind.js';
 // * Note: this import is important for proper manual node creation / addition
 import { util } from './jsmind/src/jsmind.util.js';
@@ -186,7 +184,7 @@ function applyTag(selectedNode, iconKey) {
  * the selected node.
  * @param { object } selectedNode - The node a highlight should be
  * applied to / removed from.
- * @param { string } highlightKey - The color of the highlight.
+ * @param { string } highlight - The color of the highlight.
  */
 function applyHighlight(selectedNode, highlight) {
     selectedNode.data.highlight = selectedNode.data.highlight !== highlight ?
