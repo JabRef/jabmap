@@ -2,6 +2,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import jsMind from './jsmind/src/jsmind.js';
+// * Note: this import is important for proper manual node creation / addition
+import { util } from './jsmind/src/jsmind.util.js';
 import './jsmind/src/plugins/jsmind.draggable-node.js';
 import { HTTPClient } from '../http/HTTPClient';
 
@@ -131,7 +133,7 @@ const options = {
  * applied to / removed from.
  * @param { string } iconKey - The key of the icon in the 'TAGS_ICONS' "dictionary".
  */
-function applyTag (selectedNode, iconKey) {
+function applyTag(selectedNode, iconKey) {
     let keyIconSets = {
         1: ["unchecked", "checked"],
         2: ["star"],
@@ -179,7 +181,7 @@ function applyTag (selectedNode, iconKey) {
  * applied to / removed from.
  * @param { string } highlightKey - The color of the highlight.
  */
-function applyHighlight (selectedNode, highlight) {
+function applyHighlight(selectedNode, highlight) {
     selectedNode.data.highlight = selectedNode.data.highlight !== highlight ?
         highlight : null;
     // redraw the node and memorize current state
@@ -192,7 +194,7 @@ function applyHighlight (selectedNode, highlight) {
  * and all its children (this doesn't overwrite existing ones).
  * @param { object } node - The node object to extend.
  */
-function extendNode (node) {
+function extendNode(node) {
     if (!node) {
         return;
     }
@@ -200,9 +202,27 @@ function extendNode (node) {
     node.icons = node.icons ?? [];
     node.highlight = node.highlight ?? null;
 
+    node.citeKey = node.citeKey ?? null;
+    node.bibPreview = node.bibPreview ?? null;
+
+    assignNodeType(node);
+
     if (!!node.children) {
         node.children.map((child) => { extendNode(child); });
     }
+}
+/**
+ * Defines the type of a node depending on its properties.
+ * @param { object } node - The node to assign to a certain type.
+ */
+function assignNodeType(node) {
+    let type = 'TEXT';
+    if (!!node.citeKey) {
+        type = 'BIBE';
+    }
+
+    // * Note: this will probably be extended to handle PDFF / PDFC types 
+    node.type = type;
 }
 // extend the default mind map
 extendNode(mind.data);
@@ -211,7 +231,7 @@ extendNode(mind.data);
 const jm = new jsMind(options);
 jm.show(mind);
 // add the initial state to the action stack
-jm.saveState();
+jm.resetStack();
 
 // create a HTTP client instance
 let httpClient = new HTTPClient();
@@ -234,9 +254,14 @@ openBtn.onclick = async function () {
     bsSelect.innerHTML = '';
     for (let i = 0; i < availableMaps.length; i++) {
         bsSelect.innerHTML +=
-            '<option value="' + availableMaps[i] + '">'
-            + availableMaps[i]
-            + '</option>';
+            `<option value=${availableMaps[i]}>` +
+            `${availableMaps[i]}` +
+            `</option>`;
+    }
+
+    if(bsSelect.innerHTML != '') {
+        // select first element
+        bsSelect.selectedIndex = 0;
     }
 }
 
@@ -246,19 +271,31 @@ openSelectedMapBtn.onclick = async function () {
     let bsSelect = document.getElementById('openMindmapSelect');
 
     // get selected mind map's name and it's data from server
-    let selectedOption = bsSelect.options[bsSelect.selectedIndex].value;
+    let selectedOption = bsSelect.options[bsSelect.selectedIndex];
+    // if user didn't select anything, don't load anything :)
+    if (!selectedOption) {
+        console.log('Couldn\'t open map because no library was selected.');
+        return;
+    }
 
-    let loadResponse = await httpClient.loadMap(selectedOption);
+    let loadResponse = await httpClient.loadMap(selectedOption.value);
+    // if no mind map exists, show the default one
+    let loadedMap = loadResponse.map ?? mind;
 
     // display the retrieved mind map
-    jm.show(loadResponse.map);
-
-    console.log(httpClient.listEntries());
+    jm.show(loadedMap);
+    jm.resetStack();
 }
 
 // debug button prints current mindmap state to console
-printMapToConsoleBtn.onclick = function () {
+printMapToConsoleBtn.onclick = async function () {
+    // print mindmap data
     console.log(jm.get_data());
+    /*// print currently active library
+    console.log(httpClient.currentLibrary);
+    // Get preview string for "Tokede_2011" current library (has to be demo to deliver result)
+    let preview = await httpClient.getPreviewString("Tokede_2011");
+    console.log(preview);*/
 }
 
 // undo - discard the last operation (display the previous state)
@@ -283,6 +320,112 @@ newChildBtn.onclick = function () {
     if (!!jm) {
         jm.shortcut.handle_addchild(jm, null);
     }
+}
+
+/**
+ * Opens a cite-as-you-write window to select citation keys and
+ * loads related previews upon confirmation.
+ * @returns A list of objects representing retrieved BibEntry properties
+ * structured as {key:<>, preview:<>}.
+ */
+async function getBibNodesProperties() {
+    // open cayw window and retrieve selected keys
+    let selectedKeys = await httpClient.getCiteKeysWithCAYW();
+    
+    // and get preview string for each selected key
+    let bibNodesProperties = [];
+    for (let i = 0; i < selectedKeys.length; i++) {
+        bibNodesProperties.push({
+            key: selectedKeys[i],
+            preview: await httpClient.getPreviewString(selectedKeys[i])
+        });
+    }
+
+    return bibNodesProperties;
+}
+
+/**
+ * Turns on and off given buttons using their .disabled property.
+ * * Note: buttons (*even a single one*) should be passed as an array / list.
+ * @param {Array} buttons - The list of bootstrap buttons to toggle.
+ * @param {boolean} isEnabled - The flag to set buttons' .disabled property to.
+ */
+function toggleButtonsEnabled(buttons, isEnabled) {
+    buttons.forEach(b => b.disabled = !isEnabled);
+}
+
+BibEntryDropdownMenuButton.onclick = function () {
+    // getting the selected node for enabling checks
+    const selectedNode = jm.get_selected_node();
+
+    // access dropdown buttons
+    const addChildBtn = document.getElementById('addBibEntryAsChildBtn');
+    const addSiblingBtn = document.getElementById('addBibEntryAsSiblingBtn');
+
+    // and enable them, if a node's selected
+    toggleButtonsEnabled([addChildBtn, addSiblingBtn], !!selectedNode);
+    // don't forget to exclude adding 2nd root node :)
+    if (!!selectedNode && selectedNode.isroot) {
+        addSiblingBtn.disabled = true;
+    }
+}
+
+addBibEntryAsChildBtn.onclick = async function () {
+    // * Note: one node is initially selected
+
+    // ask user to select some citation keys
+    // and retrieve related preview strings
+    const bibData = await getBibNodesProperties();
+
+    // if node's selection was revoked, break the process
+    let selectedNode = jm.get_selected_node();
+    if (!selectedNode) {
+        console.log('Fail: No node\'s selected to add BibEntries as children :(');
+        return;
+    }
+
+    // otherwise add extended nodes as children
+    bibData.forEach((bibProperties) => {
+        jm.add_node(selectedNode,
+            util.uuid.newid(),
+            bibProperties.key,
+            {
+                type: 'BIBE',
+                citeKey: bibProperties.key,
+                preview: bibProperties.preview
+            });
+    });
+    // save map state for undo/redo
+    jm.saveState();
+}
+
+addBibEntryAsSiblingBtn.onclick = async function () {
+    // * Note: one node is initially selected
+
+    // ask user to select some citation keys
+    // and retrieve related preview strings
+    const bibData = await getBibNodesProperties();
+
+    // if node's selection was revoked, break the process
+    let selectedNode = jm.get_selected_node();
+    if (!selectedNode) {
+        console.log('Fail: No node\'s selected to add BibEntries as siblings :(');
+        return;
+    }
+
+    // otherwise add extended nodes as siblings
+    bibData.forEach((bibProperties) => {
+        jm.insert_node_after(selectedNode,
+            util.uuid.newid(),
+            bibProperties.key,
+            {
+                type: 'BIBE',
+                citeKey: bibProperties.key,
+                preview: bibProperties.preview
+            });
+    });
+    // save map state for undo/redo
+    jm.saveState();
 }
 
 // icon-dropdown menu button handlers
