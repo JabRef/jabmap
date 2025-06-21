@@ -2,7 +2,7 @@
  * Provides HTTP-connection functionality.
  */
 export class HTTPClient {
-    #host = "http://localhost:6050/libraries/";
+    #host = "http://localhost:6050/";
 
     constructor() {
         /**
@@ -82,15 +82,16 @@ export class HTTPClient {
      * @returns The requested mind map object.
      */
     async loadMap(library = "demo") {
-        const url = library + "/map";
+        const url = `libraries/${library}/map`;
         const options = {
             method: "GET",
             headers: { "Content-Type": "application/json" }
         }
+
         // Changing current library
         this.currentLibrary = library;
-
         console.log(`Current library is now: ${this.currentLibrary}`);
+
         return this.#performRequest(url, options);
     }
 
@@ -100,7 +101,7 @@ export class HTTPClient {
      * @returns An empty map object (NULL_MAP).
      */
     async saveMap(mindMap) {
-        const url = this.currentLibrary + "/map";
+        const url = `libraries/${this.currentLibrary} + /map`;
         const options = {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
@@ -115,12 +116,13 @@ export class HTTPClient {
      * @returns A list of available mind maps stored on the server.
      */
     async listMaps() {
+        const url = 'libraries'
         const options = {
             method: "GET",
             headers: { "Content-Type": "application/json" }
         }
 
-        return this.#performRequest("", options)
+        return this.#performRequest(url, options)
     }
 
     /**
