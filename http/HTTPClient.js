@@ -46,7 +46,10 @@ export class HTTPClient {
                 if (options.headers["Content-Type"] === 'application/json') {
                     result = await response.json();
                 }
-                if (options.headers["Content-Type"] === 'text/plain') {
+                if (options.headers["Accept"] === 'text/plain') {
+                    result = await response.text();
+                }
+                if (options.headers["Accept"] === 'text/html') {
                     result = await response.text();
                 }
             }
@@ -163,7 +166,23 @@ export class HTTPClient {
         const url = `libraries/${this.currentLibrary}/entries/${citationKey}`;
         const options = {
             method: "GET",
-            headers: { "Content-Type": "text/plain" }
+            headers: { "Accept": "text/plain" }
+        }
+
+        return this.#performRequest(url, options);
+    }
+
+    /**
+     * Requests the preview for a certain BibEntry from the current library.
+     * @param { string } citationKey - The citation key (identifier) of the entry.
+     * @returns A string containing the preview with relevant information
+     * about the entry (e.g. author, title, release date, etc.).
+     */
+    async getPreviewHTML(citationKey) {
+        const url = `libraries/${this.currentLibrary}/entries/${citationKey}`;
+        const options = {
+            method: "GET",
+            headers: { "Accept": "text/html" }
         }
 
         return this.#performRequest(url, options);
