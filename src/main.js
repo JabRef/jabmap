@@ -266,12 +266,16 @@ openSelectedMapBtn.onclick = async function () {
     let bsSelect = document.getElementById('openMindmapSelect');
 
     // get selected mind map's name and it's data from server
-    let selectedOption = bsSelect.options[bsSelect.selectedIndex].value;
+    let selectedOption = bsSelect.options[bsSelect.selectedIndex];
+    // if user didn't select anything, don't load anything :)
+    if (!selectedOption) {
+        console.log('Couldn\'t open map because no library was selected.');
+        return;
+    }
 
-    let loadResponse = await httpClient.loadMap(selectedOption);
-
+    let loadResponse = await httpClient.loadMap(selectedOption.value);
     // if no mind map exists, show the default one
-    loadResponse = loadResponse ?? mind;
+    loadResponse = loadResponse.map ?? mind;
 
     // display the retrieved mind map
     jm.show(loadResponse.map);
