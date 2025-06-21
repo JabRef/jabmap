@@ -101,7 +101,7 @@ export class HTTPClient {
      * @returns An empty map object (NULL_MAP).
      */
     async saveMap(mindMap) {
-        const url = `libraries/${this.currentLibrary} + /map`;
+        const url = `libraries/${this.currentLibrary}/map`;
         const options = {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
