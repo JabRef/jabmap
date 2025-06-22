@@ -259,18 +259,8 @@ let httpClient = new HTTPClient();
  */
 function hidePopovers() {
     // iterate through all Bootstrap's toggles as HTML elements
-    let bsToggles = document.querySelectorAll('[data-bs-toggle]');
-    bsToggles.forEach((bsToggle) => {
-        // if one isn't a popover, skip it
-        if (bsToggle.getAttribute('data-bs-toggle') !== 'popover') {
-            return;
-        }
-
-        // otherwise hiding the toggle manually
-        const popover = Popover.getInstance(bsToggle);
-        if (popover) {
-            popover.hide();
-        }
+    document.querySelectorAll('.popover').forEach((bsToggle) => {
+        bsToggle.remove();
     });
 }
 
@@ -279,7 +269,7 @@ function hidePopovers() {
  */
 function addPopoversToBibEntryNodes() {
     // iterate through all nodes as HTML elements
-    const allNodes = document.querySelectorAll('[nodeid]');
+    const allNodes = document.querySelectorAll('jmnode');
     allNodes.forEach(nodeElem => {
         // if one already has a popover, skip it
         if (nodeElem.getAttribute('data-bs-toggle') === 'popover') {
@@ -288,6 +278,9 @@ function addPopoversToBibEntryNodes() {
 
         // get node's instance
         const nodeId = nodeElem.getAttribute('nodeid');
+        if (!nodeId) {
+            return;
+        }
         const node = jm.get_node(nodeId);
         // if one isn't a BibEntry node, skip it
         if (node?.data?.type !== 'BIBE') {
