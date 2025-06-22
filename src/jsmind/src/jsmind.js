@@ -245,6 +245,13 @@ export default class jsMind {
                 return this.begin_edit(the_node);
             }
         }
+        // Altered lines:
+        let nodeType = node.data.type;
+        if (nodeType === 'BIBE') {
+            console.log('No editing for BIBE nodes >:(');
+            return;
+        }
+        // End
         if (this.get_editable()) {
             this.view.edit_node_begin(node);
         } else {
