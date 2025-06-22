@@ -1,5 +1,6 @@
+import '@popperjs/core';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import { Popover } from 'bootstrap';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import jsMind from './jsmind/src/jsmind.js';
 // * Note: this import is important for proper manual node creation / addition
@@ -73,10 +74,12 @@ const options = {
         handles: {                      // Named shortcut key event processor
             'undo': function (jm, e) {
                 // display mind map's previous state (undo the last operation)
+                hidePopovers();
                 jm.undo();
             },
             'redo': function (jm, e) {
                 // display mind map's next state (redo the next operation)
+                hidePopovers();
                 jm.redo();
             },
             'toggleTag': function (jm, e) {
@@ -102,7 +105,7 @@ const options = {
             addchild: [45, 4096 + 13],  // <Insert>, <Ctrl> + <Enter>
             addbrother: 13,             // <Enter>
             editnode: 113, 	            // <F2>
-            delnode: 46, 	            // <Delete>
+            delnode: [46, 8], 	            // <Delete>
             toggle: 32, 	            // <Space>
             left: 37, 		            // <Left>
             up: 38, 		            // <Up>
@@ -179,7 +182,7 @@ function applyTag(selectedNode, iconKey) {
  * the selected node.
  * @param { object } selectedNode - The node a highlight should be
  * applied to / removed from.
- * @param { string } highlightKey - The color of the highlight.
+ * @param { string } highlight - The color of the highlight.
  */
 function applyHighlight(selectedNode, highlight) {
     selectedNode.data.highlight = selectedNode.data.highlight !== highlight ?
@@ -203,7 +206,7 @@ function extendNode(node) {
     node.highlight = node.highlight ?? null;
 
     node.citeKey = node.citeKey ?? null;
-    node.bibPreview = node.bibPreview ?? null;
+    node.preview = node.preview ?? null;
 
     assignNodeType(node);
 
@@ -221,20 +224,82 @@ function assignNodeType(node) {
         type = 'BIBE';
     }
 
-    // * Note: this will probably be extended to handle PDFF / PDFC types 
+    // * Note: this will probably be extended to handle PDFF / PDFC types
     node.type = type;
 }
 // extend the default mind map
 extendNode(mind.data);
 
-// create a render for mind maps and display the initial one
+// create a render for mind maps
 const jm = new jsMind(options);
+
+// add some logic to jsMind's events
+// * Note: this is called after the original logic is performed
+jm.add_event_listener((type, data) => {
+    if (type === jsMind.event_type.show) {
+        addPopoversToBibEntryNodes();
+    }
+    if (type === jsMind.event_type.edit) {
+        hidePopovers();
+    }
+    if (type === jsMind.event_type.select) {
+        hidePopovers();
+    }
+});
+
+// display the initial state and add it to the action stack
 jm.show(mind);
-// add the initial state to the action stack
 jm.resetStack();
 
 // create a HTTP client instance
 let httpClient = new HTTPClient();
+
+/**
+ * Hides all existing Bootsrap's popovers.
+ */
+function hidePopovers() {
+    // iterate through all Bootstrap's toggles as HTML elements
+    document.querySelectorAll('.popover').forEach((bsToggle) => {
+        bsToggle.remove();
+    });
+}
+
+/**
+ * Attaches Bootstrap's popovers to all BibEntry nodes.
+ */
+function addPopoversToBibEntryNodes() {
+    // iterate through all nodes as HTML elements
+    const allNodes = document.querySelectorAll('jmnode');
+    allNodes.forEach(nodeElem => {
+        // if one already has a popover, skip it
+        if (nodeElem.getAttribute('data-bs-toggle') === 'popover') {
+            return;
+        }
+
+        // get node's instance
+        const nodeId = nodeElem.getAttribute('nodeid');
+        if (!nodeId) {
+            return;
+        }
+        const node = jm.get_node(nodeId);
+        // if one isn't a BibEntry node, skip it
+        if (node?.data?.type !== 'BIBE') {
+            return;
+        }
+
+        // otherwise create a popover for it
+        const previewHTML = node.data.preview;
+
+        nodeElem.setAttribute('data-bs-toggle', 'popover');
+        nodeElem.setAttribute('data-bs-trigger', 'hover focus');
+        nodeElem.setAttribute('data-bs-placement', 'bottom');
+        nodeElem.setAttribute('data-bs-html', 'true');
+        nodeElem.setAttribute('title', 'Entry Preview');
+        nodeElem.setAttribute('data-bs-content', previewHTML);
+
+        new Popover(nodeElem, { container: 'body' });
+    });
+}
 
 //--- Button click handlers ---
 
@@ -259,7 +324,7 @@ openBtn.onclick = async function () {
             `</option>`;
     }
 
-    if(bsSelect.innerHTML != '') {
+    if (bsSelect.innerHTML != '') {
         // select first element
         bsSelect.selectedIndex = 0;
     }
@@ -282,6 +347,8 @@ openSelectedMapBtn.onclick = async function () {
     // if no mind map exists, show the default one
     let loadedMap = loadResponse.map ?? mind;
 
+    extendNode(loadedMap.data);
+
     // display the retrieved mind map
     jm.show(loadedMap);
     jm.resetStack();
@@ -300,11 +367,13 @@ printMapToConsoleBtn.onclick = async function () {
 
 // undo - discard the last operation (display the previous state)
 undoBtn.onclick = function () {
+    hidePopovers();
     jm.undo();
 }
 
 // redo - reapply the next operation (display the following state)
 redoBtn.onclick = function () {
+    hidePopovers();
     jm.redo();
 }
 
@@ -331,13 +400,13 @@ newChildBtn.onclick = function () {
 async function getBibNodesProperties() {
     // open cayw window and retrieve selected keys
     let selectedKeys = await httpClient.getCiteKeysWithCAYW();
-    
+
     // and get preview string for each selected key
     let bibNodesProperties = [];
     for (let i = 0; i < selectedKeys.length; i++) {
         bibNodesProperties.push({
             key: selectedKeys[i],
-            preview: await httpClient.getPreviewString(selectedKeys[i])
+            preview: await httpClient.getPreviewHTML(selectedKeys[i])
         });
     }
 
@@ -397,6 +466,8 @@ addBibEntryAsChildBtn.onclick = async function () {
     });
     // save map state for undo/redo
     jm.saveState();
+    // and create popovers for new BibEntry nodes
+    addPopoversToBibEntryNodes();
 }
 
 addBibEntryAsSiblingBtn.onclick = async function () {
@@ -426,48 +497,50 @@ addBibEntryAsSiblingBtn.onclick = async function () {
     });
     // save map state for undo/redo
     jm.saveState();
+    // and create popovers for new BibEntry nodes
+    addPopoversToBibEntryNodes();
 }
 
 // icon-dropdown menu button handlers
 iconCycleBtn.onclick = function () {
-    if(jm != null) {
-        applyTag(jm.get_selected_node(),1);
+    if (jm != null) {
+        applyTag(jm.get_selected_node(), 1);
     }
 }
 
 iconStarBtn.onclick = function () {
-    if(jm != null) {
-        applyTag(jm.get_selected_node(),2);
+    if (jm != null) {
+        applyTag(jm.get_selected_node(), 2);
     }
 }
 
 iconQuestionBtn.onclick = function () {
-    if(jm != null) {
-        applyTag(jm.get_selected_node(),3);
+    if (jm != null) {
+        applyTag(jm.get_selected_node(), 3);
     }
 }
 
 iconWarningBtn.onclick = function () {
-    if(jm != null) {
-        applyTag(jm.get_selected_node(),6);
+    if (jm != null) {
+        applyTag(jm.get_selected_node(), 6);
     }
 }
 
 iconLightbulbBtn.onclick = function () {
-    if(jm != null) {
-        applyTag(jm.get_selected_node(),7);
+    if (jm != null) {
+        applyTag(jm.get_selected_node(), 7);
     }
 }
 
 iconGreenFlagBtn.onclick = function () {
-    if(jm != null) {
-        applyTag(jm.get_selected_node(),8);
+    if (jm != null) {
+        applyTag(jm.get_selected_node(), 8);
     }
 }
 
 iconRedFlagBtn.onclick = function () {
-    if(jm != null) {
-        applyTag(jm.get_selected_node(),9);
+    if (jm != null) {
+        applyTag(jm.get_selected_node(), 9);
     }
 }
 
