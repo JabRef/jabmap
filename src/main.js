@@ -76,10 +76,14 @@ const options = {
         handles: {                      // Named shortcut key event processor
             'undo': function (jm, e) {
                 // display mind map's previous state (undo the last operation)
+                closeAllPopovers();
+                setTimeout(addPopoversToNodes, 100);
                 jm.undo();
             },
             'redo': function (jm, e) {
                 // display mind map's next state (redo the next operation)
+                closeAllPopovers();
+                setTimeout(addPopoversToNodes, 100);
                 jm.redo();
             },
             'toggleTag': function (jm, e) {
@@ -297,7 +301,7 @@ iconCycleBtn.onclick = function () {
     }
 }
 
-iconStarBtn.onclick = function () {q
+iconStarBtn.onclick = function () {
     if(jm != null) {
         applyTag(jm.get_selected_node(),2);
     }
@@ -400,8 +404,9 @@ jm.add_event_listener(function(type, data) { // Listen for jsMind events that up
         'update',
         'select_node',
         'expand_node',
-        'collapse_node'
+        'collapse_node',
     ].includes(type)) { // If event is one that changes the nodes
+        closeAllPopovers();
         setTimeout(addPopoversToNodes, 100); // Re-attach popovers after a short delay
     }
 });
@@ -418,5 +423,45 @@ new MutationObserver(muts => { // Observe DOM changes in the container
     });
 }).observe(container, { childList: true, subtree: true }); // Observe all child nodes and subtrees
 
+function closeAllPopovers() {
+    // Dispose all Bootstrap popover instances on .jsmind-inner elements
+    document.querySelectorAll('.jsmind-inner').forEach(el => {
+        // Get the popover instance (Bootstrap 5 way)
+        const instance = bootstrap.Popover.getInstance(el);
+        if (instance) {
+            instance.dispose(); // Remove popover from DOM and cleans up
+        }
+    });
+    // As a fallback, remove any orphaned popover elements left in the DOM
+    document.querySelectorAll('.popover').forEach(pop => pop.remove());
+}
 
-
+// Observe for changes in the container's DOM
+new MutationObserver(mutations => {
+    // For each mutation record, get its removedNodes and addedNodes.
+    mutations.forEach(({ removedNodes, addedNodes }) => {
+        // Loop through every node that was removed.
+        removedNodes.forEach(node => {
+            // If the node is an element and has a 'nodeid' attribute.
+            if (node.nodeType === 1 && node.hasAttribute('nodeid')) {
+                // Get the popover instance from Bootstrap for this node.
+                const popover = bootstrap.Popover.getInstance(node);
+                // If a popover exists, dispose of it to clean up.
+                if (popover) popover.dispose();
+            }
+        });
+        // Loop through every node that was added.
+        addedNodes.forEach(node => {
+            // If the node is an element and has a 'nodeid' attribute.
+            if (node.nodeType === 1 && node.hasAttribute('nodeid')) {
+                // Reapply popovers to the new node.
+                addPopoversToNodes();
+            }
+        });
+    });
+})
+    // Start observing the container for changes in child elements and all its sub-elements.
+    .observe(container, {
+        childList: true,  // Watch for added or removed child nodes.
+        subtree: true     // Extend the observation to all descendants of the container.
+    });
