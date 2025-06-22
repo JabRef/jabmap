@@ -1,14 +1,12 @@
+import '@popperjs/core';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import { Popover } from 'bootstrap';
 import 'bootstrap-icons/font/bootstrap-icons.css';
-import * as bootstrap from 'bootstrap';
-import Popover from 'bootstrap/js/dist/popover';
-import Dropdown from 'bootstrap/js/dist/dropdown';
 import jsMind from './jsmind/src/jsmind.js';
+// * Note: this import is important for proper manual node creation / addition
+import { util } from './jsmind/src/jsmind.util.js';
 import './jsmind/src/plugins/jsmind.draggable-node.js';
 import { HTTPClient } from '../http/HTTPClient';
-
-
 
 // "load" initial mind map data
 const mind = {
@@ -76,14 +74,12 @@ const options = {
         handles: {                      // Named shortcut key event processor
             'undo': function (jm, e) {
                 // display mind map's previous state (undo the last operation)
-                closeAllPopovers();
-                setTimeout(addPopoversToNodes, 100);
+                hidePopovers();
                 jm.undo();
             },
             'redo': function (jm, e) {
                 // display mind map's next state (redo the next operation)
-                closeAllPopovers();
-                setTimeout(addPopoversToNodes, 100);
+                hidePopovers();
                 jm.redo();
             },
             'toggleTag': function (jm, e) {
@@ -109,7 +105,7 @@ const options = {
             addchild: [45, 4096 + 13],  // <Insert>, <Ctrl> + <Enter>
             addbrother: 13,             // <Enter>
             editnode: 113, 	            // <F2>
-            delnode: 46, 	            // <Delete>
+            delnode: [46, 8], 	            // <Delete>
             toggle: 32, 	            // <Space>
             left: 37, 		            // <Left>
             up: 38, 		            // <Up>
@@ -140,7 +136,7 @@ const options = {
  * applied to / removed from.
  * @param { string } iconKey - The key of the icon in the 'TAGS_ICONS' "dictionary".
  */
-function applyTag (selectedNode, iconKey) {
+function applyTag(selectedNode, iconKey) {
     let keyIconSets = {
         1: ["unchecked", "checked"],
         2: ["star"],
@@ -186,9 +182,9 @@ function applyTag (selectedNode, iconKey) {
  * the selected node.
  * @param { object } selectedNode - The node a highlight should be
  * applied to / removed from.
- * @param { string } highlightKey - The color of the highlight.
+ * @param { string } highlight - The color of the highlight.
  */
-function applyHighlight (selectedNode, highlight) {
+function applyHighlight(selectedNode, highlight) {
     selectedNode.data.highlight = selectedNode.data.highlight !== highlight ?
         highlight : null;
     // redraw the node and memorize current state
@@ -201,7 +197,7 @@ function applyHighlight (selectedNode, highlight) {
  * and all its children (this doesn't overwrite existing ones).
  * @param { object } node - The node object to extend.
  */
-function extendNode (node) {
+function extendNode(node) {
     if (!node) {
         return;
     }
@@ -209,21 +205,101 @@ function extendNode (node) {
     node.icons = node.icons ?? [];
     node.highlight = node.highlight ?? null;
 
+    node.citeKey = node.citeKey ?? null;
+    node.preview = node.preview ?? null;
+
+    assignNodeType(node);
+
     if (!!node.children) {
         node.children.map((child) => { extendNode(child); });
     }
 }
+/**
+ * Defines the type of a node depending on its properties.
+ * @param { object } node - The node to assign to a certain type.
+ */
+function assignNodeType(node) {
+    let type = 'TEXT';
+    if (!!node.citeKey) {
+        type = 'BIBE';
+    }
+
+    // * Note: this will probably be extended to handle PDFF / PDFC types
+    node.type = type;
+}
 // extend the default mind map
 extendNode(mind.data);
 
-// create a render for mind maps and display the initial one
+// create a render for mind maps
 const jm = new jsMind(options);
+
+// add some logic to jsMind's events
+// * Note: this is called after the original logic is performed
+jm.add_event_listener((type, data) => {
+    if (type === jsMind.event_type.show) {
+        addPopoversToBibEntryNodes();
+    }
+    if (type === jsMind.event_type.edit) {
+        hidePopovers();
+    }
+    if (type === jsMind.event_type.select) {
+        hidePopovers();
+    }
+});
+
+// display the initial state and add it to the action stack
 jm.show(mind);
-// add the initial state to the action stack
-jm.saveState();
+jm.resetStack();
 
 // create a HTTP client instance
 let httpClient = new HTTPClient();
+
+/**
+ * Hides all existing Bootsrap's popovers.
+ */
+function hidePopovers() {
+    // iterate through all Bootstrap's toggles as HTML elements
+    document.querySelectorAll('.popover').forEach((bsToggle) => {
+        bsToggle.remove();
+    });
+}
+
+/**
+ * Attaches Bootstrap's popovers to all BibEntry nodes.
+ */
+function addPopoversToBibEntryNodes() {
+    // iterate through all nodes as HTML elements
+    const allNodes = document.querySelectorAll('jmnode');
+    allNodes.forEach(nodeElem => {
+        // if one already has a popover, skip it
+        if (nodeElem.getAttribute('data-bs-toggle') === 'popover') {
+            return;
+        }
+
+        // get node's instance
+        const nodeId = nodeElem.getAttribute('nodeid');
+        if (!nodeId) {
+            return;
+        }
+        const node = jm.get_node(nodeId);
+        // if one isn't a BibEntry node, skip it
+        if (node?.data?.type !== 'BIBE') {
+            return;
+        }
+
+        // otherwise create a popover for it
+        const previewHTML = node.data.preview;
+
+        nodeElem.setAttribute('data-bs-toggle', 'popover');
+        nodeElem.setAttribute('data-bs-trigger', 'hover focus');
+        nodeElem.setAttribute('data-bs-placement', 'bottom');
+        nodeElem.setAttribute('data-bs-html', 'true');
+        nodeElem.setAttribute('title', 'Entry Preview');
+        nodeElem.setAttribute('data-bs-content', previewHTML);
+
+        new Popover(nodeElem, { container: 'body' });
+    });
+}
 
 //--- Button click handlers ---
 
@@ -243,9 +319,14 @@ openBtn.onclick = async function () {
     bsSelect.innerHTML = '';
     for (let i = 0; i < availableMaps.length; i++) {
         bsSelect.innerHTML +=
-            '<option value="' + availableMaps[i] + '">'
-            + availableMaps[i]
-            + '</option>';
+            `<option value=${availableMaps[i]}>` +
+            `${availableMaps[i]}` +
+            `</option>`;
+    }
+
+    if (bsSelect.innerHTML != '') {
+        // select first element
+        bsSelect.selectedIndex = 0;
     }
 }
 
@@ -255,28 +336,44 @@ openSelectedMapBtn.onclick = async function () {
     let bsSelect = document.getElementById('openMindmapSelect');
 
     // get selected mind map's name and it's data from server
-    let selectedOption = bsSelect.options[bsSelect.selectedIndex].value;
+    let selectedOption = bsSelect.options[bsSelect.selectedIndex];
+    // if user didn't select anything, don't load anything :)
+    if (!selectedOption) {
+        console.log('Couldn\'t open map because no library was selected.');
+        return;
+    }
 
-    let loadResponse = await httpClient.loadMap(selectedOption);
+    let loadResponse = await httpClient.loadMap(selectedOption.value);
+    // if no mind map exists, show the default one
+    let loadedMap = loadResponse.map ?? mind;
+
+    extendNode(loadedMap.data);
 
     // display the retrieved mind map
-    jm.show(loadResponse.map);
-
-    console.log(httpClient.listEntries());
+    jm.show(loadedMap);
+    jm.resetStack();
 }
 
 // debug button prints current mindmap state to console
-printMapToConsoleBtn.onclick = function () {
+printMapToConsoleBtn.onclick = async function () {
+    // print mindmap data
     console.log(jm.get_data());
+    /*// print currently active library
+    console.log(httpClient.currentLibrary);
+    // Get preview string for "Tokede_2011" current library (has to be demo to deliver result)
+    let preview = await httpClient.getPreviewString("Tokede_2011");
+    console.log(preview);*/
 }
 
 // undo - discard the last operation (display the previous state)
 undoBtn.onclick = function () {
+    hidePopovers();
     jm.undo();
 }
 
 // redo - reapply the next operation (display the following state)
 redoBtn.onclick = function () {
+    hidePopovers();
     jm.redo();
 }
 
@@ -294,46 +391,156 @@ newChildBtn.onclick = function () {
     }
 }
 
+/**
+ * Opens a cite-as-you-write window to select citation keys and
+ * loads related previews upon confirmation.
+ * @returns A list of objects representing retrieved BibEntry properties
+ * structured as {key:<>, preview:<>}.
+ */
+async function getBibNodesProperties() {
+    // open cayw window and retrieve selected keys
+    let selectedKeys = await httpClient.getCiteKeysWithCAYW();
+
+    // and get preview string for each selected key
+    let bibNodesProperties = [];
+    for (let i = 0; i < selectedKeys.length; i++) {
+        bibNodesProperties.push({
+            key: selectedKeys[i],
+            preview: await httpClient.getPreviewHTML(selectedKeys[i])
+        });
+    }
+
+    return bibNodesProperties;
+}
+
+/**
+ * Turns on and off given buttons using their .disabled property.
+ * * Note: buttons (*even a single one*) should be passed as an array / list.
+ * @param {Array} buttons - The list of bootstrap buttons to toggle.
+ * @param {boolean} isEnabled - The flag to set buttons' .disabled property to.
+ */
+function toggleButtonsEnabled(buttons, isEnabled) {
+    buttons.forEach(b => b.disabled = !isEnabled);
+}
+
+BibEntryDropdownMenuButton.onclick = function () {
+    // getting the selected node for enabling checks
+    const selectedNode = jm.get_selected_node();
+
+    // access dropdown buttons
+    const addChildBtn = document.getElementById('addBibEntryAsChildBtn');
+    const addSiblingBtn = document.getElementById('addBibEntryAsSiblingBtn');
+
+    // and enable them, if a node's selected
+    toggleButtonsEnabled([addChildBtn, addSiblingBtn], !!selectedNode);
+    // don't forget to exclude adding 2nd root node :)
+    if (!!selectedNode && selectedNode.isroot) {
+        addSiblingBtn.disabled = true;
+    }
+}
+
+addBibEntryAsChildBtn.onclick = async function () {
+    // * Note: one node is initially selected
+
+    // ask user to select some citation keys
+    // and retrieve related preview strings
+    const bibData = await getBibNodesProperties();
+
+    // if node's selection was revoked, break the process
+    let selectedNode = jm.get_selected_node();
+    if (!selectedNode) {
+        console.log('Fail: No node\'s selected to add BibEntries as children :(');
+        return;
+    }
+
+    // otherwise add extended nodes as children
+    bibData.forEach((bibProperties) => {
+        jm.add_node(selectedNode,
+            util.uuid.newid(),
+            bibProperties.key,
+            {
+                type: 'BIBE',
+                citeKey: bibProperties.key,
+                preview: bibProperties.preview
+            });
+    });
+    // save map state for undo/redo
+    jm.saveState();
+    // and create popovers for new BibEntry nodes
+    addPopoversToBibEntryNodes();
+}
+
+addBibEntryAsSiblingBtn.onclick = async function () {
+    // * Note: one node is initially selected
+
+    // ask user to select some citation keys
+    // and retrieve related preview strings
+    const bibData = await getBibNodesProperties();
+
+    // if node's selection was revoked, break the process
+    let selectedNode = jm.get_selected_node();
+    if (!selectedNode) {
+        console.log('Fail: No node\'s selected to add BibEntries as siblings :(');
+        return;
+    }
+
+    // otherwise add extended nodes as siblings
+    bibData.forEach((bibProperties) => {
+        jm.insert_node_after(selectedNode,
+            util.uuid.newid(),
+            bibProperties.key,
+            {
+                type: 'BIBE',
+                citeKey: bibProperties.key,
+                preview: bibProperties.preview
+            });
+    });
+    // save map state for undo/redo
+    jm.saveState();
+    // and create popovers for new BibEntry nodes
+    addPopoversToBibEntryNodes();
+}
+
 // icon-dropdown menu button handlers
 iconCycleBtn.onclick = function () {
-    if(jm != null) {
-        applyTag(jm.get_selected_node(),1);
+    if (jm != null) {
+        applyTag(jm.get_selected_node(), 1);
     }
 }
 
 iconStarBtn.onclick = function () {
-    if(jm != null) {
-        applyTag(jm.get_selected_node(),2);
+    if (jm != null) {
+        applyTag(jm.get_selected_node(), 2);
     }
 }
 
 iconQuestionBtn.onclick = function () {
-    if(jm != null) {
-        applyTag(jm.get_selected_node(),3);
+    if (jm != null) {
+        applyTag(jm.get_selected_node(), 3);
     }
 }
 
 iconWarningBtn.onclick = function () {
-    if(jm != null) {
-        applyTag(jm.get_selected_node(),6);
+    if (jm != null) {
+        applyTag(jm.get_selected_node(), 6);
     }
 }
 
 iconLightbulbBtn.onclick = function () {
-    if(jm != null) {
-        applyTag(jm.get_selected_node(),7);
+    if (jm != null) {
+        applyTag(jm.get_selected_node(), 7);
     }
 }
 
 iconGreenFlagBtn.onclick = function () {
-    if(jm != null) {
-        applyTag(jm.get_selected_node(),8);
+    if (jm != null) {
+        applyTag(jm.get_selected_node(), 8);
     }
 }
 
 iconRedFlagBtn.onclick = function () {
-    if(jm != null) {
-        applyTag(jm.get_selected_node(),9);
+    if (jm != null) {
+        applyTag(jm.get_selected_node(), 9);
     }
 }
 
@@ -344,124 +551,3 @@ document.addEventListener("keydown", (e) => {
         e.preventDefault();
     }
 });
-
-const entry = { // BibTeX entry object
-    author: "R. Corti, A. J. Flammer, N. K. Hollenberg, and T. F. Lüscher", // Author name
-    title: "Cocoa and Cardiovascular Health", // Article title
-    journal: "Circulation, vol. 119, no. 10", // Journal details
-    pages: "pp. 1433–1441", // Page numbers
-    releasedOn: "Mar. 2009" // Publication date
-};
-
-function getBibTeXEntry(entry) { // Returns formatted BibTeX preview
-    return `
-<!--Author field-->
-<strong>Author:</strong> ${entry.author},<br> 
-<!--Title field-->
-<strong>Title:</strong> “${entry.title}”,<br>
-<!-- Journal field-->
-<strong>Journal:</strong> ${entry.journal},<br> 
-<!--Pages field-->
-<strong>Pages:</strong> ${entry.pages},<br> 
-<!-- Release date field-->
-<strong>Released on:</strong> ${entry.releasedOn},`;
-}
-
-function generateBibTeXEntry(node) { // Generates a BibTeX entry based on the node's topic
-    return {
-        author: `Auto Author for ${node.topic}`, // Auto-generated author using node topic
-        title: `${node.topic}`, // Node topic as title
-        journal: `Auto Journal`, // Placeholder journal
-        pages: `pp. 1–10`, // Placeholder pages
-        releasedOn: `2025` // Placeholder release year
-    };
-}
-
-function addPopoversToNodes() { // Attaches Bootstrap popovers to all mind map nodes
-    document.querySelectorAll('[nodeid]').forEach(nodeElem => { // Loop through all elements with node_id attribute
-        if (nodeElem.getAttribute('data-bs-toggle') === 'popover') return; // Skip if popover already attached
-        const nodeId = nodeElem.getAttribute('nodeid'); // Get node id
-        const node = jm.get_node(nodeId); // Get node object from jsMind
-        const entry = generateBibTeXEntry(node); // Generate BibTeX entry for this node
-        nodeElem.setAttribute('data-bs-toggle', 'popover'); // Enable popover
-        nodeElem.setAttribute('data-bs-trigger', 'hover focus'); // Show on hover
-        nodeElem.setAttribute('data-bs-placement', 'bottom'); // Always show popover below the node
-        nodeElem.setAttribute('data-bs-html', 'true'); // Allow HTML content in popover
-        nodeElem.setAttribute('title', 'Entry Preview'); // Popover title
-        nodeElem.setAttribute('data-bs-content', getBibTeXEntry(entry)); // Popover content
-        new bootstrap.Popover(nodeElem, { container: 'body' }); // Initialize Bootstrap popover
-    });
-}
-
-window.addEventListener('DOMContentLoaded', () => { // When DOM is fully loaded
-    addPopoversToNodes(); // Attach popovers to all nodes
-});
-
-jm.add_event_listener(function(type, data) { // Listen for jsMind events that update the mind map
-    if ([
-        'show',
-        'add_node',
-        'update',
-        'select_node',
-        'expand_node',
-        'collapse_node',
-    ].includes(type)) { // If event is one that changes the nodes
-        closeAllPopovers();
-        setTimeout(addPopoversToNodes, 100); // Re-attach popovers after a short delay
-    }
-});
-
-// Adding Entry Preview to the Child Nodes
-const container = document.getElementById('jsmind_container'); // Get the mind map container
-new MutationObserver(muts => { // Observe DOM changes in the container
-    muts.forEach(m => {
-        m.addedNodes.forEach(n => {
-            if (n.nodeType === 1 && n.hasAttribute('nodeid')) { // If a new node element is added
-                addPopoversToNodes(); // Attach popover to the new node
-            }
-        });
-    });
-}).observe(container, { childList: true, subtree: true }); // Observe all child nodes and subtrees
-
-function closeAllPopovers() {
-    // Dispose all Bootstrap popover instances on .jsmind-inner elements
-    document.querySelectorAll('.jsmind-inner').forEach(el => {
-        // Get the popover instance (Bootstrap 5 way)
-        const instance = bootstrap.Popover.getInstance(el);
-        if (instance) {
-            instance.dispose(); // Remove popover from DOM and cleans up
-        }
-    });
-    // As a fallback, remove any orphaned popover elements left in the DOM
-    document.querySelectorAll('.popover').forEach(pop => pop.remove());
-}
-
-// Observe for changes in the container's DOM
-new MutationObserver(mutations => {
-    // For each mutation record, get its removedNodes and addedNodes.
-    mutations.forEach(({ removedNodes, addedNodes }) => {
-        // Loop through every node that was removed.
-        removedNodes.forEach(node => {
-            // If the node is an element and has a 'nodeid' attribute.
-            if (node.nodeType === 1 && node.hasAttribute('nodeid')) {
-                // Get the popover instance from Bootstrap for this node.
-                const popover = bootstrap.Popover.getInstance(node);
-                // If a popover exists, dispose of it to clean up.
-                if (popover) popover.dispose();
-            }
-        });
-        // Loop through every node that was added.
-        addedNodes.forEach(node => {
-            // If the node is an element and has a 'nodeid' attribute.
-            if (node.nodeType === 1 && node.hasAttribute('nodeid')) {
-                // Reapply popovers to the new node.
-                addPopoversToNodes();
-            }
-        });
-    });
-})
-    // Start observing the container for changes in child elements and all its sub-elements.
-    .observe(container, {
-        childList: true,  // Watch for added or removed child nodes.
-        subtree: true     // Extend the observation to all descendants of the container.
-    });

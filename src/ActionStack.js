@@ -44,6 +44,14 @@ export class ActionStack {
     }
 
     /**
+     * Removes all previously saved states.
+     */
+    clear() {
+        this.#lastSaves.length = 0;
+        this.#saveIndex = 0;
+    }
+
+    /**
      * Cancels the latest performed change made to a mind map
      * by providing it's state saved earlier.
      * @returns { object } A map's state saved at decremented
