@@ -517,13 +517,55 @@ function showPDFList() {
     }
 }
 
-addPDFAsSiblingBtn.onclick = showPDFList;
-addPDFAsChildBtn.onclick = showPDFList;
+addPDFAsSiblingBtn.onclick = function() {
+    showPDFList();
+    addSelectedPDFBtn.onclick = function() {
+        let selectedNode = jm.get_selected_node();
+        if (!selectedNode) {
+            console.log('Fail: No node\'s selected to add PDFs as siblings :(');
+            return;
+        }
 
-addSelectedPDFBtn.onclick = async function() {
-    // access bootstrap's <form-select> element
-    let bsSelect = document.getElementById('addPDFSelect');
-    console.log(bsSelect.selectedIndex);
+        // access bootstrap's <form-select> element
+        let bsSelect = document.getElementById('addPDFSelect');
+        let selectedPDFs = bsSelect.selectedOptions;
+
+        let pdfOption;
+        for (let i = 0; i < selectedPDFs.length; i++) {
+            pdfOption = selectedPDFs[i];
+            jm.insert_node_after(selectedNode,
+                util.uuid.newid(),
+                pdfOption.label,
+                {
+                    type: 'PDFF'
+                });
+        }
+    }
+}
+addPDFAsChildBtn.onclick = function() {
+    showPDFList();
+    addSelectedPDFBtn.onclick = function() {
+        let selectedNode = jm.get_selected_node();
+        if (!selectedNode) {
+            console.log('Fail: No node\'s selected to add PDFs as siblings :(');
+            return;
+        }
+
+        // access bootstrap's <form-select> element
+        let bsSelect = document.getElementById('addPDFSelect');
+        let selectedPDFs = bsSelect.selectedOptions;
+
+        let pdfOption;
+        for (let i = 0; i < selectedPDFs.length; i++) {
+            pdfOption = selectedPDFs[i];
+            jm.add_node(selectedNode,
+                util.uuid.newid(),
+                pdfOption.label,
+                {
+                    type: 'PDFF'
+                });
+        }
+    }
 }
 
 // icon-dropdown menu button handlers
