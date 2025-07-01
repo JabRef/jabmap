@@ -320,7 +320,6 @@ saveBtn.onclick = function () {
     httpClient.saveMap(jm.get_data());
 }
 
-// @shalabi how to fill the modal with options
 // opening - opens a dialog to select available mind maps
 openBtn.onclick = async function () {
     // request a list of available mind maps from JabRef's HTTP server
@@ -366,7 +365,7 @@ openSelectedMapBtn.onclick = async function () {
     jm.resetStack();
 }
 
-// debug button prints current mindmap state to console
+// debug button prints current mind map state to console
 printMapToConsoleBtn.onclick = async function () {
     // print mindmap data
     console.log(jm.get_data());
