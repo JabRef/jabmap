@@ -137,7 +137,6 @@ export class HTTPClient {
             method: "GET",
             headers: { "Content-Type": "application/json" }
         }
-        // TODO - format the list to contain the keys, titles, authors and releases of the entries and return it
         return this.#performRequest(this.currentLibrary, options)
     }
 
@@ -186,5 +185,32 @@ export class HTTPClient {
         }
 
         return this.#performRequest(url, options);
+    }
+
+    /**
+     * Requests a list of all local pdf files from the current library.
+     * @returns A list of objects of the following structure
+     * ```
+     * [
+     *     {
+     *         "fileName": "example.pdf",
+     *         "parentCitationKey": "Tokede_2011",
+     *         "path": (relative) "Example.pdf" or
+     *                 (absolute) "/Users/exampleUser/documents/Example.pdf"
+     *     },
+     *     {...}
+     *  ]
+     *  ```
+     */
+    async getPDFFiles(){
+        const url = `libraries/${this.currentLibrary}/entries/pdffiles`;
+        const options = {
+            method: "GET",
+            headers: { "Content-Type": "application/json" }
+        }
+
+        let response = await this.#performRequest(url, options);
+        console.log(response);
+        return response;
     }
 }

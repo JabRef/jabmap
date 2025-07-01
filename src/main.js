@@ -358,11 +358,10 @@ openSelectedMapBtn.onclick = async function () {
 printMapToConsoleBtn.onclick = async function () {
     // print mindmap data
     console.log(jm.get_data());
-    /*// print currently active library
-    console.log(httpClient.currentLibrary);
-    // Get preview string for "Tokede_2011" current library (has to be demo to deliver result)
-    let preview = await httpClient.getPreviewString("Tokede_2011");
-    console.log(preview);*/
+    let listpdfs = await httpClient.getPDFFiles();
+    for (let i = 0; i < listpdfs.length; i++) {
+        console.log("fileName: " + listpdfs[i].fileName + " parentCiteKey: " + listpdfs[i].parentCitationKey + " path: " + listpdfs[i].path);
+    }
 }
 
 // undo - discard the last operation (display the previous state)
