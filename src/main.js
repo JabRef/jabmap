@@ -550,6 +550,7 @@ addPDFAsSiblingBtn.onclick = async function() {
                 }
             );
         }
+        jm.saveState();
     }
 }
 
@@ -583,6 +584,7 @@ addPDFAsChildBtn.onclick = async function() {
                 }
             );
         }
+        jm.saveState();
     }
 }
 
