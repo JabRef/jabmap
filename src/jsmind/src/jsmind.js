@@ -481,10 +481,6 @@ export default class jsMind {
                 data: [node_id],
                 node: parent_id,
             });
-            // Altered lines:
-            // Save current mind map's state to the action stack
-            this.saveState();
-            // End
             return true;
         } else {
             logger.error('fail, this mind map is not editable');
@@ -537,10 +533,6 @@ export default class jsMind {
                     data: [node_id, before_id, parent_id, direction],
                     node: node_id,
                 });
-                // Altered lines:
-                // Save current mind map's state to the action stack
-                this.saveState();
-                // End
             }
         } else {
             logger.error('fail, this mind map is not editable');

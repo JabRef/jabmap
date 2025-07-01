@@ -168,6 +168,10 @@ jm.add_event_listener((type, data) => {
     }
     if (type === jsMind.event_type.edit) {
         hidePopovers();
+
+        if (['move_node', 'remove_node'].includes(data.evt)){
+            jm.saveState();
+        }
     }
     if (type === jsMind.event_type.select) {
         hidePopovers();
