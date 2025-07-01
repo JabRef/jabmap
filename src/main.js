@@ -434,22 +434,6 @@ function toggleButtonsEnabled(buttons, isEnabled) {
     buttons.forEach(b => b.disabled = !isEnabled);
 }
 
-BibEntryDropdownMenuButton.onclick = function () {
-    // getting the selected node for enabling checks
-    const selectedNode = jm.get_selected_node();
-
-    // access dropdown buttons
-    const addChildBtn = document.getElementById('addBibEntryAsChildBtn');
-    const addSiblingBtn = document.getElementById('addBibEntryAsSiblingBtn');
-
-    // and enable them, if a node's selected
-    toggleButtonsEnabled([addChildBtn, addSiblingBtn], !!selectedNode);
-    // don't forget to exclude adding 2nd root node :)
-    if (!!selectedNode && selectedNode.isroot) {
-        addSiblingBtn.disabled = true;
-    }
-}
-
 addBibEntryAsChildBtn.onclick = async function () {
     // * Note: one node is initially selected
 

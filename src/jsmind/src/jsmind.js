@@ -575,6 +575,10 @@ export default class jsMind {
         if (!!this.mind) {
             this.mind.selected = null;
             this.view.select_clear();
+            // Altered lines:
+            // Invoke 'select' event to disable UI buttons
+            this.invoke_event_handle(EventType.select, { evt: 'select_node', data: [], node: '' });
+            // End
         }
     }
     is_node_visible(node) {
