@@ -109,7 +109,7 @@ const options = {
             addchild: [45, 4096 + 13],  // <Insert>, <Ctrl> + <Enter>
             addbrother: 13,             // <Enter>
             editnode: 113, 	            // <F2>
-            delnode: [46, 8], 	            // <Delete>
+            delnode: [46, 8], 	        // <Delete>
             toggle: 32, 	            // <Space>
             left: 37, 		            // <Left>
             up: 38, 		            // <Up>
@@ -165,6 +165,9 @@ jm.add_event_listener((type, data) => {
     if (type === jsMind.event_type.show) {
         addPopoversToBibEntryNodes();
         jm.select_clear();
+
+        redoBtn.disabled = !jm.actionStack.isRedoable;
+        undoBtn.disabled = !jm.actionStack.isUndoable;
     }
     if (type === jsMind.event_type.edit) {
         hidePopovers();
@@ -172,6 +175,9 @@ jm.add_event_listener((type, data) => {
         if (['move_node', 'remove_node'].includes(data.evt)){
             jm.saveState();
         }
+
+        redoBtn.disabled = !jm.actionStack.isRedoable;
+        undoBtn.disabled = !jm.actionStack.isUndoable;
     }
     if (type === jsMind.event_type.select) {
         hidePopovers();
