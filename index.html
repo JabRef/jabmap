@@ -125,6 +125,22 @@
               </button>
             </div>
           </div>
+
+        <div class="dropdown">
+          <button class="btn btn-secondary dropdown-toggle me-2" id="PDFDropDownMenuButton" data-bs-toggle="dropdown">
+            <i class="bi bi-file-pdf"></i></i>
+          </button>
+          <div class="dropdown-menu">
+            <h6 class="dropdown-header">New PDF node</h6>
+            <button id="addPDFAsSiblingBtn" class="btn dropdown-item" data-bs-toggle="modal" data-bs-target="#selectPDFModal">
+              <i class="bi bi-node-plus-fill"> </i> As sibling node
+            </button>
+            <button id="addPDFAsChildBtn" class="btn dropdown-item" data-bs-toggle="modal" data-bs-target="#selectPDFModal">
+              <i class="bi bi-diagram-2-fill" style="transform: rotate(-90deg); display: inline-block;"> </i> As child node
+            </button>
+          </div>
+        </div>
+
       </div>
       <div style="flex-basis: 33%; max-width: 33%;"></div>
     </div>

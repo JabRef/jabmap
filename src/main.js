@@ -501,6 +501,31 @@ addBibEntryAsSiblingBtn.onclick = async function () {
     addPopoversToBibEntryNodes();
 }
 
+function showPDFList() {
+    // list PDFs of current library
+    const pdfList = ["PDF 1", "PDF 2", "PDF 3"];
+
+    // access bootstrap's <form-select> element
+    let bsSelect = document.getElementById('addPDFSelect');
+    // and replace its options with retrieved ones
+    bsSelect.innerHTML = '';
+    for (let i = 0; i < pdfList.length; i++) {
+        bsSelect.innerHTML +=
+            `<option value=${pdfList[i]}>` +
+            `${pdfList[i]}` +
+            `</option>`;
+    }
+}
+
+addPDFAsSiblingBtn.onclick = showPDFList;
+addPDFAsChildBtn.onclick = showPDFList;
+
+addSelectedPDFBtn.onclick = async function() {
+    // access bootstrap's <form-select> element
+    let bsSelect = document.getElementById('addPDFSelect');
+    console.log(bsSelect.selectedIndex);
+}
+
 // icon-dropdown menu button handlers
 iconCycleBtn.onclick = function () {
     if (jm != null) {
