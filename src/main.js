@@ -238,12 +238,24 @@ const jm = new jsMind(options);
 jm.add_event_listener((type, data) => {
     if (type === jsMind.event_type.show) {
         addPopoversToBibEntryNodes();
+        jm.select_clear();
     }
     if (type === jsMind.event_type.edit) {
         hidePopovers();
     }
     if (type === jsMind.event_type.select) {
         hidePopovers();
+
+        // disable nodes' buttons, if no node's selected
+        let isNodeSelected = !!jm.get_selected_node();
+        let buttons = [
+            newChildBtn,
+            newSiblingBtn,
+            tagsDropdownMenuButton,
+            BibEntryDropdownMenuButton,
+            PDFDropDownMenuButton
+        ];
+        toggleButtonsEnabled(buttons, isNodeSelected);
     }
 });
 
