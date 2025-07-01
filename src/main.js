@@ -347,7 +347,7 @@ openSelectedMapBtn.onclick = async function () {
     let loadResponse = await httpClient.loadMap(selectedOption.value);
     // if no mind map exists, show the default one
     let loadedMap = loadResponse.map ?? mind;
-    extendNode(loadedMap.data);
+    extendNode(loadedMap);
 
     // display the retrieved mind map
     jm.show(loadedMap);
@@ -550,6 +550,7 @@ addPDFAsSiblingBtn.onclick = async function() {
                 }
             );
         }
+        // save map state for undo/redo
         jm.saveState();
     }
 }
@@ -584,6 +585,7 @@ addPDFAsChildBtn.onclick = async function() {
                 }
             );
         }
+        // save map state for undo/redo
         jm.saveState();
     }
 }
