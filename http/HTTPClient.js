@@ -201,6 +201,7 @@ export class HTTPClient {
      *     {...}
      *  ]
      *  ```
+     *  Relative being relative to the corresponding current library.bib file;
      */
     async getPDFFiles(){
         const url = `libraries/${this.currentLibrary}/entries/pdffiles`;

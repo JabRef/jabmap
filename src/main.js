@@ -500,9 +500,13 @@ addBibEntryAsSiblingBtn.onclick = async function () {
     addPopoversToBibEntryNodes();
 }
 
-function showPDFList() {
-    // list PDFs of current library
-    const pdfList = ["PDF 1", "PDF 2", "PDF 3"];
+// TODO: add javadoc comment
+async function showPDFList(pdfList) {
+    // list of filenames to display
+    const files = [];
+    for (let i = 0; i < pdfList.length; i++) {
+        files[i] = pdfList[i].fileName;
+    }
 
     // access bootstrap's <form-select> element
     let bsSelect = document.getElementById('addPDFSelect');
@@ -511,13 +515,15 @@ function showPDFList() {
     for (let i = 0; i < pdfList.length; i++) {
         bsSelect.innerHTML +=
             `<option value=${pdfList[i]}>` +
-            `${pdfList[i]}` +
+            `${files[i]}` +
             `</option>`;
     }
 }
 
-addPDFAsSiblingBtn.onclick = function() {
-    showPDFList();
+// TODO: add comments
+addPDFAsSiblingBtn.onclick = async function() {
+    const pdfList= await httpClient.getPDFFiles();
+    showPDFList(pdfList);
     addSelectedPDFBtn.onclick = function() {
         let selectedNode = jm.get_selected_node();
         if (!selectedNode) {
@@ -528,21 +534,29 @@ addPDFAsSiblingBtn.onclick = function() {
         // access bootstrap's <form-select> element
         let bsSelect = document.getElementById('addPDFSelect');
         let selectedPDFs = bsSelect.selectedOptions;
+        let selectedIndices = Array.from(bsSelect.selectedOptions).map(option => option.index);
 
-        let pdfOption;
         for (let i = 0; i < selectedPDFs.length; i++) {
-            pdfOption = selectedPDFs[i];
-            jm.insert_node_after(selectedNode,
+            let currentPdfFileInfo = pdfList[selectedIndices[i]];
+            jm.insert_node_after(
+                selectedNode,
                 util.uuid.newid(),
-                pdfOption.label,
+                currentPdfFileInfo.fileName,
                 {
-                    type: 'PDFF'
-                });
+                    type: 'PDFF',
+                    parentCitationKey: currentPdfFileInfo.parentCitationKey,
+                    path: currentPdfFileInfo.path,
+                    fileName: currentPdfFileInfo.fileName,
+                }
+            );
         }
     }
 }
-addPDFAsChildBtn.onclick = function() {
-    showPDFList();
+
+// TODO: add comments
+addPDFAsChildBtn.onclick = async function() {
+    const pdfList= await httpClient.getPDFFiles();
+    showPDFList(pdfList);
     addSelectedPDFBtn.onclick = function() {
         let selectedNode = jm.get_selected_node();
         if (!selectedNode) {
@@ -553,16 +567,21 @@ addPDFAsChildBtn.onclick = function() {
         // access bootstrap's <form-select> element
         let bsSelect = document.getElementById('addPDFSelect');
         let selectedPDFs = bsSelect.selectedOptions;
+        let selectedIndices = Array.from(bsSelect.selectedOptions).map(option => option.index);
 
-        let pdfOption;
         for (let i = 0; i < selectedPDFs.length; i++) {
-            pdfOption = selectedPDFs[i];
-            jm.add_node(selectedNode,
+            let currentPdfFileInfo = pdfList[selectedIndices[i]];
+            jm.add_node(
+                selectedNode,
                 util.uuid.newid(),
-                pdfOption.label,
+                currentPdfFileInfo.fileName,
                 {
-                    type: 'PDFF'
-                });
+                    type: 'PDFF',
+                    parentCitationKey: currentPdfFileInfo.parentCitationKey,
+                    path: currentPdfFileInfo.path,
+                    fileName: currentPdfFileInfo.fileName,
+                }
+            );
         }
     }
 }
