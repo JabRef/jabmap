@@ -325,21 +325,7 @@ openBtn.onclick = async function () {
     // request a list of available mind maps from JabRef's HTTP server
     let availableMaps = await httpClient.listMaps();
 
-    // access bootstrap's <form-select> element
-    let bsSelect = document.getElementById('openMindmapSelect');
-    // and replace it's options with retrieved ones
-    bsSelect.innerHTML = '';
-    for (let i = 0; i < availableMaps.length; i++) {
-        bsSelect.innerHTML +=
-            `<option value=${availableMaps[i]}>` +
-            `${availableMaps[i]}` +
-            `</option>`;
-    }
-
-    if (bsSelect.innerHTML != '') {
-        // select first element
-        bsSelect.selectedIndex = 0;
-    }
+    fillSelect('openMindmapSelect', availableMaps, availableMaps);
 }
 
 // <modal> dialog confirmation button
@@ -433,23 +419,25 @@ function toggleButtonsEnabled(buttons, isEnabled) {
     buttons.forEach(b => b.disabled = !isEnabled);
 }
 
-addBibEntryAsChildBtn.onclick = async function () {
+/**
+ * Adds given BibEntry data to the current mind map
+ * using specific function of jsMind.
+ * @param { Array } bibList - The BibEntries to add.
+ * @param { CallableFunction } add_nodes_callback - The function to add new nodes by.
+ */
+async function addBibEntryNodes(bibList, add_nodes_callback) {
     // * Note: one node is initially selected
-
-    // ask user to select some citation keys
-    // and retrieve related preview strings
-    const bibData = await getBibNodesProperties();
 
     // if node's selection was revoked, break the process
     let selectedNode = jm.get_selected_node();
     if (!selectedNode) {
-        console.log('Fail: No node\'s selected to add BibEntries as children :(');
+        console.log('Fail: No node\'s selected to add BibEntries to :(');
         return;
     }
 
     // otherwise add extended nodes as children
-    bibData.forEach((bibProperties) => {
-        jm.add_node(selectedNode,
+    bibList.forEach((bibProperties) => {
+        add_nodes_callback(selectedNode,
             util.uuid.newid(),
             bibProperties.key,
             {
@@ -462,127 +450,129 @@ addBibEntryAsChildBtn.onclick = async function () {
     jm.saveState();
     // and create popovers for new BibEntry nodes
     addPopoversToBibEntryNodes();
+}
+
+addBibEntryAsChildBtn.onclick = async function () {
+    // ask user to select some citation keys
+    // and retrieve related preview strings
+    const bibList = await getBibNodesProperties();
+
+    // add selected BibEntries to the mind map as child nodes
+    await addBibEntryNodes(bibList,
+        (selectedNode, id, topic, data) => {
+            jm.add_node(selectedNode, id, topic, data);
+        });
 }
 
 addBibEntryAsSiblingBtn.onclick = async function () {
-    // * Note: one node is initially selected
-
     // ask user to select some citation keys
     // and retrieve related preview strings
-    const bibData = await getBibNodesProperties();
+    const bibList = await getBibNodesProperties();
+    
+    // add selected BibEntries to the mind map as child nodes
+    await addBibEntryNodes(bibList,
+        (selectedNode, id, topic, data) => {
+            jm.insert_node_after(selectedNode, id, topic, data);
+        });
+}
 
-    // if node's selection was revoked, break the process
-    let selectedNode = jm.get_selected_node();
-    if (!selectedNode) {
-        console.log('Fail: No node\'s selected to add BibEntries as siblings :(');
+/**
+ * Fills given select object with provided options.
+ * @param { String } selectId - Id of the bootstrap select to fill.
+ * @param { Array } values - The options' values of the select.
+ * @param { Array } showedOptions - The options to show to the user.
+ */
+function fillSelect(selectId, values, showedOptions) {
+    // access bootstrap's <form-select> element
+    let bsSelect = document.getElementById(selectId);
+    if (!bsSelect) {
+        console.log(`Failed to get \'select\' element by id: ${selectId}`);
         return;
     }
 
-    // otherwise add extended nodes as siblings
-    bibData.forEach((bibProperties) => {
-        jm.insert_node_after(selectedNode,
-            util.uuid.newid(),
-            bibProperties.key,
-            {
-                type: 'BIBE',
-                citeKey: bibProperties.key,
-                preview: bibProperties.preview
-            });
-    });
-    // save map state for undo/redo
-    jm.saveState();
-    // and create popovers for new BibEntry nodes
-    addPopoversToBibEntryNodes();
-}
-
-// TODO: add javadoc comment
-async function showPDFList(pdfList) {
-    // list of filenames to display
-    const files = [];
-    for (let i = 0; i < pdfList.length; i++) {
-        files[i] = pdfList[i].fileName;
-    }
-
-    // access bootstrap's <form-select> element
-    let bsSelect = document.getElementById('addPDFSelect');
     // and replace its options with retrieved ones
     bsSelect.innerHTML = '';
-    for (let i = 0; i < pdfList.length; i++) {
+    for (let i = 0; i < values.length; i++) {
         bsSelect.innerHTML +=
-            `<option value=${pdfList[i]}>` +
-            `${files[i]}` +
+            `<option value=${values[i]}>` +
+            `${showedOptions[i]}` +
             `</option>`;
     }
 }
 
+/**
+ * Adds given PDF data to the current mind map
+ * using specific function of jsMind.
+ * @param { Array } pdfList - The PDF entries to add.
+ * @param { CallableFunction } add_nodes_callback - The function to add nodes by.
+ */
+function addPDFNodes(pdfList, add_nodes_callback) {
+    console.log(pdfList);
+    let selectedNode = jm.get_selected_node();
+    if (!selectedNode) {
+        console.log('Fail: No node\'s selected to add PDFs to :(');
+        return;
+    }
+
+    for (let i = 0; i < pdfList.length; i++) {
+        add_nodes_callback(
+            selectedNode,
+            util.uuid.newid(),
+            pdfList[i].fileName,
+            {
+                type: 'PDFF',
+                parentCitationKey: pdfList[i].parentCitationKey,
+                path: pdfList[i].path,
+                fileName: pdfList[i].fileName,
+            }
+        );
+    }
+    // save map state for undo/redo
+    jm.saveState();
+}
+
 // TODO: add comments
 addPDFAsSiblingBtn.onclick = async function() {
-    const pdfList= await httpClient.getPDFFiles();
-    showPDFList(pdfList);
-    addSelectedPDFBtn.onclick = function() {
-        let selectedNode = jm.get_selected_node();
-        if (!selectedNode) {
-            console.log('Fail: No node\'s selected to add PDFs as siblings :(');
-            return;
-        }
+    // retrieve available PDFs and list them
+    const pdfList = await httpClient.getPDFFiles();
+    fillSelect('addPDFSelect',
+               pdfList,
+               pdfList.map((pdf) => pdf.fileName));
 
+    // upon confirming selection
+    addSelectedPDFBtn.onclick = function() {
         // access bootstrap's <form-select> element
         let bsSelect = document.getElementById('addPDFSelect');
         let selectedPDFs = bsSelect.selectedOptions;
-        let selectedIndices = Array.from(bsSelect.selectedOptions).map(option => option.index);
-
-        for (let i = 0; i < selectedPDFs.length; i++) {
-            let currentPdfFileInfo = pdfList[selectedIndices[i]];
-            jm.insert_node_after(
-                selectedNode,
-                util.uuid.newid(),
-                currentPdfFileInfo.fileName,
-                {
-                    type: 'PDFF',
-                    parentCitationKey: currentPdfFileInfo.parentCitationKey,
-                    path: currentPdfFileInfo.path,
-                    fileName: currentPdfFileInfo.fileName,
-                }
-            );
-        }
-        // save map state for undo/redo
-        jm.saveState();
-    }
+        
+        // and add selected PDFs as children
+        addPDFNodes(selectedPDFs,
+            (selectedNode, id, topic, data) => {
+                jm.insert_node_after(selectedNode, id, topic, data);
+            });
+    };
 }
 
 // TODO: add comments
 addPDFAsChildBtn.onclick = async function() {
-    const pdfList= await httpClient.getPDFFiles();
-    showPDFList(pdfList);
+    // retrieve available PDFs and list them
+    const pdfList = await httpClient.getPDFFiles();
+    fillSelect('addPDFSelect',
+               pdfList,
+               pdfList.map((pdf) => pdf.fileName));
+    
+    // upon confirming selection
     addSelectedPDFBtn.onclick = function() {
-        let selectedNode = jm.get_selected_node();
-        if (!selectedNode) {
-            console.log('Fail: No node\'s selected to add PDFs as siblings :(');
-            return;
-        }
-
         // access bootstrap's <form-select> element
         let bsSelect = document.getElementById('addPDFSelect');
-        let selectedPDFs = bsSelect.selectedOptions;
-        let selectedIndices = Array.from(bsSelect.selectedOptions).map(option => option.index);
+        let selectedPDFs = Array.from(bsSelect.selectedOptions).map((option) => pdfList[option.index]);
 
-        for (let i = 0; i < selectedPDFs.length; i++) {
-            let currentPdfFileInfo = pdfList[selectedIndices[i]];
-            jm.add_node(
-                selectedNode,
-                util.uuid.newid(),
-                currentPdfFileInfo.fileName,
-                {
-                    type: 'PDFF',
-                    parentCitationKey: currentPdfFileInfo.parentCitationKey,
-                    path: currentPdfFileInfo.path,
-                    fileName: currentPdfFileInfo.fileName,
-                }
-            );
-        }
-        // save map state for undo/redo
-        jm.saveState();
-    }
+        // and add selected PDFs as children
+        addPDFNodes(selectedPDFs,
+            (selectedNode, id, topic, data) => {
+                jm.add_node(selectedNode, id, topic, data);
+            });
+    };
 }
 
 // icon-dropdown menu button handlers
@@ -633,5 +623,19 @@ iconRedFlagBtn.onclick = function () {
 document.addEventListener("keydown", (e) => {
     if (e.ctrlKey && (jm.get_selected_node() && !jm.view.editing_node)) {
         e.preventDefault();
+    }
+});
+
+// remove focus from active element upon showing / closing modals
+// due to a 'Blocked aria-hidden' warning
+// * More about it in this answer: https://stackoverflow.com/a/79210442/23515071
+document.addEventListener('hide.bs.modal', function (event) {
+    if (document.activeElement) {
+        document.activeElement.blur();
+    }
+});
+document.addEventListener('show.bs.modal', function (event) {
+    if (document.activeElement) {
+        document.activeElement.blur();
     }
 });
