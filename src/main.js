@@ -308,6 +308,7 @@ saveBtn.onclick = function () {
     httpClient.saveMap(jm.get_data());
 }
 
+// @shalabi how to fill the modal with options
 // opening - opens a dialog to select available mind maps
 openBtn.onclick = async function () {
     // request a list of available mind maps from JabRef's HTTP server
@@ -346,7 +347,6 @@ openSelectedMapBtn.onclick = async function () {
     let loadResponse = await httpClient.loadMap(selectedOption.value);
     // if no mind map exists, show the default one
     let loadedMap = loadResponse.map ?? mind;
-
     extendNode(loadedMap.data);
 
     // display the retrieved mind map
