@@ -247,8 +247,8 @@ export default class jsMind {
         }
         // Altered lines:
         let nodeType = node.data.type;
-        if (nodeType === 'BIBE') {
-            console.log('No editing for BIBE nodes >:(');
+        if (['BIBE', 'PDFF'].includes(nodeType)) {
+            console.log(`No editing for ${nodeType} nodes >:(`);
             return;
         }
         // End
