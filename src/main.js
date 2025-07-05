@@ -441,7 +441,7 @@ addBibEntryAsSiblingBtn.onclick = async function () {
     // ask user to select some citation keys
     // and retrieve related preview strings
     const bibList = await getBibNodesProperties();
-    
+
     // add selected BibEntries to the mind map as child nodes
     await addBibEntryNodes(bibList,
         (selectedNode, id, topic, data) => {
@@ -458,7 +458,7 @@ addBibEntryAsSiblingBtn.onclick = async function () {
  * @param { Array } pdfList - The PDF entries to add.
  * @param { CallableFunction } add_nodes_callback - The function to add nodes by.
  */
-function addPDFNodes(pdfList, add_nodes_callback) {
+/*function addPDFNodes(pdfList, add_nodes_callback) {
     console.log(pdfList);
     let selectedNode = jm.get_selected_node();
     if (!selectedNode) {
@@ -482,9 +482,9 @@ function addPDFNodes(pdfList, add_nodes_callback) {
     // save map state for undo/redo
     jm.saveState();
 }
-
+*/
 // TODO: add comments
-addPDFAsSiblingBtn.onclick = async function() {
+/*addPDFAsSiblingBtn.onclick = async function() {
     // retrieve available PDFs and list them
     const pdfList = await httpClient.getPDFFiles();
     fillSelect('addPDFSelect',
@@ -496,7 +496,7 @@ addPDFAsSiblingBtn.onclick = async function() {
         // access bootstrap's <form-select> element
         let bsSelect = document.getElementById('addPDFSelect');
         let selectedPDFs = Array.from(bsSelect.selectedOptions).map((option) => pdfList[option.index]);
-        
+
         // and add selected PDFs as children
         addPDFNodes(selectedPDFs,
             (selectedNode, id, topic, data) => {
@@ -512,7 +512,7 @@ addPDFAsChildBtn.onclick = async function() {
     fillSelect('addPDFSelect',
                pdfList,
                pdfList.map((pdf) => pdf.fileName));
-    
+
     // upon confirming selection
     addSelectedPDFBtn.onclick = function() {
         // access bootstrap's <form-select> element
@@ -525,8 +525,85 @@ addPDFAsChildBtn.onclick = async function() {
                 jm.add_node(selectedNode, id, topic, data);
             });
     };
-}
+}*/
 
+// ======================= [PDF Nodes Section] =======================
+
+// PDF Nodes: Add PDF nodes as siblings or children to the selected node
+document.addEventListener('DOMContentLoaded', () => {
+
+    //  References to the buttons and modal elements
+    const btnSibling = document.getElementById('addPDFAsSiblingBtn'); // "As sibling" button
+    const btnChild   = document.getElementById('addPDFAsChildBtn');   // "As child" button
+    const btnAdd     = document.getElementById('addSelectedPDFBtn');  // "Add" button inside modal
+    const selectEl   = document.getElementById('addPDFSelect');      // <select> element listing PDFs
+    const modalEl    = document.getElementById('selectPDFModal');    // PDF selection modal
+
+    //  State for PDF list and insertion mode ('child' or 'sibling')
+    let pdfList = [];    // Hold the list of PDFs fetched from the server
+    let mode    = 'child'; // Default insertion mode is as child
+
+    // Set the insertion mode when the buttons are clicked
+    btnSibling.addEventListener('click', () => { mode = 'sibling'; });
+    btnChild  .addEventListener('click', () => { mode = 'child';   });
+
+    //  When the modal opens: fetch the PDF list and populate the <select>
+    modalEl.addEventListener('show.bs.modal', async () => {
+        console.log('Fetching PDF list…');
+        try {
+            pdfList = await httpClient.getPDFFiles(); // Call the server to get PDFs
+        } catch (e) {
+            console.error(' Error fetching PDF list:', e);
+            pdfList = []; // If error, reset to empty array
+        }
+        console.log('Fetched PDF list:', pdfList);
+
+        // Populate the <select> with fetched PDFs
+        selectEl.innerHTML = pdfList
+            .map((p, i) => `<option value="${i}">${p.fileName}</option>`)
+            .join('');
+    });
+
+    //  When the "Add" button is clicked: add selected PDF nodes
+    btnAdd.addEventListener('click', () => {
+        // Read the selected indices from the <select>
+        const indexes = Array.from(selectEl.selectedOptions)
+            .map(o => parseInt(o.value, 10));
+
+        // Build an array of the actual PDF objects
+        const chosen = indexes.map(i => pdfList[i]).filter(x => x);
+        console.log('Selected PDFs to add:', chosen);
+
+        // Get the currently selected node in the mind map
+        const node = jm.get_selected_node();
+        if (!node) {
+            console.warn('No node selected — cannot add PDFs');
+            return;
+        }
+
+        // For each chosen PDF, create a new node
+        chosen.forEach(pdf => {
+            const newId = util.uuid.newid(); // Generate a unique ID
+            const data  = {                  // Node data object
+                type: 'PDFF',
+                parentCitationKey: pdf.parentCitationKey,
+                path: pdf.path,
+                fileName: pdf.fileName
+            };
+            if (mode === 'sibling') {
+                // Insert as a sibling node
+                jm.insert_node_after(node, newId, pdf.fileName, data);
+            } else {
+                // Add as a child node
+                jm.add_node(node, newId, pdf.fileName, data);
+            }
+            console.log(` Added PDF node ("${pdf.fileName}") as ${mode}`);
+        });
+        jm.saveState(); // Save the state for undo/redo
+    });
+});
+
+// ======================= [End PDF Nodes Section] =======================
 //#endregion
 //#region [Icons & Tags]
 
@@ -547,7 +624,7 @@ function applyTag(selectedNode, iconKey) {
         9: ["red_flag"]
     };
 
-    // if the node doesn't have icons list, assign an empty one  
+    // if the node doesn't have icons list, assign an empty one
     selectedNode.data.icons = selectedNode.data.icons ?? [];
 
     // getting currently applied tags and the list of toggling ones
