@@ -9,20 +9,44 @@ Next-Generation scientific mind mapping.
 The current state of the application is hosted on [github pages](https://jabref.github.io/jabmap/) for you to try out. Note that saving and loading mind maps does not work when running the app like this. This is because both require communication with the [JabRef's HTTP server](#getting-the-server) which will be restricted by your browser for security reasons. 
 
 ## 💾 Installation
-### Building the app
-Currently, there is no production build available for download so you have to build it yourself.
-To do this, you need to have `npm` and `node.js` installed. Installing them with [nvm](https://github.com/nvm-sh/nvm) is the recommended way.
 
-Installation Guide for Windows and Linux / OS X is available [here](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm).
+Currently, there is no production build available for download so you have to build it yourself :3
 
-Then, clone this repository onto your machine and open a terminal session at the project root.
+### Basic Setup
+Firstly ensure you have `nvm` (_Node version manager_) and `Node.js` installed:
 
-Then, run the following commands:
-1. ```npm install```  - this will install all necessary packages in a `./node_modules` directory. You may run this command to update existing packages.
-2. ```npm run build``` - this will bundle the app and dependencies into a `./dist` directory.
-3. ```npm run preview``` - this will run the preview of the build-output in your browser (_click on the link in the terminal_).
+1. Open terminal (_you may have to run it with administrator permissions_)
+2. Install `nvm` or update your version by running one of following install scripts in your terminal (more information about these in [nvm documentation](https://github.com/nvm-sh/nvm?tab=readme-ov-file#install--update-script)):
+   - `curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash`
+  
+     or
 
-Alternatively, you can simply open the `index.html` file (_using IDEA_) in the `./dist` directory after building and choose a browser (_in the top right corner_) to run the application.
+   - `wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash`
+3. Install `npm` or update your version by running `npm install -g npm`
+4. Install `Node.js` or update your current version by downloading latest release from [its website](https://nodejs.org/en/download/).
+5. At the end ensure installations were successful by running `npm -v` and `node -v` (_you may need to reboot your system before this step_)
+
+After you ensured the basic setup is complete, clone this repository onto your machine and open a terminal session at the project root.
+
+### Building
+
+Now you should be able to run the following commands:
+1. `npm install`  - this will install / update all necessary packages in a `./node_modules` directory.
+2. `npm run bundle` - this will bundle the project into the `./electron-dist` directory.
+
+If bundling fails with `ERROR: Cannot create symbolic link`, you have to do the following:
+
+3. Download the `winCodeSign` package using [this link](https://github.com/electron-userland/electron-builder-binaries/releases/download/winCodeSign-2.6.0/winCodeSign-2.6.0.7z).
+4. Extract downloaded archive into `C:\Users\<YourUserName>\AppData\Local\electron-builder\Cache\winCodeSign\winCodeSign-2.6.0\`
+5. Retry running the `npm run bundle` command
+
+_More about this workaround in [this issue](https://github.com/electron-userland/electron-builder/issues/8149)_.
+
+### Starting
+
+After a successful build you can finally start the app located at `./electron-dist/win-unpacked/JabMap.exe`.
+
+_Optionally you can install it by opening_ `./electron-dist/JabMap Setup 1.0.0.exe`
 
 ### Getting the server
 As mentioned above, saving and loading of mind maps are handled by JabRef's HTTP server. Currently you have to start it manually:
