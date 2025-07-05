@@ -6,10 +6,9 @@ Next-Generation scientific mind mapping.
  <img width="1549" alt="JabMap opening a mindmap example" src="https://github.com/user-attachments/assets/23aa56d0-4432-4e5f-957b-8797d36a22fd" />
 
 ## 🌟 Try It Out!
-The current state of the application is hosted on [github pages](https://jabref.github.io/jabmap/) for you to try out. Note that saving and loading mind maps does not work when running the app like this. This is because both require communication with the [JabRef's HTTP server](#getting-the-server) which will be restricted by your browser for security reasons. 
+The current state of the application is hosted on [github pages](https://jabref.github.io/jabmap/) for you to try out. Note that saving and loading mind maps does not work when running the app like this because the communication with the [JabRef's HTTP server](#getting-the-server) is restricted by your browser for security reasons. Unfortunately this applies to any interaction with the server.
 
 ## 💾 Installation
-
 Currently, there is no production build available for download so you have to build it yourself :3
 
 ### Basic Setup
@@ -29,7 +28,6 @@ Firstly ensure you have `nvm` (_Node version manager_) and `Node.js` installed:
 After you ensured the basic setup is complete, clone this repository onto your machine and open a terminal session at the project root.
 
 ### Building
-
 Now you should be able to run the following commands:
 1. `npm install`  - this will install / update all necessary packages in a `./node_modules` directory.
 2. `npm run bundle` - this will bundle the project into the `./electron-dist` directory.
@@ -43,13 +41,12 @@ If bundling fails with `ERROR: Cannot create symbolic link`, you have to do the 
 _More about this workaround in [this issue](https://github.com/electron-userland/electron-builder/issues/8149)_.
 
 ### Starting
-
 After a successful build you can finally start the app located at `./electron-dist/win-unpacked/JabMap.exe`.
 
 _Optionally you can install it by opening_ `./electron-dist/JabMap Setup 1.0.0.exe`
 
-### Getting the server
-As mentioned above, saving and loading of mind maps are handled by JabRef's HTTP server. Currently you have to start it manually:
+## 🤖 Getting the server
+As mentioned above, several features are handled by JabRef's HTTP server. Currently you have to start it manually:
 
 First clone our [JabRef's fork repository](https://github.com/iloveskittles82/jabref) (_Note: It is recommended to complete this step of_ [_JabRef's setup guide_](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-12-build.html)).
 
@@ -57,6 +54,8 @@ After you cloned the repository, open it in editor of your choice (_IDEA works w
 
 Follow the steps described at the top of the file to start the server.
 
-_Alternatively_ you can start it with the `main()` method of `org.jabref.http.server.cli.ServerCli` package located at `./jabsrv-cli.src.main.java`.
+_Alternatively_ you can do the following:
+1. Open `ServerCLI` file located at `./jabsrv-cli/src/main/java/org.jabref.http.server.cli`
+2. Execute its `main()` method
 
 More about starting the server in [JabRef's server documentation](https://devdocs.jabref.org/code-howtos/http-server.html)
