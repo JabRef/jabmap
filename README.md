@@ -39,12 +39,14 @@ If bundling fails with `ERROR: Cannot create symbolic link`, you have to do the 
 
 _More about this workaround in [this issue](https://github.com/electron-userland/electron-builder/issues/8149)_.
 
+On Linux, there is a bug with npm and optional dependencies (See [this issue](https://github.com/npm/cli/issues/4828). Should you encounter this bug after running `npm install`, remove the `package-lock.json` file and `node-modules` directory and run `npm i`. Then, simply continue with step 2.
+
 ### Starting
 After a successful build you can finally start the app located at `./electron-dist/win-unpacked/JabMap.exe`.
 
 _Optionally you can install it by opening_ `./electron-dist/JabMap Setup 1.0.0.exe`
 
-## 🤖 Getting the server
+## 🤖 Getting the server running
 As mentioned above, several features are handled by JabRef's HTTP server. Currently you have to start it manually:
 
 First clone our [JabRef's fork repository](https://github.com/iloveskittles82/jabref) (_Note: It is recommended to complete this step of_ [_JabRef's setup guide_](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-12-build.html)).
