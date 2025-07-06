@@ -142,17 +142,23 @@ export class HTTPClient {
 
     /**
      * Sends a request to open a cite-as-you-write window
-     * to select saved citation keys.
+     * to select any number of BibEntries from the current library.
      * @returns A list of selected citation keys.
      */
     async getCiteKeysWithCAYW() {
-        const url = 'better-bibtex/cayw?format=simple-json';
+        let url = 'better-bibtex/cayw';
+        url += (`?libraryid=${this.currentLibrary}&format=simple-json`);
+        console.log(url);
         const options = {
             method: "GET",
             headers: { "Accept": "application/json" }
         }
-
-        return this.#performRequest(url, options)
+        let selectedEntries = await this.#performRequest(url, options);
+        let selectedCiteKeys = [];
+        for (let entry of selectedEntries) {
+            selectedCiteKeys.push(entry.citationKey);
+        }
+        return selectedCiteKeys;
     }
 
     /**
@@ -201,17 +207,16 @@ export class HTTPClient {
      *     {...}
      *  ]
      *  ```
-     *  Relative being relative to the corresponding current library.bib file;
+     *  "relative" being relative to the corresponding current library.bib file;
      */
     async getPDFFiles(){
         const url = `libraries/${this.currentLibrary}/entries/pdffiles`;
         const options = {
             method: "GET",
-            headers: { "Content-Type": "application/json" }
+            headers: { "Accept": "application/json" }
         }
 
         let response = await this.#performRequest(url, options);
-        console.log(response);
         return response;
     }
 }
