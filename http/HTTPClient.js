@@ -2,7 +2,7 @@
  * Provides HTTP-connection functionality.
  */
 export class HTTPClient {
-    #host = "http://localhost:6050/";
+    #host = "http://localhost:23119/";
 
     constructor() {
         /**
@@ -43,7 +43,7 @@ export class HTTPClient {
 
             // If some output is awaited, save it
             if (options.method !== "PUT") {
-                if (options.headers["Content-Type"] === 'application/json') {
+                if (options.headers["Accept"] === 'application/json') {
                     result = await response.json();
                 }
                 if (options.headers["Accept"] === 'text/plain') {
@@ -88,7 +88,7 @@ export class HTTPClient {
         const url = `libraries/${library}/map`;
         const options = {
             method: "GET",
-            headers: { "Content-Type": "application/json" }
+            headers: { "Accept": "application/json" }
         }
 
         // Changing current library
@@ -122,7 +122,7 @@ export class HTTPClient {
         const url = 'libraries'
         const options = {
             method: "GET",
-            headers: { "Content-Type": "application/json" }
+            headers: { "Accept": "application/json" }
         }
 
         return this.#performRequest(url, options)
@@ -146,10 +146,10 @@ export class HTTPClient {
      * @returns A list of selected citation keys.
      */
     async getCiteKeysWithCAYW() {
-        const url = 'better-bibtex/cayw';
+        const url = 'better-bibtex/cayw?format=simple-json';
         const options = {
             method: "GET",
-            headers: { "Content-Type": "application/json" }
+            headers: { "Accept": "application/json" }
         }
 
         return this.#performRequest(url, options)
