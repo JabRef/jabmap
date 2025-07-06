@@ -21,9 +21,8 @@ Firstly ensure you have `nvm` (_Node version manager_) and `Node.js` installed:
      or
 
    - `wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash`
-3. Install `npm` or update your version by running `npm install -g npm`
-4. Install `Node.js` or update your current version by downloading latest release from [its website](https://nodejs.org/en/download/).
-5. At the end ensure installations were successful by running `npm -v` and `node -v` (_you may need to reboot your system before this step_)
+3. Install `npm` and `node.js` by running `nvm install v24.0.1` (or newer)
+4. At the end, ensure installation was successful by running `npm -v` and `node -v` (_you may need to reboot your system before this step_)
 
 After you ensured the basic setup is complete, clone this repository onto your machine and open a terminal session at the project root.
 
