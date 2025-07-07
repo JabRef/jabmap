@@ -323,6 +323,7 @@ newChildBtn.onclick = function () {
 //#endregion
 //#region [BibEntry Nodes]
 
+
 /**
  * Opens a cite-as-you-write window to select citation keys and
  * loads related previews upon confirmation.
@@ -387,7 +388,6 @@ function hidePopovers() {
         bsToggle.remove();
     });
 }
-
 /**
  * Attaches Bootstrap's popovers to all BibEntry nodes.
  */
@@ -453,107 +453,35 @@ addBibEntryAsSiblingBtn.onclick = async function () {
 //#region [PDF Nodes]
 
 /**
- * Adds given PDF data to the current mind map
- * using specific function of jsMind.
- * @param { Array } pdfList - The PDF entries to add.
- * @param { CallableFunction } add_nodes_callback - The function to add nodes by.
+ * Sets up PDF node insertion functionality:
+ * - Tracks insertion mode ('child' or 'sibling') based on which button is clicked
+ * - Fetches available PDF attachments when the modal opens and fills the <select>
+ * - On "Add", reads selected PDFs and inserts them into the mind map accordingly
  */
-/*function addPDFNodes(pdfList, add_nodes_callback) {
-    console.log(pdfList);
-    let selectedNode = jm.get_selected_node();
-    if (!selectedNode) {
-        console.log('Fail: No node\'s selected to add PDFs to :(');
-        return;
-    }
-
-    for (let i = 0; i < pdfList.length; i++) {
-        add_nodes_callback(
-            selectedNode,
-            util.uuid.newid(),
-            pdfList[i].fileName,
-            {
-                type: 'PDFF',
-                parentCitationKey: pdfList[i].parentCitationKey,
-                path: pdfList[i].path,
-                fileName: pdfList[i].fileName,
-            }
-        );
-    }
-    // save map state for undo/redo
-    jm.saveState();
-}
-*/
-// TODO: add comments
-/*addPDFAsSiblingBtn.onclick = async function() {
-    // retrieve available PDFs and list them
-    const pdfList = await httpClient.getPDFFiles();
-    fillSelect('addPDFSelect',
-               pdfList,
-               pdfList.map((pdf) => pdf.fileName));
-
-    // upon confirming selection
-    addSelectedPDFBtn.onclick = function() {
-        // access bootstrap's <form-select> element
-        let bsSelect = document.getElementById('addPDFSelect');
-        let selectedPDFs = Array.from(bsSelect.selectedOptions).map((option) => pdfList[option.index]);
-
-        // and add selected PDFs as children
-        addPDFNodes(selectedPDFs,
-            (selectedNode, id, topic, data) => {
-                jm.insert_node_after(selectedNode, id, topic, data);
-            });
-    };
-}
-
-// TODO: add comments
-addPDFAsChildBtn.onclick = async function() {
-    // retrieve available PDFs and list them
-    const pdfList = await httpClient.getPDFFiles();
-    fillSelect('addPDFSelect',
-               pdfList,
-               pdfList.map((pdf) => pdf.fileName));
-
-    // upon confirming selection
-    addSelectedPDFBtn.onclick = function() {
-        // access bootstrap's <form-select> element
-        let bsSelect = document.getElementById('addPDFSelect');
-        let selectedPDFs = Array.from(bsSelect.selectedOptions).map((option) => pdfList[option.index]);
-
-        // and add selected PDFs as children
-        addPDFNodes(selectedPDFs,
-            (selectedNode, id, topic, data) => {
-                jm.add_node(selectedNode, id, topic, data);
-            });
-    };
-}*/
-
-// ======================= [PDF Nodes Section] =======================
-
-// PDF Nodes: Add PDF nodes as siblings or children to the selected node
 document.addEventListener('DOMContentLoaded', () => {
 
-    //  References to the buttons and modal elements
+    // References to the buttons and modal elements
     const btnSibling = document.getElementById('addPDFAsSiblingBtn'); // "As sibling" button
     const btnChild   = document.getElementById('addPDFAsChildBtn');   // "As child" button
     const btnAdd     = document.getElementById('addSelectedPDFBtn');  // "Add" button inside modal
     const selectEl   = document.getElementById('addPDFSelect');      // <select> element listing PDFs
     const modalEl    = document.getElementById('selectPDFModal');    // PDF selection modal
 
-    //  State for PDF list and insertion mode ('child' or 'sibling')
-    let pdfList = [];    // Hold the list of PDFs fetched from the server
-    let mode    = 'child'; // Default insertion mode is as child
+    // State for PDF list and insertion mode ('child' or 'sibling')
+    let pdfList = [];     // Will hold the list of PDFs fetched from the server
+    let mode    = 'child';// Default insertion mode is as child
 
     // Set the insertion mode when the buttons are clicked
     btnSibling.addEventListener('click', () => { mode = 'sibling'; });
     btnChild  .addEventListener('click', () => { mode = 'child';   });
 
-    //  When the modal opens: fetch the PDF list and populate the <select>
+    // When the modal opens: fetch the PDF list and populate the <select>
     modalEl.addEventListener('show.bs.modal', async () => {
         console.log('Fetching PDF list…');
         try {
             pdfList = await httpClient.getPDFFiles(); // Call the server to get PDFs
         } catch (e) {
-            console.error(' Error fetching PDF list:', e);
+            console.error('Error fetching PDF list:', e);
             pdfList = []; // If error, reset to empty array
         }
         console.log('Fetched PDF list:', pdfList);
@@ -564,7 +492,7 @@ document.addEventListener('DOMContentLoaded', () => {
             .join('');
     });
 
-    //  When the "Add" button is clicked: add selected PDF nodes
+    // When the "Add" button is clicked: add selected PDF nodes
     btnAdd.addEventListener('click', () => {
         // Read the selected indices from the <select>
         const indexes = Array.from(selectEl.selectedOptions)
@@ -580,7 +508,6 @@ document.addEventListener('DOMContentLoaded', () => {
             console.warn('No node selected — cannot add PDFs');
             return;
         }
-
         // For each chosen PDF, create a new node
         chosen.forEach(pdf => {
             const newId = util.uuid.newid(); // Generate a unique ID
@@ -597,13 +524,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Add as a child node
                 jm.add_node(node, newId, pdf.fileName, data);
             }
-            console.log(` Added PDF node ("${pdf.fileName}") as ${mode}`);
+            console.log(`Added PDF node ("${pdf.fileName}") as ${mode}`);
         });
         jm.saveState(); // Save the state for undo/redo
     });
 });
-
-// ======================= [End PDF Nodes Section] =======================
 //#endregion
 //#region [Icons & Tags]
 
