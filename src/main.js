@@ -286,10 +286,10 @@ openSelectedMapBtn.onclick = async function () {
 printMapToConsoleBtn.onclick = async function () {
     // print mindmap data
     console.log(jm.get_data());
-    let listpdfs = await httpClient.getPDFFiles();
+    /*let listpdfs = await httpClient.getPDFFiles();
     for (let i = 0; i < listpdfs.length; i++) {
         console.log("fileName: " + listpdfs[i].fileName + " parentCiteKey: " + listpdfs[i].parentCitationKey + " path: " + listpdfs[i].path);
-    }
+    }*/
 }
 
 // undo - discard the last operation (display the previous state)
@@ -484,7 +484,13 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Error fetching PDF list:', e);
             pdfList = []; // If error, reset to empty array
         }
+        pdfList = Array.from(pdfList);
         console.log('Fetched PDF list:', pdfList);
+        console.log(pdfList.length);
+
+        if (pdfList.length = 0) {
+            document.getElementById("noPDFInfoText").style.visibility = "hidden";
+        }
 
         // Populate the <select> with fetched PDFs
         selectEl.innerHTML = pdfList
