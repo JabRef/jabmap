@@ -207,7 +207,7 @@ export class HTTPClient {
      *     {...}
      *  ]
      *  ```
-     *  "relative" being relative to the corresponding current library.bib file;
+     *  for more info on the path, see https://docs.jabref.org/finding-sorting-and-cleaning-entries/filelinks
      */
     async getPDFFiles(){
         const url = `libraries/${this.currentLibrary}/entries/pdffiles`;
