@@ -19,6 +19,7 @@ function createWindow () {
         }
     });
 
+    mainWindow.setMenu(null);
     mainWindow.loadFile(path.join(__dirname, '../../dist/index.html'));
     // this line is optional.
     // ! don't forget to turn this off before deploying !
