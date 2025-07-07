@@ -80,6 +80,19 @@ export class HTTPClient {
     }
 
     /**
+     * Checks whether a connection to the JabRef's server is present or not.
+     * @returns True if JabRef's responded, false otherwise.
+     */
+    async isConnected() {
+        try {
+            const response = await fetch(this.#host);
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
+
+    /**
      * Requests a mind map (.jmp file) from JabRef's server.
      * @param { string } library - The library of the requested mind map.
      * @returns The requested mind map object.
