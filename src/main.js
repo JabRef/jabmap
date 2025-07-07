@@ -452,89 +452,83 @@ addBibEntryAsSiblingBtn.onclick = async function () {
 //#endregion
 //#region [PDF Nodes]
 
-/**
- * Sets up PDF node insertion functionality:
- * - Tracks insertion mode ('child' or 'sibling') based on which button is clicked
- * - Fetches available PDF attachments when the modal opens and fills the <select>
- * - On "Add", reads selected PDFs and inserts them into the mind map accordingly
- */
-document.addEventListener('DOMContentLoaded', () => {
+// default insertion mode
+let PDFNodeInsertMode = 'child';
+// placeholder for available PDFs
+let pdfList = [];
 
-    // References to the buttons and modal elements
-    const btnSibling = document.getElementById('addPDFAsSiblingBtn'); // "As sibling" button
-    const btnChild   = document.getElementById('addPDFAsChildBtn');   // "As child" button
-    const btnAdd     = document.getElementById('addSelectedPDFBtn');  // "Add" button inside modal
-    const selectEl   = document.getElementById('addPDFSelect');      // <select> element listing PDFs
-    const modalEl    = document.getElementById('selectPDFModal');    // PDF selection modal
+// set the insertion mode when the related buttons are clicked
+addPDFAsSiblingBtn.onclick = function () {
+    PDFNodeInsertMode = 'sibling';
+};
+addPDFAsChildBtn.onclick = function () {
+    PDFNodeInsertMode = 'child';
+};
 
-    // State for PDF list and insertion mode ('child' or 'sibling')
-    let pdfList = [];     // Will hold the list of PDFs fetched from the server
-    let mode    = 'child';// Default insertion mode is as child
+// when the modal opens: fetch the PDF list and populate the <select>
+selectPDFModal.addEventListener('show.bs.modal', async () => {
+    // * Note: modal's elements can be accessed directly by ID
+    
+    // set "loading layout" to the modal
+    PDFModalInfoText.innerText = 'Loading PDFs from current library...';
+    PDFModalInfoText.hidden = false;
+    addPDFSelect.hidden = true;
+    addSelectedPDFBtn.disabled = true;
+    
+    // reset PDF list and call the server to get a new one
+    pdfList = [];
+    pdfList = await httpClient.getPDFFiles();
 
-    // Set the insertion mode when the buttons are clicked
-    btnSibling.addEventListener('click', () => { mode = 'sibling'; });
-    btnChild  .addEventListener('click', () => { mode = 'child';   });
-
-    // When the modal opens: fetch the PDF list and populate the <select>
-    modalEl.addEventListener('show.bs.modal', async () => {
-        console.log('Fetching PDF list…');
-        try {
-            pdfList = await httpClient.getPDFFiles(); // Call the server to get PDFs
-        } catch (e) {
-            console.error('Error fetching PDF list:', e);
-            pdfList = []; // If error, reset to empty array
-        }
-        pdfList = Array.from(pdfList);
-        console.log('Fetched PDF list:', pdfList);
-        console.log(pdfList.length);
-
-        if (pdfList.length = 0) {
-            document.getElementById("noPDFInfoText").style.visibility = "hidden";
-        }
-
-        // Populate the <select> with fetched PDFs
-        selectEl.innerHTML = pdfList
-            .map((p, i) => `<option value="${i}">${p.fileName}</option>`)
-            .join('');
-    });
-
-    // When the "Add" button is clicked: add selected PDF nodes
-    btnAdd.addEventListener('click', () => {
-        // Read the selected indices from the <select>
-        const indexes = Array.from(selectEl.selectedOptions)
-            .map(o => parseInt(o.value, 10));
-
-        // Build an array of the actual PDF objects
-        const chosen = indexes.map(i => pdfList[i]).filter(x => x);
-        console.log('Selected PDFs to add:', chosen);
-
-        // Get the currently selected node in the mind map
-        const node = jm.get_selected_node();
-        if (!node) {
-            console.warn('No node selected — cannot add PDFs');
-            return;
-        }
-        // For each chosen PDF, create a new node
-        chosen.forEach(pdf => {
-            const newId = util.uuid.newid(); // Generate a unique ID
-            const data  = {                  // Node data object
-                type: 'PDFF',
-                parentCitationKey: pdf.parentCitationKey,
-                path: pdf.path,
-                fileName: pdf.fileName
-            };
-            if (mode === 'sibling') {
-                // Insert as a sibling node
-                jm.insert_node_after(node, newId, pdf.fileName, data);
-            } else {
-                // Add as a child node
-                jm.add_node(node, newId, pdf.fileName, data);
-            }
-            console.log(`Added PDF node ("${pdf.fileName}") as ${mode}`);
-        });
-        jm.saveState(); // Save the state for undo/redo
-    });
+    // update modal's layout according to retrieved list
+    let isNoPDF = pdfList.length == null || pdfList.length <= 0;
+    PDFModalInfoText.hidden = !isNoPDF;
+    addPDFSelect.hidden = isNoPDF;
+    addSelectedPDFBtn.disabled = isNoPDF;
+    
+    // if no PDFs are available, show the info line only
+    if (isNoPDF) {
+        PDFModalInfoText.innerText = 
+        'There\'re no PDFs in current library.';
+        return;
+    }
+    // otherwise show the options
+    fillSelect('addPDFSelect', pdfList, pdfList.map((pdf) => pdf.fileName));
 });
+
+// when the "Add" button is clicked: add selected PDF nodes
+addSelectedPDFBtn.onclick = function () {
+    // get the currently selected node in the mind map
+    const selectedNode = jm.get_selected_node();
+    if (!selectedNode) {
+        console.warn('Fail: No node\'s selected to add PDFs to :(');
+        return;
+    }
+    
+    // access bootstrap's <form-select> element
+    let bsSelect = document.getElementById('addPDFSelect');
+    let selectedPDFs = Array.from(bsSelect.selectedOptions).map((option) => pdfList[option.index]);
+
+    // create a new node for each chosen PDF
+    selectedPDFs.forEach((pdf) => {
+        const newId = util.uuid.newid();
+        const data = {
+            type: 'PDFF',
+            parentCitationKey: pdf.parentCitationKey,
+            path: pdf.path,
+            fileName: pdf.fileName
+        };
+
+        // insert in selected mode
+        if (PDFNodeInsertMode === 'sibling') {
+            jm.insert_node_after(selectedNode, newId, pdf.fileName, data);
+        } else {
+            jm.add_node(selectedNode, newId, pdf.fileName, data);
+        }
+    });
+    // save map state for undo/redo
+    jm.saveState();
+};
+
 //#endregion
 //#region [Icons & Tags]
 
