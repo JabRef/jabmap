@@ -368,7 +368,7 @@ async function addBibEntryNodes(bibList, add_nodes_callback) {
             util.uuid.newid(),
             bibProperties.key,
             {
-                type: 'BIBE',
+                type: 'BibEntry',
                 citeKey: bibProperties.key,
                 preview: bibProperties.preview
             });
@@ -407,7 +407,7 @@ function addPopoversToBibEntryNodes() {
         }
         const node = jm.get_node(nodeId);
         // if one isn't a BibEntry node, skip it
-        if (node?.data?.type !== 'BIBE') {
+        if (node?.data?.type !== 'BibEntry') {
             return;
         }
 
@@ -512,7 +512,7 @@ addSelectedPDFBtn.onclick = function () {
     selectedPDFs.forEach((pdf) => {
         const newId = util.uuid.newid();
         const data = {
-            type: 'PDFF',
+            type: 'PDFFile',
             parentCitationKey: pdf.parentCitationKey,
             path: pdf.path,
             fileName: pdf.fileName

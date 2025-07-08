@@ -506,7 +506,7 @@ export class ViewProvider {
             let icons = (node.data.icons || [])
             .map(iconKey => `<img src="${this.resourceManager.TAG_ICONS[iconKey]}" style="width: 16px; height: 16px; margin-right: 2px; vertical-align: middle;">`)
             .join('');
-            if (!!node.data.type && node.data.type !== 'TEXT') {
+            if (!!node.data.type && node.data.type !== 'Text') {
                 icons = icons.concat(`<img src="${this.resourceManager.TYPE_ICONS[node.data.type]}" style="width: 16px; height: 16px; margin-right: 2px; vertical-align: middle;">`);
             }
             // Also defining text's styling property
