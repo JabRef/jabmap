@@ -147,10 +147,25 @@ function extendNode(node) {
     node.icons = node.icons ?? [];
     node.highlight = node.highlight ?? null;
 
-    node.type = node.type ?? 'TEXT';
+    setNodeType(node);
 
     if (!!node.children) {
         node.children.map((child) => { extendNode(child); });
+    }
+}
+/**
+ * Assigns a specific type depending on node's properties.
+ * @param { object } node - The node to set the type of.
+ */
+function setNodeType(node) {
+    node.type = 'Text';
+    if (!!node.citeKey) {
+        node.type = 'BibEntry';
+        return;
+    }
+    if (!!node.parentCitationKey) {
+        node.type = 'PDFFile';
+        return;
     }
 }
 // extend the default mind map
@@ -273,7 +288,7 @@ openSelectedMapBtn.onclick = async function () {
     let loadResponse = await httpClient.loadMap(selectedOption.value);
     // if no mind map exists, show the default one
     let loadedMap = loadResponse.map ?? mind;
-    extendNode(loadedMap);
+    extendNode(loadedMap.data);
 
     // display the retrieved mind map
     jm.show(loadedMap);
