@@ -433,7 +433,7 @@ function addPopoversToBibEntryNodes() {
         nodeElem.setAttribute('data-bs-trigger', 'hover focus');
         nodeElem.setAttribute('data-bs-placement', 'bottom');
         nodeElem.setAttribute('data-bs-html', 'true');
-        nodeElem.setAttribute('title', 'Entry Preview');
+        nodeElem.setAttribute('title', 'BibTex Preview');
         nodeElem.setAttribute('data-bs-content', previewHTML);
 
         new Popover(nodeElem, { container: 'body' });
