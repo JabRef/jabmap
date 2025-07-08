@@ -283,14 +283,14 @@ openSelectedMapBtn.onclick = async function () {
 //#endregion
 
 // debug button prints current mind map state to console
-printMapToConsoleBtn.onclick = async function () {
-    // print mindmap data
-    console.log(jm.get_data());
-    /*let listpdfs = await httpClient.getPDFFiles();
-    for (let i = 0; i < listpdfs.length; i++) {
-        console.log("fileName: " + listpdfs[i].fileName + " parentCiteKey: " + listpdfs[i].parentCitationKey + " path: " + listpdfs[i].path);
-    }*/
-}
+// printMapToConsoleBtn.onclick = async function () {
+//     // print mindmap data
+//     console.log(jm.get_data());
+//     let listpdfs = await httpClient.getPDFFiles();
+//     for (let i = 0; i < listpdfs.length; i++) {
+//         console.log("fileName: " + listpdfs[i].fileName + " parentCiteKey: " + listpdfs[i].parentCitationKey + " path: " + listpdfs[i].path);
+//     }
+// }
 
 // undo - discard the last operation (display the previous state)
 undoBtn.onclick = function () {
