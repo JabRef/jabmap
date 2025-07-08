@@ -11,7 +11,16 @@ export class ActionStack {
     // The list of actions (maps) to cancel/reapply
     #lastSaves = [];
 
-    constructor() { }
+    constructor() {
+        /**
+         * A flag to determine whether there's a previous state to show.
+         */
+        this.isUndoable = false;
+        /**
+         * A flag to determine whether there's a next state to show.
+         */
+        this.isRedoable = false;
+    }
 
     /**
      * Adds a state of a mind map to switch between while
@@ -41,6 +50,9 @@ export class ActionStack {
         }
 
         console.log(`Saved map. Stack size: ${this.#lastSaves.length}`);
+
+        this.isUndoable = this.#saveIndex > 0;
+        this.isRedoable = this.#saveIndex < this.#lastSaves.length - 1;
     }
 
     /**
@@ -49,6 +61,9 @@ export class ActionStack {
     clear() {
         this.#lastSaves.length = 0;
         this.#saveIndex = 0;
+
+        this.isUndoable = false;
+        this.isRedoable = false;
     }
 
     /**
@@ -58,10 +73,17 @@ export class ActionStack {
      * (-1) stack's index (capped on bottom at 0).
      */
     undo() {
+        if (!this.isUndoable) {
+            return;
+        }
+
         // * Note: Stack's index shouldn't drop below 0.
         this.#saveIndex = Math.max(this.#saveIndex - 1, 0);
         console.log(`Performing Undo.` +
             `Current state index: ${this.#saveIndex}`);
+        this.isUndoable = this.#saveIndex > 0;
+        this.isRedoable = true;
+
         return JSON.parse(this.#lastSaves[this.#saveIndex]);
     }
 
@@ -72,6 +94,10 @@ export class ActionStack {
      * (+1) stack's index (capped on top at current stack's size).
     */
     redo() {
+        if (!this.isRedoable) {
+            return;
+        }
+
         // * Note: Stack's index shouldn't exceed
         // * (the current stack's size - 1)
         // An additional nested Math.max() excludes an edge case
@@ -81,6 +107,9 @@ export class ActionStack {
             Math.max(this.#lastSaves.length - 1, 0));
         console.log(`Performing Redo.` +
             `Current state index: ${this.#saveIndex}`);
+        this.isUndoable = true;
+        this.isRedoable = this.#saveIndex < this.#lastSaves.length - 1;
+
         return JSON.parse(this.#lastSaves[this.#saveIndex]);
     }
 }

@@ -247,8 +247,8 @@ export default class jsMind {
         }
         // Altered lines:
         let nodeType = node.data.type;
-        if (nodeType === 'BIBE') {
-            console.log('No editing for BIBE nodes >:(');
+        if (['BIBE', 'PDFF'].includes(nodeType)) {
+            console.log(`No editing for ${nodeType} nodes >:(`);
             return;
         }
         // End
@@ -481,10 +481,6 @@ export default class jsMind {
                 data: [node_id],
                 node: parent_id,
             });
-            // Altered lines:
-            // Save current mind map's state to the action stack
-            this.saveState();
-            // End
             return true;
         } else {
             logger.error('fail, this mind map is not editable');
@@ -537,10 +533,6 @@ export default class jsMind {
                     data: [node_id, before_id, parent_id, direction],
                     node: node_id,
                 });
-                // Altered lines:
-                // Save current mind map's state to the action stack
-                this.saveState();
-                // End
             }
         } else {
             logger.error('fail, this mind map is not editable');
@@ -575,6 +567,10 @@ export default class jsMind {
         if (!!this.mind) {
             this.mind.selected = null;
             this.view.select_clear();
+            // Altered lines:
+            // Invoke 'select' event to disable UI buttons
+            this.invoke_event_handle(EventType.select, { evt: 'select_node', data: [], node: '' });
+            // End
         }
     }
     is_node_visible(node) {

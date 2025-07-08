@@ -2,7 +2,7 @@
  * Provides HTTP-connection functionality.
  */
 export class HTTPClient {
-    #host = "http://localhost:6050/";
+    #host = "http://localhost:23119/";
 
     constructor() {
         /**
@@ -43,7 +43,7 @@ export class HTTPClient {
 
             // If some output is awaited, save it
             if (options.method !== "PUT") {
-                if (options.headers["Content-Type"] === 'application/json') {
+                if (options.headers["Accept"] === 'application/json') {
                     result = await response.json();
                 }
                 if (options.headers["Accept"] === 'text/plain') {
@@ -80,6 +80,19 @@ export class HTTPClient {
     }
 
     /**
+     * Checks whether a connection to the JabRef's server is present or not.
+     * @returns True if JabRef's responded, false otherwise.
+     */
+    async isConnected() {
+        try {
+            const response = await fetch(this.#host);
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
+
+    /**
      * Requests a mind map (.jmp file) from JabRef's server.
      * @param { string } library - The library of the requested mind map.
      * @returns The requested mind map object.
@@ -88,7 +101,7 @@ export class HTTPClient {
         const url = `libraries/${library}/map`;
         const options = {
             method: "GET",
-            headers: { "Content-Type": "application/json" }
+            headers: { "Accept": "application/json" }
         }
 
         // Changing current library
@@ -122,7 +135,7 @@ export class HTTPClient {
         const url = 'libraries'
         const options = {
             method: "GET",
-            headers: { "Content-Type": "application/json" }
+            headers: { "Accept": "application/json" }
         }
 
         return this.#performRequest(url, options)
@@ -137,23 +150,28 @@ export class HTTPClient {
             method: "GET",
             headers: { "Content-Type": "application/json" }
         }
-        // TODO - format the list to contain the keys, titles, authors and releases of the entries and return it
         return this.#performRequest(this.currentLibrary, options)
     }
 
     /**
      * Sends a request to open a cite-as-you-write window
-     * to select saved citation keys.
+     * to select any number of BibEntries from the current library.
      * @returns A list of selected citation keys.
      */
     async getCiteKeysWithCAYW() {
-        const url = 'better-bibtex/cayw';
+        let url = 'better-bibtex/cayw';
+        url += (`?libraryid=${this.currentLibrary}&format=simple-json`);
+        console.log(url);
         const options = {
             method: "GET",
-            headers: { "Content-Type": "application/json" }
+            headers: { "Accept": "application/json" }
         }
-
-        return this.#performRequest(url, options)
+        let selectedEntries = await this.#performRequest(url, options);
+        let selectedCiteKeys = [];
+        for (let entry of selectedEntries) {
+            selectedCiteKeys.push(entry.citationKey);
+        }
+        return selectedCiteKeys;
     }
 
     /**
@@ -186,5 +204,32 @@ export class HTTPClient {
         }
 
         return this.#performRequest(url, options);
+    }
+
+    /**
+     * Requests a list of all local pdf files from the current library.
+     * @returns A list of objects of the following structure
+     * ```
+     * [
+     *     {
+     *         "fileName": "example.pdf",
+     *         "parentCitationKey": "Tokede_2011",
+     *         "path": (relative) "Example.pdf" or
+     *                 (absolute) "/Users/exampleUser/documents/Example.pdf"
+     *     },
+     *     {...}
+     *  ]
+     *  ```
+     *  for more info on the path, see https://docs.jabref.org/finding-sorting-and-cleaning-entries/filelinks
+     */
+    async getPDFFiles(){
+        const url = `libraries/${this.currentLibrary}/entries/pdffiles`;
+        const options = {
+            method: "GET",
+            headers: { "Accept": "application/json" }
+        }
+
+        let response = await this.#performRequest(url, options);
+        return response;
     }
 }

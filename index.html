@@ -38,7 +38,7 @@
   <!--Navbar with Buttons-->
   <nav class="navbar bg-body-tertiary">
     <div class="container-fluid">
-      <div class = "d-flex align-items-start" style="flex-basis: 33%; max-width: 33%;">
+      <div class="d-flex align-items-start" style="flex-basis: 33%; max-width: 33%;">
         <!--JabMap title-->
         <a class="navbar-brand" href="#">JabMap</a>
 
@@ -121,6 +121,22 @@
               </button>
             </div>
           </div>
+
+        <div class="dropdown">
+          <button class="btn btn-secondary dropdown-toggle me-2" id="PDFDropDownMenuButton" data-bs-toggle="dropdown">
+            <i class="bi bi-file-pdf"></i></i>
+          </button>
+          <div class="dropdown-menu">
+            <h6 class="dropdown-header">New PDF node</h6>
+            <button id="addPDFAsSiblingBtn" class="btn dropdown-item" data-bs-toggle="modal" data-bs-target="#selectPDFModal">
+              <i class="bi bi-node-plus-fill"> </i> As sibling node
+            </button>
+            <button id="addPDFAsChildBtn" class="btn dropdown-item" data-bs-toggle="modal" data-bs-target="#selectPDFModal">
+              <i class="bi bi-diagram-2-fill" style="transform: rotate(-90deg); display: inline-block;"> </i> As child node
+            </button>
+          </div>
+        </div>
+
       </div>
       <div style="flex-basis: 33%; max-width: 33%;"></div>
     </div>
@@ -148,6 +164,28 @@
       </div>
     </div>
   </div>
+
+  <!-- Modal for the "Add PDF Nodes" dialog-->
+  <div class="modal fade" id="selectPDFModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="SelectPDFModalLabel">Choose PDFs to add</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="PDFModalBody">
+          <div id="PDFModalInfoText"></div>
+          <select class="form-select" multiple id="addPDFSelect" size="10"></select>
+        </div>
+        <div class="d-flex modal-footer">
+          <button type="button" id="addSelectedPDFBtn" class="btn btn-outline-secondary alig" data-bs-dismiss="modal">
+            Add
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script type="module" src="/src/main.js"></script>
 </body>
 
