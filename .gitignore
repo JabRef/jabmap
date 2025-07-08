@@ -109,6 +109,7 @@ dist
 # Build output
 dist/
 .vite/
+electron-dist/
 
 # vitepress build output
 **/.vitepress/dist
