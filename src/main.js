@@ -15,36 +15,18 @@ import { HTTPClient } from '../http/HTTPClient';
 // "load" initial mind map data
 const mind = {
     meta: {
-        name: "jsMind remote",
-        author: "hizzgdev@163.com",
-        version: "0.2"
+        name: "JabMap",
+        author: "JabMap",
+        version: "1.0"
     },
     format: "node_tree",
     data: {
         id: "root",
-        topic: "jsMind",
-        children: [
-            {
-                id: "easy",
-                topic: "Easy",
-                direction: "left",
-                children: [
-                    { id: "easy1", topic: "Easy to show" },
-                    { id: "easy2", topic: "Easy to edit" },
-                    { id: "easy3", topic: "Easy to store" },
-                    { id: "easy4", topic: "Easy to embed" }
-                ]
-            },
-            {
-                id: "open",
-                topic: "Open Source",
-                direction: "right",
-                children: [
-                    { id: "open1", topic: "on GitHub" },
-                    { id: "open2", topic: "BSD License" }
-                ]
-            }
-        ]
+        topic: "Welcome to JabMap!",
+        expanded: true,
+        icons: [],
+        highlight: null,
+        type: "Text"
     }
 };
 
@@ -103,6 +85,10 @@ const options = {
                 }
                 // apply / remove a highlight
                 applyHighlight(selectedNode, e.key);
+            },
+            'save': function (jm, e) {
+                // save mindmap
+                if(!!httpClient) httpClient.saveMap();
             }
         },
         mapping: { 			            // Shortcut key mapping
@@ -117,6 +103,7 @@ const options = {
             down: 40, 		            // <Down>
             undo: 4096 + 90,            // <Ctrl> + <Z>
             redo: 4096 + 1024 + 90,     // <Ctrl> + <Shift> + <Z>
+            save: 4096 + 83,            // <Ctrl> + <S>
             toggleTag: [                // <Ctrl> +
                 4096 + 49,              // <1> - Cycle (checkboxes)
                 4096 + 50,              // <2> - Star
