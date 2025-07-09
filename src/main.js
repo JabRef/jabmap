@@ -1,6 +1,6 @@
 import '@popperjs/core';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Popover } from 'bootstrap';
+import { Dropdown, Popover } from 'bootstrap';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import jsMind from './jsmind/src/jsmind.js';
 // * Note: this import is important for proper manual node creation / addition
@@ -202,17 +202,9 @@ jm.add_event_listener((type, data) => {
         let buttons = [
             newChildBtn,
             newSiblingBtn,
-            iconCycleBtn,
-            iconStarBtn,
-            iconQuestionBtn,
-            iconWarningBtn,
-            iconLightbulbBtn,
-            iconGreenFlagBtn,
-            iconRedFlagBtn,
-            addBibEntryAsSiblingBtn,
-            addBibEntryAsChildBtn,
-            addPDFAsSiblingBtn,
-            addPDFAsChildBtn
+            tagsDropdownMenuButton,
+            BibEntryDropdownMenuButton,
+            PDFDropDownMenuButton
         ];
         toggleButtonsEnabled(buttons, isNodeSelected);
     }
@@ -232,12 +224,16 @@ let httpClient = new HTTPClient();
 
 /**
  * Turns on and off given buttons using their .disabled property.
+ * If a button is related to a dropdown, its menu will be closed before toggle.
  * * Note: buttons (*even a single one*) should be passed as an array / list.
- * @param {Array} buttons - The list of bootstrap buttons to toggle.
- * @param {boolean} isEnabled - The flag to set buttons' .disabled property to.
+ * @param { Array } buttons - The list of bootstrap buttons to toggle.
+ * @param { boolean } isEnabled - The flag to set buttons' .disabled property to.
  */
 function toggleButtonsEnabled(buttons, isEnabled) {
-    buttons.forEach(b => b.disabled = !isEnabled);
+    buttons.forEach((b) => {
+        Dropdown.getOrCreateInstance(b).hide();
+        b.disabled = !isEnabled;
+    });
 }
 
 /**
