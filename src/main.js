@@ -202,9 +202,17 @@ jm.add_event_listener((type, data) => {
         let buttons = [
             newChildBtn,
             newSiblingBtn,
-            tagsDropdownMenuButton,
-            BibEntryDropdownMenuButton,
-            PDFDropDownMenuButton
+            iconCycleBtn,
+            iconStarBtn,
+            iconQuestionBtn,
+            iconWarningBtn,
+            iconLightbulbBtn,
+            iconGreenFlagBtn,
+            iconRedFlagBtn,
+            addBibEntryAsSiblingBtn,
+            addBibEntryAsChildBtn,
+            addPDFAsSiblingBtn,
+            addPDFAsChildBtn
         ];
         toggleButtonsEnabled(buttons, isNodeSelected);
     }
