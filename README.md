@@ -10,7 +10,7 @@ Next-Generation scientific mind mapping.
 
 ## ⌨️ Shortcuts
 
-You can find a list of shortcuts [here]().
+You can find a list of shortcuts [here](https://github.com/JabRef/jabmap/blob/bf7ccc8bcfde49c3d868f629e373168ee9059f11/shortcuts.md).
 
 ## 🌟 Try It Out!
 
