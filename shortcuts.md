@@ -22,3 +22,4 @@ These shortcuts can be used without selecting a node first.
 | ------------- | ------------- |
 | <kbd>CTRL</kbd> + <kbd>Z</kbd> | Undo last operation
 | <kbd>CTRL</kbd> + <kbd>SHIFT</kbd> + <kbd>Z</kbd> | Redo last operation
+| <kbd>CTRL</kbd> + <kbd>S</kbd> | Save mindmap
