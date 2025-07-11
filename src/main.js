@@ -2,163 +2,31 @@ import '@popperjs/core';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Dropdown, Popover } from 'bootstrap';
 import 'bootstrap-icons/font/bootstrap-icons.css';
+
 import jsMind from './jsmind/src/jsmind.js';
 // * Note: this import is important for proper manual node creation / addition
 import { util } from './jsmind/src/jsmind.util.js';
 import './jsmind/src/plugins/jsmind.draggable-node.js';
+
 import { HTTPClient } from '../http/HTTPClient';
+
 import { ModalDesigner, MODAL_LAYOUT } from './modals/ModalDesigner.js';
 import { ModalObject } from './modals/ModalObject.js';
+
+import { DefaultMap, FelixMap } from './mindPresets/DefaultMindMaps.js';
+import { DefaultOptions, NoEditOptions } from './mindPresets/DefaultMindOptions.js';
+import { NodeExtender } from './mindPresets/NodeExtender.js';
 
 //#region [General Setup]
 // * This region contains declaration of most basic instances
 // * e.g. jsMind, HTTPClient and their properties
 
 // "load" initial mind map data
-const mind = {
-    meta: {
-        name: "JabMap",
-        author: "JabMap",
-        version: "1.0"
-    },
-    format: "node_tree",
-    data: {
-        id: "root",
-        topic: "Welcome to JabMap!",
-        expanded: true,
-        icons: [],
-        highlight: null,
-        type: "Text"
-    }
-};
-
+let mind = DefaultMap;
 // specify editor (jsMind's) options
-const options = {
-    container: 'jsmind_container',      // [required] ID of the container
-    editable: true,                     // Is editing enabled?
-    theme: null,                        // Theme
-    mode: 'full',                       // Display mode
-    support_html: true,                 // Does it support HTML elements in the node?
-    view: {
-        engine: 'canvas',               // Engine for drawing lines between nodes in the mind map
-        hmargin: 100,                   // Minimum horizontal distance of the mind map from the outer frame of the container
-        vmargin: 50,                    // Minimum vertical distance of the mind map from the outer frame of the container
-        line_width: 3,                  // Thickness of the mind map line
-        line_color: '#555',             // Thought mind map line color
-        line_style: 'curved',           // Line style, straight or curved
-        custom_line_render: null,       // Customized line render function
-        draggable: true,                // Drag the mind map with your mouse, when it's larger that the container
-        hide_scrollbars_when_draggable: false,  // Hide container scrollbars, when mind map is larger than container and draggable option is true
-        node_overflow: 'hidden'         // Text overflow style in node
-    },
-    layout: {
-        hspace: 30,                     // Horizontal spacing between nodes
-        vspace: 20,                     // Vertical spacing between nodes
-        pspace: 13,                     // Horizontal spacing between node and connection line (to place node expander)
-        cousin_space: 0                 // Additional vertical spacing between child nodes of neighbor nodes
-    },
-    shortcut: {
-        enable: true,                   // Whether to enable shortcut
-        handles: {                      // Named shortcut key event processor
-            'undo': function (jm, e) {
-                // display mind map's previous state (undo the last operation)
-                hidePopovers();
-                jm.undo();
-            },
-            'redo': function (jm, e) {
-                // display mind map's next state (redo the next operation)
-                hidePopovers();
-                jm.redo();
-            },
-            'toggleTag': function (jm, e) {
-                let selectedNode = jm.get_selected_node();
-                // if no node's selected -> skip
-                if (!selectedNode) {
-                    return;
-                }
-                // apply / remove a tag otherwise
-                applyTag(selectedNode, e.key);
-            },
-            'toggleHighlight': function (jm, e) {
-                let selectedNode = jm.get_selected_node();
-                // if no node's selected -> skip
-                if (!selectedNode) {
-                    return;
-                }
-                // apply / remove a highlight
-                applyHighlight(selectedNode, e.key);
-            },
-            'save': function (jm, e) {
-                // save mindmap
-                if(!!httpClient) httpClient.saveMap();
-            }
-        },
-        mapping: { 			            // Shortcut key mapping
-            addchild: [45, 4096 + 13],  // <Insert>, <Ctrl> + <Enter>
-            addbrother: 13,             // <Enter>
-            editnode: 113, 	            // <F2>
-            delnode: [46, 8], 	        // <Delete>
-            toggle: 32, 	            // <Space>
-            left: 37, 		            // <Left>
-            up: 38, 		            // <Up>
-            right: 39, 		            // <Right>
-            down: 40, 		            // <Down>
-            undo: 4096 + 90,            // <Ctrl> + <Z>
-            redo: 4096 + 1024 + 90,     // <Ctrl> + <Shift> + <Z>
-            save: 4096 + 83,            // <Ctrl> + <S>
-            toggleTag: [                // <Ctrl> +
-                4096 + 49,              // <1> - Cycle (checkboxes)
-                4096 + 50,              // <2> - Star
-                4096 + 51,              // <3> - Question
-                4096 + 54,              // <6> - Lamp
-                4096 + 55,              // <7> - Warning
-                4096 + 56,              // <8> - Green Flag
-                4096 + 57,              // <9> - Red Flag
-            ],
-            toggleHighlight: [
-                4096 + 52,              // <4> - Yellow Highlight
-                4096 + 53,              // <5> - Green Highlight
-            ]
-        }
-    },
-};
-
-/**
- * Adds "icons", "highlight" and "type" properties to a node object
- * and all its children (this doesn't overwrite existing ones).
- * @param { object } node - The node object to extend.
- */
-function extendNode(node) {
-    if (!node) {
-        return;
-    }
-
-    node.icons = node.icons ?? [];
-    node.highlight = node.highlight ?? null;
-
-    setNodeType(node);
-
-    if (!!node.children) {
-        node.children.map((child) => { extendNode(child); });
-    }
-}
-/**
- * Assigns a specific type depending on node's properties.
- * @param { object } node - The node to set the type of.
- */
-function setNodeType(node) {
-    node.type = 'Text';
-    if (!!node.citeKey) {
-        node.type = 'BibEntry';
-        return;
-    }
-    if (!!node.parentCitationKey) {
-        node.type = 'PDFFile';
-        return;
-    }
-}
+const options = DefaultOptions;
 // extend the default mind map
-extendNode(mind.data);
+NodeExtender.extendNode(mind.data);
 
 // create a render for mind maps
 const jm = new jsMind(options);
@@ -281,7 +149,7 @@ openSelectedMapBtn.onclick = async function () {
     let loadResponse = await httpClient.loadMap(selectedOptions[0]);
     // if no mind map exists, show the default one
     let loadedMap = loadResponse.map ?? mind;
-    extendNode(loadedMap.data);
+    NodeExtender.extendNode(loadedMap.data);
 
     // display the retrieved mind map
     jm.show(loadedMap);
@@ -602,47 +470,23 @@ function applyHighlight(selectedNode, highlight) {
 }
 
 // icon-dropdown menu button handlers
-iconCycleBtn.onclick = function () {
-    if (jm != null) {
-        applyTag(jm.get_selected_node(), 1);
+[
+    iconCycleBtn,
+    iconStarBtn,
+    iconQuestionBtn,
+    iconWarningBtn,
+    iconLightbulbBtn,
+    iconGreenFlagBtn,
+    iconRedFlagBtn
+].forEach((button, index) => {
+    // skip numbers 4 and 5 that're reserved for highlighting
+    index = index >= 3 ? index + 2 : index;
+    button.onclick = function () {
+        if (jm != null) {
+            applyTag(jm.get_selected_node(), index + 1);
+        }
     }
-}
-
-iconStarBtn.onclick = function () {
-    if (jm != null) {
-        applyTag(jm.get_selected_node(), 2);
-    }
-}
-
-iconQuestionBtn.onclick = function () {
-    if (jm != null) {
-        applyTag(jm.get_selected_node(), 3);
-    }
-}
-
-iconWarningBtn.onclick = function () {
-    if (jm != null) {
-        applyTag(jm.get_selected_node(), 6);
-    }
-}
-
-iconLightbulbBtn.onclick = function () {
-    if (jm != null) {
-        applyTag(jm.get_selected_node(), 7);
-    }
-}
-
-iconGreenFlagBtn.onclick = function () {
-    if (jm != null) {
-        applyTag(jm.get_selected_node(), 8);
-    }
-}
-
-iconRedFlagBtn.onclick = function () {
-    if (jm != null) {
-        applyTag(jm.get_selected_node(), 9);
-    }
-}
+});
 
 //#endregion
 // #region [Miscellaneous]
