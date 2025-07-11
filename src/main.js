@@ -7,6 +7,8 @@ import jsMind from './jsmind/src/jsmind.js';
 import { util } from './jsmind/src/jsmind.util.js';
 import './jsmind/src/plugins/jsmind.draggable-node.js';
 import { HTTPClient } from '../http/HTTPClient';
+import { ModalDesigner, MODAL_LAYOUT } from './modals/ModalDesigner.js';
+import { ModalObject } from './modals/ModalObject.js';
 
 //#region [General Setup]
 // * This region contains declaration of most basic instances
@@ -223,32 +225,21 @@ function toggleButtonsEnabled(buttons, isEnabled) {
     });
 }
 
-/**
- * Fills given select object with provided options.
- * @param { String } selectId - Id of the bootstrap select to fill.
- * @param { Array } values - The options' values of the select.
- * @param { Array } showedOptions - The options to show to the user.
- */
-function fillSelect(selectId, values, showedOptions) {
-    // access bootstrap's <form-select> element
-    let bsSelect = document.getElementById(selectId);
-    if (!bsSelect) {
-        console.log(`Failed to get \'select\' element by id: ${selectId}`);
-        return;
-    }
-
-    // and replace its options with retrieved ones
-    bsSelect.innerHTML = '';
-    for (let i = 0; i < values.length; i++) {
-        bsSelect.innerHTML +=
-            `<option value=${values[i]}>` +
-            `${showedOptions[i]}` +
-            `</option>`;
-    }
-}
-
 //#endregion
 //#region [Save / Open click handlers]
+
+// define modal object for opening mind maps (not the bootstrap one)
+// for easier layout switching
+let mapsLoadingText = 'Listing available mind maps...';
+let mapsFailText = 'No mind maps were found. Try to create one in JabRef first.';
+let loadMapModalObject = new ModalObject(
+    exampleModalLabel,
+    openMindmapInfoText,
+    openMindmapSelect,
+    openSelectedMapBtn,
+    mapsLoadingText,
+    mapsFailText
+);
 
 // saving - sends mind map's content to JabRef's HTTP server
 saveBtn.onclick = function () {
@@ -257,26 +248,37 @@ saveBtn.onclick = function () {
 
 // opening - opens a dialog to select available mind maps
 openBtn.onclick = async function () {
+    // * Note: modal's elements can be accessed directly by ID
+    
+    // set "loading layout" to the opening modal
+    ModalDesigner.setLayout(loadMapModalObject, MODAL_LAYOUT.Loading);
+
     // request a list of available mind maps from JabRef's HTTP server
     let availableMaps = await httpClient.listMaps();
+
+    if (availableMaps?.length == null || availableMaps?.length <= 0) {
+        ModalDesigner.setLayout(loadMapModalObject, MODAL_LAYOUT.Failed);
+        return;
+    }
+    
+    // update modal's layout according to retrieved list
     // and show it to the user
-    fillSelect('openMindmapSelect', availableMaps, availableMaps);
+    ModalDesigner.setLayout(loadMapModalObject, MODAL_LAYOUT.Steady);
+    loadMapModalObject.fillSelect(availableMaps, availableMaps);
 }
 
 // <modal> dialog confirmation button
 openSelectedMapBtn.onclick = async function () {
-    // access bootstrap's <form-select> element
-    let bsSelect = document.getElementById('openMindmapSelect');
-
     // get selected mind map's name and it's data from server
-    let selectedOption = bsSelect.options[bsSelect.selectedIndex];
+    let selectedOptions = loadMapModalObject.getSelectedOptions();
+
     // if user didn't select anything, don't load anything :)
-    if (!selectedOption) {
-        console.log('Couldn\'t open map because no library was selected.');
+    if (!selectedOptions) {
+        console.warn('Couldn\'t open map because no library was selected.');
         return;
     }
 
-    let loadResponse = await httpClient.loadMap(selectedOption.value);
+    let loadResponse = await httpClient.loadMap(selectedOptions[0]);
     // if no mind map exists, show the default one
     let loadedMap = loadResponse.map ?? mind;
     extendNode(loadedMap.data);
@@ -328,7 +330,6 @@ newChildBtn.onclick = function () {
 
 //#endregion
 //#region [BibEntry Nodes]
-
 
 /**
  * Opens a cite-as-you-write window to select citation keys and
@@ -458,10 +459,21 @@ addBibEntryAsSiblingBtn.onclick = async function () {
 //#endregion
 //#region [PDF Nodes]
 
+// define PDF modal object (not the bootstrap one)
+// for easier layout switching
+let PDFLoadingText = 'Loading PDFs from current library...';
+let PDFFailText = 'There\'re no PDFs in current library.';
+let addPDFModalObject = new ModalObject(
+    SelectPDFModalLabel,
+    PDFModalInfoText,
+    addPDFSelect,
+    addSelectedPDFBtn,
+    PDFLoadingText,
+    PDFFailText
+);
+
 // default insertion mode
 let PDFNodeInsertMode = 'child';
-// placeholder for available PDFs
-let pdfList = [];
 
 // set the insertion mode when the related buttons are clicked
 addPDFAsSiblingBtn.onclick = function () {
@@ -472,33 +484,23 @@ addPDFAsChildBtn.onclick = function () {
 };
 
 // when the modal opens: fetch the PDF list and populate the <select>
-selectPDFModal.addEventListener('show.bs.modal', async () => {
-    // * Note: modal's elements can be accessed directly by ID
-    
+selectPDFModal.addEventListener('show.bs.modal', async () => {    
     // set "loading layout" to the modal
-    PDFModalInfoText.innerText = 'Loading PDFs from current library...';
-    PDFModalInfoText.hidden = false;
-    addPDFSelect.hidden = true;
-    addSelectedPDFBtn.disabled = true;
-    
-    // reset PDF list and call the server to get a new one
-    pdfList = [];
-    pdfList = await httpClient.getPDFFiles();
+    ModalDesigner.setLayout(addPDFModalObject, MODAL_LAYOUT.Loading);
 
-    // update modal's layout according to retrieved list
-    let isNoPDF = pdfList.length == null || pdfList.length <= 0;
-    PDFModalInfoText.hidden = !isNoPDF;
-    addPDFSelect.hidden = isNoPDF;
-    addSelectedPDFBtn.disabled = isNoPDF;
-    
+    // reset PDF list and call the server to get a new one
+    let pdfList = await httpClient.getPDFFiles();
+
     // if no PDFs are available, show the info line only
-    if (isNoPDF) {
-        PDFModalInfoText.innerText = 
-        'There\'re no PDFs in current library.';
+    if (pdfList?.length == null || pdfList?.length <= 0) {
+        ModalDesigner.setLayout(addPDFModalObject, MODAL_LAYOUT.Failed);
         return;
     }
-    // otherwise show the options
-    fillSelect('addPDFSelect', pdfList, pdfList.map((pdf) => pdf.fileName));
+    
+    // update modal's layout according to retrieved list and
+    // show the options
+    ModalDesigner.setLayout(addPDFModalObject, MODAL_LAYOUT.Steady);
+    addPDFModalObject.fillSelect(pdfList, pdfList.map((pdf) => pdf.fileName));
 });
 
 // when the "Add" button is clicked: add selected PDF nodes
@@ -511,8 +513,7 @@ addSelectedPDFBtn.onclick = function () {
     }
     
     // access bootstrap's <form-select> element
-    let bsSelect = document.getElementById('addPDFSelect');
-    let selectedPDFs = Array.from(bsSelect.selectedOptions).map((option) => pdfList[option.index]);
+    let selectedPDFs = addPDFModalObject.getSelectedOptions();
 
     // create a new node for each chosen PDF
     selectedPDFs.forEach((pdf) => {
