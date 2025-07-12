@@ -14,8 +14,8 @@ class HTTPClient {
      * @param { object } options - Optional request's options.
      * @returns A result object of following structure:
      * - code: the status of the request defined by REQUEST_RESULT enum.
-     * - value: **null** in case of a `PUT / POST request`
-     *      or with `GET` requested **object**.
+     * - value: **null** in case of `PUT` or `POST` requests
+     *      or **object** requested by `GET`.
      */
     async #performRequest(url, options = null) {
         let result = {
@@ -90,7 +90,7 @@ class HTTPClient {
      */
     async isConnected() {
         try {
-            const response = await fetch(this.#host);
+            await fetch(this.#host);
             return true;
         } catch (e) {
             return false;
@@ -114,8 +114,8 @@ class HTTPClient {
 
         const loadRequest = await this.#performRequest(url, options);
 
+        // Changing current library if succeeded
         if (loadRequest.code === REQUEST_RESULT.Success) {
-            // Changing current library if succeeded
             this.currentLibrary = library;
             console.log(`Current library is now: ${this.currentLibrary}`);
         }
@@ -128,7 +128,7 @@ class HTTPClient {
      * @param { object } mindMap - The mind map to save.
      * @returns A result object of following structure:
      * - code: the status of the request defined by REQUEST_RESULT enum.
-     * - value: null (in case of a `PUT / POST request`).
+     * - value: null.
      */
     async saveMap(mindMap) {
         const url = `libraries/${this.currentLibrary}/map`;
@@ -178,7 +178,7 @@ class HTTPClient {
      * to select any number of BibEntries from the current library.
      * @returns A result object of following structure:
      * - code: the status of the request defined by REQUEST_RESULT enum.
-     * - value: **null** in case the request failed
+     * - value: null in case the request failed
      *      or list of requested citation keys.
      */
     async getCiteKeysWithCAYW() {
@@ -189,11 +189,19 @@ class HTTPClient {
             method: "GET",
             headers: { "Accept": "application/json" }
         }
-        let selectedEntries = (await this.#performRequest(url, options)).value;
-        let selectedCiteKeys = [];
-        for (let entry of selectedEntries) {
-            selectedCiteKeys.push(entry.citationKey);
+
+        let entriesRequest = await this.#performRequest(url, options);
+        let selectedEntries = entriesRequest.value;
+
+        if (entriesRequest.code !== REQUEST_RESULT.Success) {
+            return null;
         }
+        
+        let selectedCiteKeys = [];
+            for (let entry of selectedEntries) {
+                selectedCiteKeys.push(entry.citationKey);
+            }
+
         return selectedCiteKeys;
     }
 
@@ -203,7 +211,7 @@ class HTTPClient {
      * @returns A result object of following structure:
      * - code: the status of the request defined by REQUEST_RESULT enum.
      * - value: null in case the request failed
-     *      or an object containing the preview with relevant information
+     *      or a string containing the preview with relevant information
      *      about the entry (e.g. author, title, release date, etc.).
      */
     async getPreviewString(citationKey) {
