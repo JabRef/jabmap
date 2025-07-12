@@ -122,7 +122,7 @@ let httpClient = new HTTPClient();
  * If a button is related to a dropdown, its menu will be closed before toggle.
  * * Note: buttons (*even a single one*) should be passed as an array / list.
  * @param { Array } buttons - The list of bootstrap buttons to toggle.
- * @param { boolean } isEnabled - The flag to set buttons' .disabled property to.
+ * @param { boolean } isEnabled - The flag to enable / disable buttons.
  */
 function toggleButtonsEnabled(buttons, isEnabled) {
     buttons.forEach((b) => {
@@ -165,12 +165,12 @@ let loadMapModalObject = new ModalObject(
     mapsFailText
 );
 
-// saving - sends mind map's content to JabRef's HTTP server
+// save - sends mind map's content to JabRef's HTTP server
 saveBtn.onclick = function () {
     httpClient.saveMap(jm.get_data());
 }
 
-// opening - opens a dialog to select available mind maps
+// open - opens a dialog to select available mind maps
 openBtn.onclick = async function () {
     // * Note: modal's elements can be accessed directly by ID
     
@@ -192,9 +192,9 @@ openBtn.onclick = async function () {
     loadMapModalObject.fillSelect(availableMaps, availableMaps);
 }
 
-// <modal> dialog confirmation button
+// open (in the mind map selection modal) - loads selected mind map
 openSelectedMapBtn.onclick = async function () {
-    // get selected mind map's name and it's data from server
+    // get selected mind map's name
     let selectedOptions = loadMapModalObject.getSelectedOptions();
 
     // if user didn't select anything, don't load anything :)
@@ -203,6 +203,7 @@ openSelectedMapBtn.onclick = async function () {
         return;
     }
 
+    // retrieve the mind map from server
     let loadRequest = await httpClient.loadMap(selectedOptions[0]);
     if (loadRequest.code !== REQUEST_RESULT.Success) {
         console.warn(`Failed to load ${selectedOptions[0]} mind map. ` +
@@ -247,6 +248,10 @@ newChildBtn.onclick = function () {
 async function getBibNodesProperties() {
     // open cayw window and retrieve selected keys
     let selectedKeys = await httpClient.getCiteKeysWithCAYW();
+    if (!selectedKeys) {
+        console.warn('There\'re no citation keys to create nodes from ( ,_,)');
+        return null;
+    }
 
     // and get preview string for each selected key
     let bibNodesProperties = [];
@@ -266,7 +271,7 @@ async function getBibNodesProperties() {
  * @param { Array } bibList - The BibEntries to add.
  * @param { CallableFunction } add_nodes_callback - The function to add new nodes by.
  */
-async function addBibEntryNodes(bibList, add_nodes_callback) {
+function addBibEntryNodes(bibList, add_nodes_callback) {
     // * Note: one node is initially selected
 
     // if node's selection was revoked, break the process
@@ -343,9 +348,13 @@ addBibEntryAsChildBtn.onclick = async function () {
     // ask user to select some citation keys
     // and retrieve related preview strings
     const bibList = await getBibNodesProperties();
+    if (!bibList) {
+        console.warn('Fail: There\'re no BibEntry nodes to add as children ( ,_,)');
+        return;
+    }
 
     // add selected BibEntries to the mind map as child nodes
-    await addBibEntryNodes(bibList,
+    addBibEntryNodes(bibList,
         (selectedNode, id, topic, data) => {
             jm.add_node(selectedNode, id, topic, data);
         });
@@ -355,9 +364,13 @@ addBibEntryAsSiblingBtn.onclick = async function () {
     // ask user to select some citation keys
     // and retrieve related preview strings
     const bibList = await getBibNodesProperties();
+    if (!bibList) {
+        console.warn('Fail: There\'re no BibEntry nodes to add as siblings ( ,_,)');
+        return;
+    }
 
     // add selected BibEntries to the mind map as child nodes
-    await addBibEntryNodes(bibList,
+    addBibEntryNodes(bibList,
         (selectedNode, id, topic, data) => {
             jm.insert_node_after(selectedNode, id, topic, data);
         });
@@ -390,23 +403,22 @@ addPDFAsChildBtn.onclick = function () {
     PDFNodeInsertMode = 'child';
 };
 
-// when the modal opens: fetch the PDF list and populate the <select>
+// when the modal opens: show list of available PDFs
 selectPDFModal.addEventListener('show.bs.modal', async () => {    
     // set "loading layout" to the modal
     ModalDesigner.setLayout(addPDFModalObject, MODAL_LAYOUT.Loading);
 
-    // reset PDF list and call the server to get a new one
+    // getting the list of available PDFs
     let pdfRequest = await httpClient.getPDFFiles();
     let pdfList = pdfRequest.value;
 
-    // if no PDFs are available, show the info line only
+    // update modal's layout according to retrieved list
     if (pdfRequest.code !== REQUEST_RESULT.Success || pdfList?.length <= 0) {
         ModalDesigner.setLayout(addPDFModalObject, MODAL_LAYOUT.Failed);
         return;
     }
-    
-    // update modal's layout according to retrieved list and
-    // show the options
+
+    // and show it to the user, if there're any PDFs
     ModalDesigner.setLayout(addPDFModalObject, MODAL_LAYOUT.Steady);
     addPDFModalObject.fillSelect(pdfList, pdfList.map((pdf) => pdf.fileName));
 });
@@ -420,10 +432,10 @@ addSelectedPDFBtn.onclick = function () {
         return;
     }
     
-    // access bootstrap's <form-select> element
+    // get selected PDFs
     let selectedPDFs = addPDFModalObject.getSelectedOptions();
-
     if (!selectedPDFs) {
+        console.warn('There\'re no PDFs to create nodes from ( ,_,)');
         return;
     }
 
