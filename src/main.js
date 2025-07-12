@@ -56,10 +56,24 @@ options.shortcut.handles = {
         applyHighlight(selectedNode, e.key);
     },
     'save': function (jm, e) {
-        // save mind map
-        if (!!httpClient) {
-            httpClient.saveMap();
+        saveBtn.onclick();
+    },
+    'load': function (jm, e) {
+        loadMapModalObject.toggle();
+        openBtn.onclick();
+    },
+    'addBibChild': function (jm, e) {
+        if (!jm.get_selected_node()) {
+            return;
         }
+        addBibEntryAsChildBtn.onclick();
+    },
+    'addPDFChild': function (jm, e) {
+        if (!jm.get_selected_node()) {
+            return;
+        }
+        addPDFModalObject.toggle();
+        addPDFAsChildBtn.onclick();
     }
 }
 // extend the default mind map
@@ -157,6 +171,7 @@ redoBtn.onclick = function () {
 let mapsLoadingText = 'Listing available mind maps...';
 let mapsFailText = 'No mind maps were found. Try to create one in JabRef first.';
 let loadMapModalObject = new ModalObject(
+    selectMindmapModal,
     exampleModalLabel,
     openMindmapInfoText,
     openMindmapSelect,
@@ -166,9 +181,15 @@ let loadMapModalObject = new ModalObject(
 );
 
 // save - sends mind map's content to JabRef's HTTP server
-saveBtn.onclick = function () {
-    httpClient.saveMap(jm.get_data());
-}
+saveBtn.onclick = async function () {
+    let mindMap = jm.get_data();
+    if (!httpClient || !mindMap) {
+        console.error('Error: Cannot save mind map.');
+        return;
+    }
+
+    httpClient.saveMap(mindMap);
+};
 
 // open - opens a dialog to select available mind maps
 openBtn.onclick = async function () {
@@ -384,6 +405,7 @@ addBibEntryAsSiblingBtn.onclick = async function () {
 let PDFLoadingText = 'Loading PDFs from current library...';
 let PDFFailText = 'There\'re no PDFs in current library.';
 let addPDFModalObject = new ModalObject(
+    selectPDFModal,
     SelectPDFModalLabel,
     PDFModalInfoText,
     addPDFSelect,
@@ -547,12 +569,18 @@ function applyHighlight(selectedNode, highlight) {
 //#endregion
 // #region [Miscellaneous]
 
-// disable default <Ctrl> + <number_key> browser's shortcut
-// in case a tag should be toggled
+// A flag to distinguish whether default shortcuts should be disabled
+let isJsMindSelected = false;
+
+// disable default <Ctrl> + <Key> browser's shortcut
+// in case the jsmind_container is active
 document.addEventListener("keydown", (e) => {
-    if (e.ctrlKey && (jm.get_selected_node() && !jm.view.editing_node)) {
-        e.preventDefault();
-    }
+    if (e.ctrlKey &&
+        ((jm.get_selected_node() && !jm.view.editing_node) || isJsMindSelected)) {
+            e.preventDefault();
+        }
+        
+    isJsMindSelected = document.activeElement.classList.contains('jsmind-inner');
 });
 
 // remove focus from active element upon showing / closing modals

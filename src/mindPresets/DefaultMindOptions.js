@@ -37,6 +37,9 @@ const DefaultOptions = {
             undo: 4096 + 90,            // <Ctrl> + <Z>
             redo: 4096 + 1024 + 90,     // <Ctrl> + <Shift> + <Z>
             save: 4096 + 83,            // <Ctrl> + <S>
+            load: 4096 + 79,            // <Ctrl> + <O>
+            addBibChild: 4096 + 66,     // <Ctrl> + <B>
+            addPDFChild: 4096 + 80,     // <Ctrl> + <O>
             toggleTag: [                // <Ctrl> +
                 4096 + 49,              // <1> - Cycle (checkboxes)
                 4096 + 50,              // <2> - Star

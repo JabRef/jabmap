@@ -1,3 +1,5 @@
+import { Modal } from 'bootstrap';
+
 /**
  * This class summarizes bootstrap modals' elements to
  * allow a simpler access to them.
@@ -5,12 +7,14 @@
  * * Note: this might be extended upon adding more modals types.
  */
 export class ModalObject {
-    constructor(titleElement,
+    constructor(referenceModalElement,
+                titleElement,
                 infoTextElement,
                 selectElement,
                 confirmButtonElement,
                 loadingText = 'Loading. Please wait a second...',
                 failText = 'No data could be loaded.') {
+        this.referenceModalElement = referenceModalElement;
         this.titleElement = titleElement;
         this.infoTextElement = infoTextElement;
         this.selectElement = selectElement;
@@ -71,5 +75,23 @@ export class ModalObject {
         }
 
         return selectedOptions;
+    }
+
+    /**
+     * Shows / hides the modal.
+     */
+    toggle() {
+        if (!this.referenceModalElement) {
+            console.warn('The modal doesn\'t have any reference to toggle ( ._.)');
+            return;
+        }
+
+        let modalInstance = Modal.getOrCreateInstance(this.referenceModalElement);
+
+        if (modalInstance.focus) {
+            modalInstance.hide();
+        } else {
+            modalInstance.show();
+        }
     }
 }
