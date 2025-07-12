@@ -25,6 +25,43 @@ import { NodeExtender } from './mindPresets/NodeExtender.js';
 let mind = DefaultMap;
 // specify editor (jsMind's) options
 const options = DefaultOptions;
+// adding Named shortcut key event processor
+options.shortcut.handles = {
+    'undo': function (jm, e) {
+        // display mind map's previous state (undo the last operation)
+        hidePopovers();
+        jm.undo();
+    },
+    'redo': function (jm, e) {
+        // display mind map's next state (redo the next operation)
+        hidePopovers();
+        jm.redo();
+    },
+    'toggleTag': function (jm, e) {
+        let selectedNode = jm.get_selected_node();
+        // if no node's selected -> skip
+        if (!selectedNode) {
+            return;
+        }
+        // apply / remove a tag otherwise
+        applyTag(selectedNode, e.key);
+    },
+    'toggleHighlight': function (jm, e) {
+        let selectedNode = jm.get_selected_node();
+        // if no node's selected -> skip
+        if (!selectedNode) {
+            return;
+        }
+        // apply / remove a highlight
+        applyHighlight(selectedNode, e.key);
+    },
+    'save': function (jm, e) {
+        // save mind map
+        if (!!httpClient) {
+            httpClient.saveMap();
+        }
+    }
+}
 // extend the default mind map
 NodeExtender.extendNode(mind.data);
 

@@ -24,40 +24,6 @@ const DefaultOptions = {
     },
     shortcut: {
         enable: true,                   // Whether to enable shortcut
-        handles: {                      // Named shortcut key event processor
-            'undo': function (jm, e) {
-                // display mind map's previous state (undo the last operation)
-                hidePopovers();
-                jm.undo();
-            },
-            'redo': function (jm, e) {
-                // display mind map's next state (redo the next operation)
-                hidePopovers();
-                jm.redo();
-            },
-            'toggleTag': function (jm, e) {
-                let selectedNode = jm.get_selected_node();
-                // if no node's selected -> skip
-                if (!selectedNode) {
-                    return;
-                }
-                // apply / remove a tag otherwise
-                applyTag(selectedNode, e.key);
-            },
-            'toggleHighlight': function (jm, e) {
-                let selectedNode = jm.get_selected_node();
-                // if no node's selected -> skip
-                if (!selectedNode) {
-                    return;
-                }
-                // apply / remove a highlight
-                applyHighlight(selectedNode, e.key);
-            },
-            'save': function (jm, e) {
-                // save mind map
-                if(!!httpClient) httpClient.saveMap();
-            }
-        },
         mapping: { 			            // Shortcut key mapping
             addchild: [45, 4096 + 13],  // <Insert>, <Ctrl> + <Enter>
             addbrother: 13,             // <Enter>

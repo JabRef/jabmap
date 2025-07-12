@@ -26,7 +26,7 @@ class ModalDesigner {
     }
 
     static #setLoadingLayout(modal) {
-        ModalDesigner.#toggleInfoText(modal, this.loadingText);
+        ModalDesigner.#toggleInfoText(modal, modal.loadingText);
         ModalDesigner.#toggleSelection(modal, false);
     }
     static #setSteadyLayout(modal) {
