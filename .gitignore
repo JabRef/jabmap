@@ -151,3 +151,6 @@ electron-dist/
 /.idea/modules.xml
 /.idea/vcs.xml
 /JabMap/.idea/
+
+# wrapper tool for trying out jabmap
+/gg.cmd

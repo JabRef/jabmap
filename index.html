@@ -43,16 +43,16 @@
         <a class="navbar-brand" href="#">JabMap</a>
 
         <!--Save and Load Buttons-->
-        <button id="saveBtn" class="btn btn-light me-2" type="button" data-bs-toggle="tooltip" title="Save">
-          <i class="bi bi-save"></i> Save
-        </button>
         <button id="openBtn" class="btn btn-light me-2" type="button" data-bs-toggle="modal" title="Open" data-bs-target="#selectMindmapModal">
           <i class="bi bi-folder2-open"></i> Open
         </button>
-        <!--Debug button-->
-        <button id="printMapToConsoleBtn" class="btn btn-light me-2" type="button" data-bs-toggle="tooltip" title="Debug">
-          Debug
+        <button id="saveBtn" class="btn btn-light me-2" type="button" data-bs-toggle="tooltip" title="Save">
+          <i class="bi bi-save"></i> Save
         </button>
+        <!--Debug button-->
+        <!-- <button id="printMapToConsoleBtn" class="btn btn-light me-2" type="button" data-bs-toggle="tooltip" title="Debug">
+          Debug
+        </button> -->
       </div>
 
       <!--Editor buttons-->
@@ -77,7 +77,7 @@
 
           <!--Tags Dropdown-->
           <div class="dropdown">
-            <button class="btn btn-secondary dropdown-toggle me-2" type="button" id="tagsDropdownMenuButton" data-bs-toggle="dropdown">
+            <button class="btn btn-secondary dropdown-toggle me-2" type="button" id="tagsDropdownMenuButton" data-bs-toggle="dropdown" data-bs-auto-close="outside">
               <i class="bi bi-tags"></i>
             </button>
             <div class="dropdown-menu">
@@ -112,7 +112,7 @@
               <i class="bi bi-file-earmark-text"></i>
             </button>
             <div class="dropdown-menu">
-              <h6 class="dropdown-header">New BibEntry node</h6>
+              <h6 class="dropdown-header">New BibTex node</h6>
               <button id="addBibEntryAsSiblingBtn" class="btn dropdown-item">
                 <i class="bi bi-node-plus-fill"> </i> As sibling node
               </button>
@@ -154,6 +154,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
+          <div id="openMindmapInfoText"></div>
           <select class="form-select" id="openMindmapSelect" size="10"></select>
         </div>
         <div class="modal-footer">
