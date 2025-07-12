@@ -114,7 +114,8 @@ let httpClient = new HTTPClient();
 //#endregion
 //#region [General Element Manipulation]
 // * This region contains the most general methods to manipulate
-// * HTML elements such as bootstrap Buttons and Selects
+// * HTML elements such as Bootstrap's Buttons and Selects
+// * as well as undo / redo and debug buttons
 
 /**
  * Turns on and off given buttons using their .disabled property.
@@ -128,6 +129,24 @@ function toggleButtonsEnabled(buttons, isEnabled) {
         Dropdown.getOrCreateInstance(b).hide();
         b.disabled = !isEnabled;
     });
+}
+
+// debug button prints current mind map state to console
+printMapToConsoleBtn.onclick = async function () {
+    // print mind map data
+    console.log(jm.get_data());
+}
+
+// undo - discard the last operation (display the previous state)
+undoBtn.onclick = function () {
+    hidePopovers();
+    jm.undo();
+}
+
+// redo - reapply the next operation (display the following state)
+redoBtn.onclick = function () {
+    hidePopovers();
+    jm.redo();
 }
 
 //#endregion
@@ -200,29 +219,6 @@ openSelectedMapBtn.onclick = async function () {
 }
 
 //#endregion
-
-// debug button prints current mind map state to console
-// printMapToConsoleBtn.onclick = async function () {
-//     // print mindmap data
-//     console.log(jm.get_data());
-//     let listpdfs = await httpClient.getPDFFiles();
-//     for (let i = 0; i < listpdfs.length; i++) {
-//         console.log("fileName: " + listpdfs[i].fileName + " parentCiteKey: " + listpdfs[i].parentCitationKey + " path: " + listpdfs[i].path);
-//     }
-// }
-
-// undo - discard the last operation (display the previous state)
-undoBtn.onclick = function () {
-    hidePopovers();
-    jm.undo();
-}
-
-// redo - reapply the next operation (display the following state)
-redoBtn.onclick = function () {
-    hidePopovers();
-    jm.redo();
-}
-
 //#region [Text Nodes]
 
 // new sibling node - call the default shortcut-handler
