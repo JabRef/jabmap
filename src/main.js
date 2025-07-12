@@ -8,7 +8,7 @@ import jsMind from './jsmind/src/jsmind.js';
 import { util } from './jsmind/src/jsmind.util.js';
 import './jsmind/src/plugins/jsmind.draggable-node.js';
 
-import { HTTPClient } from '../http/HTTPClient';
+import { HTTPClient, REQUEST_RESULT } from '../http/HTTPClient';
 
 import { ModalDesigner, MODAL_LAYOUT } from './modals/ModalDesigner.js';
 import { ModalObject } from './modals/ModalObject.js';
@@ -159,15 +159,16 @@ openBtn.onclick = async function () {
     ModalDesigner.setLayout(loadMapModalObject, MODAL_LAYOUT.Loading);
 
     // request a list of available mind maps from JabRef's HTTP server
-    let availableMaps = await httpClient.listMaps();
-
-    if (availableMaps?.length == null || availableMaps?.length <= 0) {
+    let mapsRequest = await httpClient.listMaps();
+    let availableMaps = mapsRequest.value;
+    
+    // update modal's layout according to retrieved list
+    if (mapsRequest.code !== REQUEST_RESULT.Success || availableMaps?.length <= 0) {
         ModalDesigner.setLayout(loadMapModalObject, MODAL_LAYOUT.Failed);
         return;
     }
     
-    // update modal's layout according to retrieved list
-    // and show it to the user
+    // and show it to the user, if there're any maps
     ModalDesigner.setLayout(loadMapModalObject, MODAL_LAYOUT.Steady);
     loadMapModalObject.fillSelect(availableMaps, availableMaps);
 }
@@ -183,9 +184,14 @@ openSelectedMapBtn.onclick = async function () {
         return;
     }
 
-    let loadResponse = await httpClient.loadMap(selectedOptions[0]);
+    let loadRequest = await httpClient.loadMap(selectedOptions[0]);
+    if (loadRequest.code !== REQUEST_RESULT.Success) {
+        console.warn(`Failed to load ${selectedOptions[0]} mind map. ` +
+            `Loading the default one.`);
+    }
+        
     // if no mind map exists, show the default one
-    let loadedMap = loadResponse.map ?? mind;
+    let loadedMap = loadRequest.value?.map ?? mind;
     NodeExtender.extendNode(loadedMap.data);
 
     // display the retrieved mind map
@@ -251,7 +257,7 @@ async function getBibNodesProperties() {
     for (let i = 0; i < selectedKeys.length; i++) {
         bibNodesProperties.push({
             key: selectedKeys[i],
-            preview: await httpClient.getPreviewHTML(selectedKeys[i])
+            preview: (await httpClient.getPreviewHTML(selectedKeys[i])).value
         });
     }
 
@@ -394,10 +400,11 @@ selectPDFModal.addEventListener('show.bs.modal', async () => {
     ModalDesigner.setLayout(addPDFModalObject, MODAL_LAYOUT.Loading);
 
     // reset PDF list and call the server to get a new one
-    let pdfList = await httpClient.getPDFFiles();
+    let pdfRequest = await httpClient.getPDFFiles();
+    let pdfList = pdfRequest.value;
 
     // if no PDFs are available, show the info line only
-    if (pdfList?.length == null || pdfList?.length <= 0) {
+    if (pdfRequest.code !== REQUEST_RESULT.Success || pdfList?.length <= 0) {
         ModalDesigner.setLayout(addPDFModalObject, MODAL_LAYOUT.Failed);
         return;
     }
@@ -419,6 +426,10 @@ addSelectedPDFBtn.onclick = function () {
     
     // access bootstrap's <form-select> element
     let selectedPDFs = addPDFModalObject.getSelectedOptions();
+
+    if (!selectedPDFs) {
+        return;
+    }
 
     // create a new node for each chosen PDF
     selectedPDFs.forEach((pdf) => {
