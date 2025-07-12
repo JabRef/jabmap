@@ -502,6 +502,13 @@ export class ViewProvider {
     _default_node_render(ele, node) {
         if (this.opts.support_html) {
             // Altered lines:
+            // Wrapping node's topic
+            const maxTopicLength = 45;
+            let topic = node.topic;
+            if (topic.length > maxTopicLength) {
+                topic = topic.slice(0, maxTopicLength - 1 - 3) + '...';
+            }
+
             // Building HTML <img> tags to attach to the node
             let icons = (node.data.icons || [])
             .map(iconKey => `<img src="${this.resourceManager.TAG_ICONS[iconKey]}" style="width: 16px; height: 16px; margin-right: 2px; vertical-align: middle;">`)
@@ -519,7 +526,7 @@ export class ViewProvider {
             const html = `
               <div>
                     <span>${icons}</span>
-                    <span style="background: ${highlighting}">${node.topic}</span>
+                    <span style="background: ${highlighting}">${topic}</span>
               </div>`;
             // Rendering the node
             $.h(ele, html);
