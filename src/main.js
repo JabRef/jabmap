@@ -21,6 +21,21 @@ import { NodeExtender } from './mindPresets/NodeExtender.js';
 // * This region contains declaration of most basic instances
 // * e.g. jsMind, HTTPClient and their properties
 
+// create a HTTP client instance
+let httpClient = new HTTPClient();
+
+/**
+ * Proves whether there's connection to the server.
+ * If not connected, loads the fail page.
+ */
+async function checkConnection() {
+    let isConnected = await httpClient.isConnected();
+    if (!isConnected) {
+        window.location.href = './src/pages/connectionFailed.html';
+    }    
+}
+checkConnection();
+
 // "load" initial mind map data
 let mind = DefaultMap;
 // specify editor (jsMind's) options
@@ -121,9 +136,6 @@ jm.add_event_listener((type, data) => {
 // display the initial state and add it to the action stack
 jm.show(mind);
 jm.resetStack();
-
-// create a HTTP client instance
-let httpClient = new HTTPClient();
 
 //#endregion
 //#region [General Element Manipulation]
