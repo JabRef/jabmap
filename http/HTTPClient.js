@@ -9,7 +9,7 @@ class HTTPClient {
     }
 
     /**
-     * Sends a HTTP-request to JabRef's server.
+     * Sends an HTTP-request to JabRef's server.
      * @param { string } url - The server's URL to make a request to. 
      * @param { object } options - Optional request's options.
      * @returns A result object of following structure:

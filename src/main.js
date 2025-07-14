@@ -579,7 +579,7 @@ function applyHighlight(selectedNode, highlight) {
 });
 
 //#endregion
-// #region [Miscellaneous]
+//#region [Miscellaneous]
 
 // A flag to distinguish whether default shortcuts should be disabled
 let isJsMindSelected = false;
