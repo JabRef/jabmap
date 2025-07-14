@@ -1,28 +1,27 @@
 /**
  * Provides HTTP-connection functionality.
  */
-export class HTTPClient {
+class HTTPClient {
     #host = "http://localhost:23119/";
 
     constructor() {
-        /**
-         * The default return value for PUT requests.
-         */
-        this.NULL_MAP = { map: {} };
         this.currentLibrary = "demo";
     }
 
     /**
-     * Sends a HTTP-request to JabRef's server.
+     * Sends an HTTP-request to JabRef's server.
      * @param { string } url - The server's URL to make a request to. 
      * @param { object } options - Optional request's options.
-     * @returns
-     * - An **object** in case of a `GET request` or
-     * - An **object** { map: {} } in case of a `PUT / POST request`
-     * or if any request failed.
+     * @returns A result object of following structure:
+     * - code: the status of the request defined by REQUEST_RESULT enum.
+     * - value: **null** in case of `PUT` or `POST` requests
+     *      or **object** requested by `GET`.
      */
     async #performRequest(url, options = null) {
-        let result = this.NULL_MAP;
+        let result = {
+            code: REQUEST_RESULT.Refused,
+            value: null
+        };
         let logMessage = "";
 
         const requestUrl = this.#host.concat(url);
@@ -41,18 +40,24 @@ export class HTTPClient {
                 throw new Error("Request's result is not ok ( -.-)");
             }
 
+            // If connection succeeded, try parsing the result (failed by default)
+            result.code = REQUEST_RESULT.Failed;
+
             // If some output is awaited, save it
             if (options.method !== "PUT") {
                 if (options.headers["Accept"] === 'application/json') {
-                    result = await response.json();
+                    result.value = await response.json();
                 }
                 if (options.headers["Accept"] === 'text/plain') {
-                    result = await response.text();
+                    result.value = await response.text();
                 }
                 if (options.headers["Accept"] === 'text/html') {
-                    result = await response.text();
+                    result.value = await response.text();
                 }
             }
+
+            // If parsing's successful, set the best result code \(OwO)/
+            result.code = REQUEST_RESULT.Success;
 
             // Providing infos about the request
             logMessage =
@@ -85,7 +90,7 @@ export class HTTPClient {
      */
     async isConnected() {
         try {
-            const response = await fetch(this.#host);
+            await fetch(this.#host);
             return true;
         } catch (e) {
             return false;
@@ -95,7 +100,10 @@ export class HTTPClient {
     /**
      * Requests a mind map (.jmp file) from JabRef's server.
      * @param { string } library - The library of the requested mind map.
-     * @returns The requested mind map object.
+     * @returns A result object of following structure:
+     * - code: the status of the request defined by REQUEST_RESULT enum.
+     * - value: null in case the request failed
+     *      or requested mind map.
      */
     async loadMap(library = "demo") {
         const url = `libraries/${library}/map`;
@@ -104,17 +112,23 @@ export class HTTPClient {
             headers: { "Accept": "application/json" }
         }
 
-        // Changing current library
-        this.currentLibrary = library;
-        console.log(`Current library is now: ${this.currentLibrary}`);
+        const loadRequest = await this.#performRequest(url, options);
 
-        return this.#performRequest(url, options);
+        // Changing current library if succeeded
+        if (loadRequest.code === REQUEST_RESULT.Success) {
+            this.currentLibrary = library;
+            console.log(`Current library is now: ${this.currentLibrary}`);
+        }
+
+        return loadRequest
     }
 
     /**
      * Sends a mind map to JabRef's server to save next to currently active library.
      * @param { object } mindMap - The mind map to save.
-     * @returns An empty map object (NULL_MAP).
+     * @returns A result object of following structure:
+     * - code: the status of the request defined by REQUEST_RESULT enum.
+     * - value: null.
      */
     async saveMap(mindMap) {
         const url = `libraries/${this.currentLibrary}/map`;
@@ -129,7 +143,10 @@ export class HTTPClient {
 
     /**
      * Requests a list of stored mind maps saved on the server.
-     * @returns A list of available mind maps stored on the server.
+     * @returns A result object of following structure:
+     * - code: the status of the request defined by REQUEST_RESULT enum.
+     * - value: null in case the request failed
+     *      or a list of available mind maps.
      */
     async listMaps() {
         const url = 'libraries'
@@ -143,7 +160,10 @@ export class HTTPClient {
 
     /**
      * Requests a list of all entries in the current library.
-     * @returns A list of all entries in the current library in json format.
+     * @returns A result object of following structure:
+     * - code: the status of the request defined by REQUEST_RESULT enum.
+     * - value: null in case the request failed
+     *      or a list of available entries of current mind map.
      */
     async listEntries() {
         const options = {
@@ -156,7 +176,10 @@ export class HTTPClient {
     /**
      * Sends a request to open a cite-as-you-write window
      * to select any number of BibEntries from the current library.
-     * @returns A list of selected citation keys.
+     * @returns A result object of following structure:
+     * - code: the status of the request defined by REQUEST_RESULT enum.
+     * - value: null in case the request failed
+     *      or list of requested citation keys.
      */
     async getCiteKeysWithCAYW() {
         let url = 'better-bibtex/cayw';
@@ -166,19 +189,30 @@ export class HTTPClient {
             method: "GET",
             headers: { "Accept": "application/json" }
         }
-        let selectedEntries = await this.#performRequest(url, options);
-        let selectedCiteKeys = [];
-        for (let entry of selectedEntries) {
-            selectedCiteKeys.push(entry.citationKey);
+
+        let entriesRequest = await this.#performRequest(url, options);
+        let selectedEntries = entriesRequest.value;
+
+        if (entriesRequest.code !== REQUEST_RESULT.Success) {
+            return null;
         }
+        
+        let selectedCiteKeys = [];
+            for (let entry of selectedEntries) {
+                selectedCiteKeys.push(entry.citationKey);
+            }
+
         return selectedCiteKeys;
     }
 
     /**
      * Requests the preview for a certain BibEntry from the current library.
      * @param { string } citationKey - The citation key (identifier) of the entry.
-     * @returns A string containing the preview with relevant information
-     * about the entry (e.g. author, title, release date, etc.).
+     * @returns A result object of following structure:
+     * - code: the status of the request defined by REQUEST_RESULT enum.
+     * - value: null in case the request failed
+     *      or a string containing the preview with relevant information
+     *      about the entry (e.g. author, title, release date, etc.).
      */
     async getPreviewString(citationKey) {
         const url = `libraries/${this.currentLibrary}/entries/${citationKey}`;
@@ -193,8 +227,11 @@ export class HTTPClient {
     /**
      * Requests the preview for a certain BibEntry from the current library.
      * @param { string } citationKey - The citation key (identifier) of the entry.
-     * @returns A string containing the preview with relevant information
-     * about the entry (e.g. author, title, release date, etc.).
+     * @returns A result object of following structure:
+     * - code: the status of the request defined by REQUEST_RESULT enum.
+     * - value: null in case the request failed
+     *      or an HTML string containing the preview with relevant information
+     *      about the entry (e.g. author, title, release date, etc.).
      */
     async getPreviewHTML(citationKey) {
         const url = `libraries/${this.currentLibrary}/entries/${citationKey}`;
@@ -208,7 +245,10 @@ export class HTTPClient {
 
     /**
      * Requests a list of all local pdf files from the current library.
-     * @returns A list of objects of the following structure
+     * @returns A result object of following structure:
+     * - code: the status of the request defined by REQUEST_RESULT enum.
+     * - value: null in case the request failed
+     *      or a list of objects of the following structure
      * ```
      * [
      *     {
@@ -229,7 +269,14 @@ export class HTTPClient {
             headers: { "Accept": "application/json" }
         }
 
-        let response = await this.#performRequest(url, options);
-        return response;
+        return this.#performRequest(url, options);
     }
 }
+
+const REQUEST_RESULT = Object.freeze({
+    Refused: -1,
+    Failed: 0,
+    Success: 1
+});
+
+export { HTTPClient, REQUEST_RESULT };

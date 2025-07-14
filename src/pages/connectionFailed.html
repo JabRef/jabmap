@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>JabMap - No Connection</title>
+    <link href="../../node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="../../node_modules/bootstrap/dist/js/bootstrap.bundle.js"></script>
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .error-container {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .error-icon {
+            font-size: 4rem;
+            color: #dc3545;
+        }
+
+        .accordion {
+            width: 400px;
+            text-align: left;
+        }
+
+        .accordion-button::after {
+            margin-left: auto;
+            margin-left: 5;
+        }
+
+        .accordion-collapse {
+            transition: height 0.4s ease, opacity 0.4s ease;
+            overflow: hidden;
+        }
+
+        .accordion-body {
+            transition: opacity 0.4s ease;
+            opacity: 0;
+        }
+
+        .accordion-collapse.show .accordion-body {
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="error-container">
+        <div class="error-icon">⚠️</div>
+        <h1 class="mt-4">Server Connection Failed</h1>
+        <p class="text-muted">Your JabMap couldn’t connect to the server. Here are a few things you can try:</p>
+
+        <div class="accordion" id="tipsAccordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingTwo">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#tip2" aria-expanded="false" aria-controls="tip2">
+                        🤖 Ensure JabRef server is running
+                    </button>
+                </h2>
+                <div id="tip2" class="accordion-collapse collapse" aria-labelledby="headingTwo"
+                    data-bs-parent="#tipsAccordion">
+                    <div class="accordion-body">
+                        <ol class="list-group list-group-flush list-group-numbered">
+                            <li class="list-group-item">Start your JabRef</li>
+                            <li class="list-group-item">Go to File -> Preferences</li>
+                            <li class="list-group-item">Check the "Http Server"</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingThree">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#tip3" aria-expanded="false" aria-controls="tip3">
+                        👾 Verify installation
+                    </button>
+                </h2>
+                <div id="tip3" class="accordion-collapse collapse" aria-labelledby="headingThree"
+                    data-bs-parent="#tipsAccordion">
+                    <div class="accordion-body">
+                            <ol class="list-group list-group-flush list-group-numbered">
+                            <li class="list-group-item">
+                                Ensure you followed
+                                <a href="https://github.com/JabRef/jabmap/tree/finishing-sprint-3?tab=readme-ov-file#running-it-locally">
+                                    running it locally</a>
+                                step of the documentation.
+                            </li>
+                            <li class="list-group-item">
+                                Then use the <code>gg.cmd</code> as guided in
+                                <a href="https://github.com/JabRef/jabmap/tree/finishing-sprint-3?tab=readme-ov-file#using-ggcmd">
+                                    the following step</a>.
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn btn-primary mt-4" onclick="restart()">Try Again</button>
+    </div>
+
+    <script type="module">
+        import { HTTPClient } from '../../http/HTTPClient.js';
+
+        let httpClient = new HTTPClient();
+        window.restart = async function () {
+            if (httpClient.isConnected()) {
+                window.location = '../../index.html';
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,14 +1,81 @@
 # JabMap
+
 Next-Generation scientific mind mapping.
 
+
 ## 📸 Screenshots
- <img width="1548" alt="JabMap mainview example" src="https://github.com/user-attachments/assets/69f5de97-3b2d-4ed7-b8f8-050a1559f93b" />
- <img width="1549" alt="JabMap opening a mindmap example" src="https://github.com/user-attachments/assets/23aa56d0-4432-4e5f-957b-8797d36a22fd" />
+
+<img width="1429" alt="JabMap-Example" src="https://github.com/user-attachments/assets/4a175c10-a0eb-438f-b5f6-1dcfb4e2520c" />
+
+
+## ⌨️ Shortcuts
+
+You can find a list of shortcuts at [shortcuts.md](shortcuts.md).
 
 ## 🌟 Try It Out!
-The current state of the application is hosted on [github pages](https://jabref.github.io/jabmap/) for you to try out. Note that saving and loading mind maps does not work when running the app like this because the communication with the [JabRef's HTTP server](#getting-the-server) is restricted by your browser for security reasons. Unfortunately this applies to any interaction with the server.
 
-## 💾 Installation
+There are a couple of ways to try out JabMap. The fastest way to just get a grasp of it is on [github pages](https://jabref.github.io/jabmap/). Note that this will merely allow you to create some nodes, edit and tag them. Saving, Loading and JabRef-related features like BibTeX-Nodes and importing attached PDF-files as nodes won't work unless you are running our version of JabRef's HTTP-Server (see [below](##-🤖-getting-the-server-running) for setup) since the mentioned features rely on it.
+
+>Note: It's still possible your browser blocks access to the server due to HTTP/HTTPS issues, for the best experience follow the steps below on how to try JabMap running it locally.
+
+### Running it locally 
+
+The following commands get the code in place and start JabRef and JabMap with the help of a handy wrapper tool called [gg.cmd](https://github.com/eirikb/gg).
+A little terminal magic is required, but don't worry, we have the commands all laid out for you!
+
+#### JabRef:
+
+1. Go to your git-repositories folder and start a new terminal session
+2. `git clone --recurse-submodules https://github.com/JabRef/jabref.git`
+3. `cd jabref`
+4. `git checkout jabmap`
+5. Enable nice wrapper: `curl -L ggcmd.io > gg.cmd`
+6. `sh ./gg.cmd just run-pr 13519`
+7. Wait for JabRef to come up
+8. File > Preferences > Check "HTTP Server"
+
+#### JabMap:
+
+1. Go to your git-repositories folder and start a new terminal session
+2. Clone it: `git clone git@github.com:JabRef/jabmap.git`
+3. `cd jabmap`
+4. Fix branch: `git checkout jabmap`
+5. Enable nice wrapper: `curl -L ggcmd.io > gg.cmd`
+6. Install dependencies: `sh gg.cmd npm install`
+7. Build: `sh ./gg.cmd npm run build`
+8. Run: `sh ./gg.cmd npm run preview`
+9. Now one can open http://localhost:4173/ and open a library with the corresponding map.
+
+
+## 🤖 Getting the server running
+
+As mentioned above, several features are handled by JabRef's HTTP server. Currently you have to start it manually. Luckily, there are multiple ways to do that:
+
+### using gg.cmd
+
+If you followed the steps (**running-it-locally**) above, instead of steps 6. - 9. you can simply do the following to start the server without JabRef's GUI:
+
+```
+sh ./gg.cmd jbang .jbang/JabSrvLauncher.java
+```
+
+### Starting it from an IDE
+
+1. If you haven't already, clone our [JabRef's fork repository](https://github.com/iloveskittles82/jabref) (_Note: It is recommended to complete this step of_ [_JabRef's setup guide_](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-12-build.html)).
+2. Afterwards, open it in editor of your choice (_IDEA works well for this_) and locate the `jabsrv/src/test/rest-api.http` file.
+3. Follow the steps described at the top of the file to start the server.
+
+_Alternatively_ you can do the following:
+1. Open `ServerCLI` file located at `./jabsrv-cli/src/main/java/org.jabref.http.server.cli`
+2. Execute its `main()` method
+
+More about starting the server in [JabRef's server documentation](https://devdocs.jabref.org/code-howtos/http-server.html)
+
+
+## 💾 Install by building the application 
+
+Now that you've tried it, here is how to build and install it. We hope to provide a downloadable installer in the future, but for now you have to build the app yourself. 
+This section is more targeted towards 
 Currently, there is no production build available for download so you have to build it yourself :3
 
 ### Basic Setup
@@ -39,24 +106,9 @@ If bundling fails with `ERROR: Cannot create symbolic link`, you have to do the 
 
 _More about this workaround in [this issue](https://github.com/electron-userland/electron-builder/issues/8149)_.
 
-On Linux, there is a bug with npm and optional dependencies (See [this issue](https://github.com/npm/cli/issues/4828). Should you encounter this bug after running `npm install`, remove the `package-lock.json` file and `node-modules` directory and run `npm i`. Then, simply continue with step 2.
+On Linux and Mac, there is a bug with npm and optional dependencies (See [this issue](https://github.com/npm/cli/issues/4828). Should you encounter this bug after running `npm install`, remove the `package-lock.json` file and `node-modules` directory and run `npm i`. Then, simply continue with step 2.
 
 ### Starting
 After a successful build you can finally start the app located at `./electron-dist/win-unpacked/JabMap.exe`.
 
 _Optionally you can install it by opening_ `./electron-dist/JabMap Setup 1.0.0.exe`
-
-## 🤖 Getting the server running
-As mentioned above, several features are handled by JabRef's HTTP server. Currently you have to start it manually:
-
-First clone our [JabRef's fork repository](https://github.com/iloveskittles82/jabref) (_Note: It is recommended to complete this step of_ [_JabRef's setup guide_](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-12-build.html)).
-
-After you cloned the repository, open it in editor of your choice (_IDEA works well for this_) and locate the `jabsrv/src/test/rest-api.http` file.
-
-Follow the steps described at the top of the file to start the server.
-
-_Alternatively_ you can do the following:
-1. Open `ServerCLI` file located at `./jabsrv-cli/src/main/java/org.jabref.http.server.cli`
-2. Execute its `main()` method
-
-More about starting the server in [JabRef's server documentation](https://devdocs.jabref.org/code-howtos/http-server.html)
