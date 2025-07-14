@@ -55,6 +55,12 @@ After setting up JabRef, you can either use [JabMap on GitHub pages](https://jab
 8. Run: `sh ./gg.cmd npm run preview`
 9. Now you can open http://localhost:4173/ and open a library with the corresponding map.
 
+10. Select the root node by clicking on it
+11. Press <kbd>CTRL</kbd> + <kbd>B</kbd>
+12. Select any number of BibTeX entries from the library
+13. Press "Cite"
+
+**You just successfully created your first BibTeX nodes!** 
 
 ## 🤖 Getting the server running
 
