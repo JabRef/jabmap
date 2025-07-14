@@ -10,7 +10,7 @@ Next-Generation scientific mind mapping.
 
 ## ⌨️ Shortcuts
 
-You can find a list of shortcuts [here](https://github.com/JabRef/jabmap/blob/bf7ccc8bcfde49c3d868f629e373168ee9059f11/shortcuts.md).
+You can find a list of shortcuts at [shortcuts.md](shortcuts.md).
 
 ## 🌟 Try It Out!
 
@@ -26,11 +26,11 @@ A little terminal magic is required, but don't worry, we have the commands all l
 #### JabRef:
 
 1. Go to your git-repositories folder and start a new terminal session
-2. `git clone --recurse-submodules https://github.com/iloveskittles82/jabref.git`
+2. `git clone --recurse-submodules https://github.com/JabRef/jabref.git`
 3. `cd jabref`
 4. `git checkout jabmap`
 5. Enable nice wrapper: `curl -L ggcmd.io > gg.cmd`
-6. `sh ./gg.cmd gradle :jabgui:run`
+6. `sh ./gg.cmd just run-pr 13519`
 7. Wait for JabRef to come up
 8. File > Preferences > Check "HTTP Server"
 
@@ -56,7 +56,7 @@ As mentioned above, several features are handled by JabRef's HTTP server. Curren
 If you followed the steps (**running-it-locally**) above, instead of steps 6. - 9. you can simply do the following to start the server without JabRef's GUI:
 
 ```
-sh gg.cmd jbang .jbang/JabSrvLauncher.java
+sh ./gg.cmd jbang .jbang/JabSrvLauncher.java
 ```
 
 ### Starting it from an IDE
