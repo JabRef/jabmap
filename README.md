@@ -28,11 +28,10 @@ A little terminal magic is required, but don't worry, we have the commands all l
 1. Go to your git-repositories folder and start a new terminal session
 2. `git clone --recurse-submodules https://github.com/JabRef/jabref.git`
 3. `cd jabref`
-4. `git checkout jabmap`
-5. Enable nice wrapper: `curl -L ggcmd.io > gg.cmd`
-6. `sh ./gg.cmd just run-pr 13519`
-7. Wait for JabRef to come up
-8. File > Preferences > Check "HTTP Server"
+4. Enable nice wrapper: `curl -L ggcmd.io > gg.cmd`
+5. `sh ./gg.cmd just run-pr 13519`
+6. Wait for JabRef to come up
+7. File > Preferences > Check "HTTP Server"
 
 #### JabMap:
 
