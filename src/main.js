@@ -29,12 +29,23 @@ let httpClient = new HTTPClient();
  * If not connected, loads the fail page.
  */
 async function checkConnection() {
+    let mainDisplayValue = 'flex';
+    let failDisplayValue = 'none';
+
     let isConnected = await httpClient.isConnected();
+
     if (!isConnected) {
-        window.location.href = './src/pages/connectionFailed.html';
-    }    
+        jm.select_clear();
+        mainDisplayValue = 'none';
+        failDisplayValue = 'flex';
+    }
+
+    topNavBar.style.display = mainDisplayValue;
+    jsmind_container.style.display = mainDisplayValue;
+    noConnectionBlock.style.display = failDisplayValue;
 }
 checkConnection();
+tryAgainBtn.onclick = checkConnection;
 
 // "load" initial mind map data
 let mind = DefaultMap;
