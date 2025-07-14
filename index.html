@@ -38,21 +38,21 @@
   <!--Navbar with Buttons-->
   <nav class="navbar bg-body-tertiary">
     <div class="container-fluid">
-      <div class = "d-flex align-items-start" style="flex-basis: 33%; max-width: 33%;">
+      <div class="d-flex align-items-start" style="flex-basis: 33%; max-width: 33%;">
         <!--JabMap title-->
         <a class="navbar-brand" href="#">JabMap</a>
 
         <!--Save and Load Buttons-->
-        <button id="saveBtn" class="btn btn-light me-2" type="button" data-bs-toggle="tooltip" title="Save">
-          <i class="bi bi-save"></i> Save
-        </button>
         <button id="openBtn" class="btn btn-light me-2" type="button" data-bs-toggle="modal" title="Open" data-bs-target="#selectMindmapModal">
           <i class="bi bi-folder2-open"></i> Open
         </button>
-        <!--Debug button-->
-        <button id="printMapToConsoleBtn" class="btn btn-light me-2" type="button" data-bs-toggle="tooltip" title="Debug">
-          Debug
+        <button id="saveBtn" class="btn btn-light me-2" type="button" data-bs-toggle="tooltip" title="Save">
+          <i class="bi bi-save"></i> Save
         </button>
+        <!--Debug button-->
+        <!-- <button id="printMapToConsoleBtn" class="btn btn-light me-2" type="button" data-bs-toggle="tooltip" title="Debug">
+          Debug
+        </button> -->
       </div>
 
       <!--Editor buttons-->
@@ -74,9 +74,10 @@
           <button id="newChildBtn" class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="New child node">
             <i class="bi bi-diagram-2-fill" style="transform: rotate(-90deg); display: inline-block;"></i>
           </button>
+
           <!--Tags Dropdown-->
           <div class="dropdown">
-            <button class="btn btn-secondary dropdown-toggle" type="button" id="tagsDropdownMenuButton" data-bs-toggle="dropdown">
+            <button class="btn btn-secondary dropdown-toggle me-2" type="button" id="tagsDropdownMenuButton" data-bs-toggle="dropdown" data-bs-auto-close="outside">
               <i class="bi bi-tags"></i>
             </button>
             <div class="dropdown-menu">
@@ -104,6 +105,40 @@
               </button>
             </div>
           </div>
+
+          <!--BibEntry nodes Dropdown-->
+          <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle me-2" id="BibEntryDropdownMenuButton" data-bs-toggle="dropdown">
+              <i class="bi bi-file-earmark-text"></i>
+            </button>
+            <div class="dropdown-menu">
+              <h6 class="dropdown-header">New BibTex node</h6>
+              <button id="addBibEntryAsSiblingBtn" class="btn dropdown-item">
+                <i class="bi bi-node-plus-fill"> </i> As sibling node
+              </button>
+              <button id="addBibEntryAsChildBtn" class="btn dropdown-item">
+                <i class="bi bi-diagram-2-fill" style="transform: rotate(-90deg); display: inline-block;"> </i> As child node
+                <span class="shortcut">Ctrl + B</span>
+              </button>
+            </div>
+          </div>
+
+        <div class="dropdown">
+          <button class="btn btn-secondary dropdown-toggle me-2" id="PDFDropDownMenuButton" data-bs-toggle="dropdown">
+            <i class="bi bi-file-pdf"></i></i>
+          </button>
+          <div class="dropdown-menu">
+            <h6 class="dropdown-header">New PDF node</h6>
+            <button id="addPDFAsSiblingBtn" class="btn dropdown-item" data-bs-toggle="modal" data-bs-target="#selectPDFModal">
+              <i class="bi bi-node-plus-fill"> </i> As sibling node
+            </button>
+            <button id="addPDFAsChildBtn" class="btn dropdown-item" data-bs-toggle="modal" data-bs-target="#selectPDFModal">
+              <i class="bi bi-diagram-2-fill" style="transform: rotate(-90deg); display: inline-block;"> </i> As child node
+              <span class="shortcut">Ctrl + P</span>
+            </button>
+          </div>
+        </div>
+
       </div>
       <div style="flex-basis: 33%; max-width: 33%;"></div>
     </div>
@@ -121,11 +156,33 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
+          <div id="openMindmapInfoText"></div>
           <select class="form-select" id="openMindmapSelect" size="10"></select>
         </div>
         <div class="modal-footer">
           <button type="button" id="openSelectedMapBtn" class="btn btn-outline-secondary" data-bs-dismiss="modal">
             Open
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for the "Add PDF Nodes" dialog-->
+  <div class="modal fade" id="selectPDFModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="SelectPDFModalLabel">Choose PDFs to add</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="PDFModalBody">
+          <div id="PDFModalInfoText"></div>
+          <select class="form-select" multiple id="addPDFSelect" size="10"></select>
+        </div>
+        <div class="d-flex modal-footer">
+          <button type="button" id="addSelectedPDFBtn" class="btn btn-outline-secondary alig" data-bs-dismiss="modal">
+            Add
           </button>
         </div>
       </div>

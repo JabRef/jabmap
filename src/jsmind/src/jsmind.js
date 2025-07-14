@@ -96,6 +96,13 @@ export default class jsMind {
     }
     // Altered lines:
     /**
+     * Sets the inner action stack to track currently displayed mind map.
+     */
+    resetStack() {
+        this.actionStack.clear();
+        this.saveState();
+    }
+    /**
      * Saves the state of currently displayed mind map
      * to inner action stack.
      */
@@ -238,6 +245,13 @@ export default class jsMind {
                 return this.begin_edit(the_node);
             }
         }
+        // Altered lines:
+        let nodeType = node.data.type;
+        if (['BibEntry', 'PDFFile'].includes(nodeType)) {
+            console.log(`No editing for ${nodeType} nodes >:(`);
+            return;
+        }
+        // End
         if (this.get_editable()) {
             this.view.edit_node_begin(node);
         } else {
@@ -467,10 +481,6 @@ export default class jsMind {
                 data: [node_id],
                 node: parent_id,
             });
-            // Altered lines:
-            // Save current mind map's state to the action stack
-            this.saveState();
-            // End
             return true;
         } else {
             logger.error('fail, this mind map is not editable');
@@ -523,10 +533,6 @@ export default class jsMind {
                     data: [node_id, before_id, parent_id, direction],
                     node: node_id,
                 });
-                // Altered lines:
-                // Save current mind map's state to the action stack
-                this.saveState();
-                // End
             }
         } else {
             logger.error('fail, this mind map is not editable');
@@ -561,6 +567,10 @@ export default class jsMind {
         if (!!this.mind) {
             this.mind.selected = null;
             this.view.select_clear();
+            // Altered lines:
+            // Invoke 'select' event to disable UI buttons
+            this.invoke_event_handle(EventType.select, { evt: 'select_node', data: [], node: '' });
+            // End
         }
     }
     is_node_visible(node) {
