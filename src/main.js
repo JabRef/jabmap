@@ -158,10 +158,10 @@ function toggleButtonsEnabled(buttons, isEnabled) {
 }
 
 // debug button prints current mind map state to console
-printMapToConsoleBtn.onclick = async function () {
-    // print mind map data
-    console.log(jm.get_data());
-}
+// printMapToConsoleBtn.onclick = async function () {
+//     // print mind map data
+//     console.log(jm.get_data());
+// }
 
 // undo - discard the last operation (display the previous state)
 undoBtn.onclick = function () {
