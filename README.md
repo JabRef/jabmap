@@ -12,13 +12,18 @@ Next-Generation scientific mind mapping.
 
 You can find a list of shortcuts at [shortcuts.md](shortcuts.md).
 
+
 ## 🌟 Try It Out!
 
-There are a couple of ways to try out JabMap. The fastest way to just get a grasp of it is on [github pages](https://jabref.github.io/jabmap/). Note that this will merely allow you to create some nodes, edit and tag them. Saving, Loading and JabRef-related features like BibTeX-Nodes and importing attached PDF-files as nodes won't work unless you are running our version of JabRef's HTTP-Server (see [below](##-🤖-getting-the-server-running) for setup) since the mentioned features rely on it.
+There are a couple of ways to try out JabMap. In any case, you first have to start the HTTP-Server on your machine since Saving, Loading and JabRef-related features like BibTeX-Nodes and importing attached PDF-files as nodes won't work unless you are running JabRef's HTTP-Server (see [below](#-getting-the-server-running) for setup). Afterwards check out [github pages](https://jabref.github.io/jabmap/) where you can try JabMap in your browser! 
 
->Note: It's still possible your browser blocks access to the server due to HTTP/HTTPS issues, for the best experience follow the steps below on how to try JabMap running it locally.
+> Note: It's still possible your browser blocks access to the server due to HTTP/HTTPS issues
+> If you see an Error 404 page, this is most likely the cause. Check if the server has started properly or use another browser and try again.
+> 
+> For the best experience follow the steps below on how to try JabMap.
 
-### Running it locally 
+
+### Quick-Start-Guide
 
 The following commands get the code in place and start JabRef and JabMap with the help of a handy wrapper tool called [gg.cmd](https://github.com/eirikb/gg).
 A little terminal magic is required, but don't worry, we have the commands all laid out for you!
@@ -28,13 +33,17 @@ A little terminal magic is required, but don't worry, we have the commands all l
 1. Go to your git-repositories folder and start a new terminal session
 2. `git clone --recurse-submodules https://github.com/JabRef/jabref.git`
 3. `cd jabref`
-4. `git checkout jabmap`
-5. Enable nice wrapper: `curl -L ggcmd.io > gg.cmd`
-6. `sh ./gg.cmd just run-pr 13519`
-7. Wait for JabRef to come up
-8. File > Preferences > Check "HTTP Server"
+4. Enable nice wrapper: `curl -L ggcmd.io > gg.cmd`
+5. `sh ./gg.cmd just run-pr 13519`
+6. Wait for JabRef to come up
+7. Click on "Create example Library"
+8. Save (Button in the top left or <kbd>CTRL/CMD</kbd> + <kbd>S</kbd>)
+9. File > Preferences > Check "HTTP Server"
+
 
 #### JabMap:
+
+After setting up JabRef, you can either use [JabMap on GitHub pages](https://jabref.github.io/jabmap/) or follow these steps to run it locally.
 
 1. Go to your git-repositories folder and start a new terminal session
 2. Clone it: `git clone git@github.com:JabRef/jabmap.git`
@@ -44,7 +53,7 @@ A little terminal magic is required, but don't worry, we have the commands all l
 6. Install dependencies: `sh gg.cmd npm install`
 7. Build: `sh ./gg.cmd npm run build`
 8. Run: `sh ./gg.cmd npm run preview`
-9. Now one can open http://localhost:4173/ and open a library with the corresponding map.
+9. Now you can open http://localhost:4173/ and open a library with the corresponding map.
 
 
 ## 🤖 Getting the server running
@@ -53,11 +62,14 @@ As mentioned above, several features are handled by JabRef's HTTP server. Curren
 
 ### using gg.cmd
 
-If you followed the steps (**running-it-locally**) above, instead of steps 6. - 9. you can simply do the following to start the server without JabRef's GUI:
+If you followed the setup for JabRef [above](#jabref), instead of steps 6. - 9. you can simply do the following to start the server without JabRef's GUI:
 
 ```
 sh ./gg.cmd jbang .jbang/JabSrvLauncher.java
 ```
+
+> Note: this is **not** recommended for trying out JabMap for the first time since it will not allow you to create a new library. Use this only if you already used JabRef before :)
+
 
 ### Starting it from an IDE
 
