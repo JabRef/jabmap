@@ -23,10 +23,8 @@ Afterwards check out [github pages](https://jabref.github.io/jabmap/) where you 
 2. Launch JabRef.
 3. File > Preferences > Check "HTTP Server"
 4. If you don't have any BibTeX files at hand:
-
    1. Click on "Create example Library"
    2. Save (Button in the top left or <kbd>Ctrl/Ccmd</kbd> + <kbd>S</kbd>)
-
 5. Visit <https://jabref.github.io/jabmap/>
 
 Hint: At click on "Save", a `.jmp` file is created next to your `.bib` file.
