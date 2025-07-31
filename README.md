@@ -23,8 +23,8 @@ Afterwards check out [github pages](https://jabref.github.io/jabmap/) where you 
 2. Launch JabRef.
 3. File > Preferences > Check "HTTP Server"
 4. If you don't have any BibTeX files at hand:
-   1. Click on "Create example Library"
-   2. Save (Button in the top left or <kbd>Ctrl/Ccmd</kbd> + <kbd>S</kbd>)
+   1. Click on "Create example library"
+   2. Save (Button in the top left or <kbd>Ctrl/Cmd</kbd> + <kbd>S</kbd>)
 5. Visit <https://jabref.github.io/jabmap/>
 
 Hint: At click on "Save", a `.jmp` file is created next to your `.bib` file.
@@ -42,8 +42,8 @@ A little terminal magic is required, but don't worry, we have the commands all l
 4. Enable nice wrapper: `curl -L ggcmd.io > gg.cmd`
 5. `sh ./gg.cmd just run-gui`
 6. Wait for JabRef to come up
-7. Click on "Create example Library"
-8. Save (Button in the top left or <kbd>CTRL/CMD</kbd> + <kbd>S</kbd>)
+7. Click on "Create example library"
+8. Save (Button in the top left or <kbd>Ctrl/Cmd</kbd> + <kbd>S</kbd>)
 9. File > Preferences > Check "HTTP Server"
 
 #### JabMap
