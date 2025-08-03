@@ -113,7 +113,6 @@ const jm = new jsMind(options);
 jm.add_event_listener((type, data) => {
     if (type === jsMind.event_type.show) {
         addPopoversToBibEntryNodes();
-        jm.select_clear();
 
         redoBtn.disabled = !jm.actionStack.isRedoable;
         undoBtn.disabled = !jm.actionStack.isUndoable;
