@@ -89,13 +89,13 @@ options.shortcut.handles = {
         openBtn.onclick();
     },
     'addBibChild': function (jm, e) {
-        if (!jm.get_selected_node()) {
+        if (!jm.get_selected_node() || jm.get_selected_node().isroot) {
             return;
         }
         addBibEntryAsChildBtn.onclick();
     },
     'addPDFChild': function (jm, e) {
-        if (!jm.get_selected_node()) {
+        if (!jm.get_selected_node() || jm.get_selected_node().isroot) {
             return;
         }
         addPDFModalObject.toggle();
@@ -131,7 +131,7 @@ jm.add_event_listener((type, data) => {
         hidePopovers();
 
         // disable nodes' buttons, if no node's selected
-        let isNodeSelected = !!jm.get_selected_node();
+        let selectedNode = jm.get_selected_node();
         let buttons = [
             newChildBtn,
             newSiblingBtn,
@@ -139,7 +139,11 @@ jm.add_event_listener((type, data) => {
             BibEntryDropdownMenuButton,
             PDFDropDownMenuButton
         ];
-        toggleButtonsEnabled(buttons, isNodeSelected);
+        toggleButtonsEnabled(buttons, !!selectedNode);
+
+        if (selectedNode?.isroot) {
+            toggleButtonsEnabled([newSiblingBtn], false);
+        }
     }
 });
 
@@ -419,6 +423,11 @@ addBibEntryAsSiblingBtn.onclick = async function () {
         });
 }
 
+// disable siblings' option if root's selected
+BibEntryDropdownMenuButton.onclick = function () {
+    addBibEntryAsSiblingBtn.disabled = jm.get_selected_node()?.isroot;
+}
+
 //#endregion
 //#region [PDF Nodes]
 
@@ -503,6 +512,11 @@ addSelectedPDFBtn.onclick = function () {
     // save map state for undo/redo
     jm.saveState();
 };
+
+// disable siblings' option if root's selected
+PDFDropDownMenuButton.onclick = function () {
+    addPDFAsSiblingBtn.disabled = jm.get_selected_node()?.isroot;
+}
 
 //#endregion
 //#region [Icons & Tags]
