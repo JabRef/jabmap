@@ -89,13 +89,13 @@ options.shortcut.handles = {
         openBtn.onclick();
     },
     'addBibChild': function (jm, e) {
-        if (!jm.get_selected_node() || jm.get_selected_node().isroot) {
+        if (!jm.get_selected_node()) {
             return;
         }
         addBibEntryAsChildBtn.onclick();
     },
     'addPDFChild': function (jm, e) {
-        if (!jm.get_selected_node() || jm.get_selected_node().isroot) {
+        if (!jm.get_selected_node()) {
             return;
         }
         addPDFModalObject.toggle();
