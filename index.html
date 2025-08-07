@@ -73,7 +73,6 @@
     .accordion-collapse.show .accordion-body {
       opacity: 1;
     }
-
   </style>
 </head>
 
@@ -86,7 +85,8 @@
         <a class="navbar-brand" href="#">JabMap</a>
 
         <!--Save and Load Buttons-->
-        <button id="openBtn" class="btn btn-light me-2" type="button" data-bs-toggle="modal" title="Open" data-bs-target="#selectMindmapModal">
+        <button id="openBtn" class="btn btn-light me-2" type="button" data-bs-toggle="modal" title="Open"
+          data-bs-target="#selectMindmapModal">
           <i class="bi bi-folder2-open"></i> Open
         </button>
         <button id="saveBtn" class="btn btn-light me-2" type="button" data-bs-toggle="tooltip" title="Save">
@@ -102,28 +102,30 @@
       <div class="d-flex justify-content-center" style="flex-basis: 33%; max-width: 33%;">
         <!--Button class explanation: class = "btn color theme margin to the right (me-2)"-->
         <!--Undo Button-->
-        <button id="undoBtn" class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="Undo">
+        <button id="undoBtn" class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="Undo"
+          disabled>
           <i class="bi bi-arrow-counterclockwise"></i>
         </button>
         <!--Redo Button-->
-        <button id="redoBtn" class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="Redo">
+        <button id="redoBtn" class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="Redo"
+          disabled>
           <i class="bi bi-arrow-clockwise"></i>
         </button>
         <!--New Topic (sibling node) Button-->
         <button id="newSiblingBtn" class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip"
-          title="New sibling node">
+          title="New sibling node" disabled>
           <i class="bi bi-node-plus-fill"></i>
         </button>
         <!--New Subtopic (child node) Button (icon rotated 90 degrees)-->
         <button id="newChildBtn" class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip"
-          title="New child node">
+          title="New child node" disabled>
           <i class="bi bi-diagram-2-fill" style="transform: rotate(-90deg); display: inline-block;"></i>
         </button>
 
         <!--Tags Dropdown-->
         <div class="dropdown">
           <button class="btn btn-secondary dropdown-toggle me-2" type="button" id="tagsDropdownMenuButton"
-            data-bs-toggle="dropdown" data-bs-auto-close="outside">
+            data-bs-toggle="dropdown" data-bs-auto-close="outside" disabled>
             <i class="bi bi-tags"></i>
           </button>
           <div class="dropdown-menu">
@@ -155,7 +157,7 @@
         <!--BibEntry nodes Dropdown-->
         <div class="dropdown">
           <button class="btn btn-secondary dropdown-toggle me-2" id="BibEntryDropdownMenuButton"
-            data-bs-toggle="dropdown">
+            data-bs-toggle="dropdown" disabled>
             <i class="bi bi-file-earmark-text"></i>
           </button>
           <div class="dropdown-menu">
@@ -172,16 +174,20 @@
         </div>
 
         <div class="dropdown">
-          <button class="btn btn-secondary dropdown-toggle me-2" id="PDFDropDownMenuButton" data-bs-toggle="dropdown">
+          <button class="btn btn-secondary dropdown-toggle me-2" id="PDFDropDownMenuButton" data-bs-toggle="dropdown"
+            disabled>
             <i class="bi bi-file-pdf"></i></i>
           </button>
           <div class="dropdown-menu">
             <h6 class="dropdown-header">New PDF node</h6>
-            <button id="addPDFAsSiblingBtn" class="btn dropdown-item" data-bs-toggle="modal" data-bs-target="#selectPDFModal">
+            <button id="addPDFAsSiblingBtn" class="btn dropdown-item" data-bs-toggle="modal"
+              data-bs-target="#selectPDFModal">
               <i class="bi bi-node-plus-fill"> </i> As sibling node
             </button>
-            <button id="addPDFAsChildBtn" class="btn dropdown-item" data-bs-toggle="modal" data-bs-target="#selectPDFModal">
-              <i class="bi bi-diagram-2-fill" style="transform: rotate(-90deg); display: inline-block;"> </i> As child node
+            <button id="addPDFAsChildBtn" class="btn dropdown-item" data-bs-toggle="modal"
+              data-bs-target="#selectPDFModal">
+              <i class="bi bi-diagram-2-fill" style="transform: rotate(-90deg); display: inline-block;"> </i> As child
+              node
               <span class="shortcut">Ctrl + P</span>
             </button>
           </div>
@@ -275,8 +281,7 @@
             <ol class="list-group list-group-flush list-group-numbered">
               <li class="list-group-item">
                 Ensure you followed
-                <a
-                  href="https://github.com/jabref/jabmap/#running-locally">
+                <a href="https://github.com/jabref/jabmap/#running-locally">
                   running it locally</a>
                 step of the documentation.
               </li>
