@@ -138,3 +138,10 @@ On Linux and Mac, there is a bug with npm and optional dependencies (See [this i
 After a successful build you can finally start the app located at `./electron-dist/win-unpacked/JabMap.exe`.
 
 _Optionally you can install it by opening_ `./electron-dist/JabMap Setup 1.0.0.exe`
+
+## Alterantives
+
+Following are known alternatives:
+
+- [Docear Online viewer](https://isg.beel.org/blog/2013/03/21/preview-of-the-docear-online-viewer/)
+- [Docear Desktop](https://docear.org/)
