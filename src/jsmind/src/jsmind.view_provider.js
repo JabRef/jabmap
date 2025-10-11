@@ -505,12 +505,14 @@ export class ViewProvider {
             // Wrapping node's topic
             const maxTopicLength = 45;
             let topic = node.topic;
-            if (topic.length > maxTopicLength) {
-                topic = topic.slice(0, maxTopicLength - 1 - 3) + '...';
+            let applied_icons = node.data.icons || [];
+            if (topic.length + applied_icons.length > maxTopicLength) {
+                // The "5" = '...'.length + 2 chars for left-right padding
+                topic = topic.slice(0, maxTopicLength - 5 - applied_icons.length * 2) + '...';
             }
 
             // Building HTML <img> tags to attach to the node
-            let icons = (node.data.icons || [])
+            let icons = applied_icons
             .map(iconKey => `<img src="${this.resourceManager.TAG_ICONS[iconKey]}" style="width: 16px; height: 16px; margin-right: 2px; vertical-align: middle;">`)
             .join('');
             if (!!node.data.type && node.data.type !== 'Text') {
