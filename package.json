@@ -13,7 +13,7 @@
     "cross-env": "^7.0.3"
   },
   "devDependencies": {
-    "vite": "^6.3.6",
+    "vite": "^6.4.1",
     "electron": "^38.1.0",
     "electron-builder": "^24.13.3"
   },
