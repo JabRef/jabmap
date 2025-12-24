@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>JabMap</title>
+  <style>
+    html,
+    body {
+      background-color: #f8f9fa;
+      height: 100%;
+      margin: 0;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+    }
+
+    nav.navbar {
+      display: flex;
+      flex-shrink: 0;
+    }
+
+    #jsmind_container {
+      display: block;
+      flex-grow: 1;
+      overflow: auto;
+    }
+
+    .dropdown-item .shortcut {
+      color: #6c757d;
+      font-size: 0.9em;
+      margin-left: 1rem;
+    }
+
+    .error-container {
+      height: 100vh;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .error-icon {
+      font-size: 4rem;
+      color: #dc3545;
+    }
+
+    .accordion {
+      width: 400px;
+      text-align: left;
+    }
+
+    .accordion-button::after {
+      margin-left: auto;
+      margin-left: 5;
+    }
+
+    .accordion-collapse {
+      transition: height 0.4s ease, opacity 0.4s ease;
+      overflow: hidden;
+    }
+
+    .accordion-body {
+      transition: opacity 0.4s ease;
+      opacity: 0;
+    }
+
+    .accordion-collapse.show .accordion-body {
+      opacity: 1;
+    }
+  </style>
+  <script type="module" crossorigin src="./assets/index-Cgd3nkJE.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-D7IKWizK.css">
+</head>
+
+<body>
+  <!--Navbar with Buttons-->
+  <nav class="navbar bg-body-tertiary" id="topNavBar">
+    <div class="container-fluid">
+      <div class="d-flex align-items-start" style="flex-basis: 33%; max-width: 33%;">
+        <!--JabMap title-->
+        <a class="navbar-brand" href="#">JabMap</a>
+
+        <!--Save and Load Buttons-->
+        <button id="openBtn" class="btn btn-light me-2" type="button" data-bs-toggle="modal" title="Open"
+          data-bs-target="#selectMindmapModal">
+          <i class="bi bi-folder2-open"></i> Open
+        </button>
+        <button id="saveBtn" class="btn btn-light me-2" type="button" data-bs-toggle="tooltip" title="Save">
+          <i class="bi bi-save"></i> Save
+        </button>
+        <!--Debug button-->
+        <!-- <button id="printMapToConsoleBtn" class="btn btn-light me-2" type="button" data-bs-toggle="tooltip" title="Debug">
+          Debug
+        </button> -->
+      </div>
+
+      <!--Editor buttons-->
+      <div class="d-flex justify-content-center" style="flex-basis: 33%; max-width: 33%;">
+        <!--Button class explanation: class = "btn color theme margin to the right (me-2)"-->
+        <!--Undo Button-->
+        <button id="undoBtn" class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="Undo"
+          disabled>
+          <i class="bi bi-arrow-counterclockwise"></i>
+        </button>
+        <!--Redo Button-->
+        <button id="redoBtn" class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="Redo"
+          disabled>
+          <i class="bi bi-arrow-clockwise"></i>
+        </button>
+        <!--New Topic (sibling node) Button-->
+        <button id="newSiblingBtn" class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip"
+          title="New sibling node" disabled>
+          <i class="bi bi-node-plus-fill"></i>
+        </button>
+        <!--New Subtopic (child node) Button (icon rotated 90 degrees)-->
+        <button id="newChildBtn" class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip"
+          title="New child node" disabled>
+          <i class="bi bi-diagram-2-fill" style="transform: rotate(-90deg); display: inline-block;"></i>
+        </button>
+
+        <!--Tags Dropdown-->
+        <div class="dropdown">
+          <button class="btn btn-secondary dropdown-toggle me-2" type="button" id="tagsDropdownMenuButton"
+            data-bs-toggle="dropdown" data-bs-auto-close="outside" disabled>
+            <i class="bi bi-tags"></i>
+          </button>
+          <div class="dropdown-menu">
+            <h6 class="dropdown-header">Icons for nodes</h6>
+            <button id="iconCycleBtn" class="dropdown-item d-flex justify-content-between">
+              <span>Cycle</span><span class="shortcut">Ctrl + 1</span>
+            </button>
+            <button id="iconStarBtn" class="dropdown-item d-flex justify-content-between">
+              <span>Star</span><span class="shortcut">Ctrl + 2</span>
+            </button>
+            <button id="iconQuestionBtn" class="dropdown-item d-flex justify-content-between">
+              <span>Question</span><span class="shortcut">Ctrl + 3</span>
+            </button>
+            <button id="iconWarningBtn" class="dropdown-item d-flex justify-content-between">
+              <span>Warning</span><span class="shortcut">Ctrl + 6</span>
+            </button>
+            <button id="iconLightbulbBtn" class="dropdown-item d-flex justify-content-between">
+              <span>Lightbulb</span><span class="shortcut">Ctrl + 7</span>
+            </button>
+            <button id="iconGreenFlagBtn" class="dropdown-item d-flex justify-content-between">
+              <span>Green Flag</span><span class="shortcut">Ctrl + 8</span>
+            </button>
+            <button id="iconRedFlagBtn" class="dropdown-item d-flex justify-content-between">
+              <span>Red Flag</span><span class="shortcut">Ctrl + 9</span>
+            </button>
+          </div>
+        </div>
+
+        <!--BibEntry nodes Dropdown-->
+        <div class="dropdown">
+          <button class="btn btn-secondary dropdown-toggle me-2" id="BibEntryDropdownMenuButton"
+            data-bs-toggle="dropdown" disabled>
+            <i class="bi bi-file-earmark-text"></i>
+          </button>
+          <div class="dropdown-menu">
+            <h6 class="dropdown-header">New BibTeX node</h6>
+            <button id="addBibEntryAsSiblingBtn" class="btn dropdown-item">
+              <i class="bi bi-node-plus-fill"> </i> As sibling node
+            </button>
+            <button id="addBibEntryAsChildBtn" class="btn dropdown-item">
+              <i class="bi bi-diagram-2-fill" style="transform: rotate(-90deg); display: inline-block;"> </i> As child
+              node
+              <span class="shortcut">Ctrl + B</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="dropdown">
+          <button class="btn btn-secondary dropdown-toggle me-2" id="PDFDropDownMenuButton" data-bs-toggle="dropdown"
+            disabled>
+            <i class="bi bi-file-pdf"></i></i>
+          </button>
+          <div class="dropdown-menu">
+            <h6 class="dropdown-header">New PDF node</h6>
+            <button id="addPDFAsSiblingBtn" class="btn dropdown-item" data-bs-toggle="modal"
+              data-bs-target="#selectPDFModal">
+              <i class="bi bi-node-plus-fill"> </i> As sibling node
+            </button>
+            <button id="addPDFAsChildBtn" class="btn dropdown-item" data-bs-toggle="modal"
+              data-bs-target="#selectPDFModal">
+              <i class="bi bi-diagram-2-fill" style="transform: rotate(-90deg); display: inline-block;"> </i> As child
+              node
+              <span class="shortcut">Ctrl + P</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+      <div style="flex-basis: 33%; max-width: 33%;"></div>
+    </div>
+  </nav>
+
+  <!--Required jsMind container-->
+  <div id="jsmind_container" style="width:100%;height:100vh;background:#f4f4f4;"></div>
+
+  <!-- Modal for the "Open" dialog-->
+  <div class="modal fade" id="selectMindmapModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Choose a JabMap to open</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="openMindmapInfoText"></div>
+          <select class="form-select" id="openMindmapSelect" size="10"></select>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="openSelectedMapBtn" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+            Open
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for the "Add PDF Nodes" dialog-->
+  <div class="modal fade" id="selectPDFModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="SelectPDFModalLabel">Choose PDFs to add</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="PDFModalBody">
+          <div id="PDFModalInfoText"></div>
+          <select class="form-select" multiple id="addPDFSelect" size="10"></select>
+        </div>
+        <div class="d-flex modal-footer">
+          <button type="button" id="addSelectedPDFBtn" class="btn btn-outline-secondary alig" data-bs-dismiss="modal">
+            Add
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!--A 'connection failed' page-->
+  <div class="error-container" id="noConnectionBlock">
+    <div class="error-icon">⚠️</div>
+    <h1 class="mt-4">Server Connection Failed</h1>
+    <p class="text-muted">Your JabMap couldn’t connect to the server. Here are a few things you can try:</p>
+
+    <div class="accordion" id="tipsAccordion">
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="headingTwo">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#tip2"
+            aria-expanded="false" aria-controls="tip2">
+            🤖 Ensure JabRef server is running
+          </button>
+        </h2>
+        <div id="tip2" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#tipsAccordion">
+          <div class="accordion-body">
+            <ol class="list-group list-group-flush list-group-numbered">
+              <li class="list-group-item">Start your JabRef</li>
+              <li class="list-group-item">Go to File -> Preferences</li>
+              <li class="list-group-item">Check the "Http Server"</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="headingThree">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#tip3"
+            aria-expanded="false" aria-controls="tip3">
+            👾 Verify installation
+          </button>
+        </h2>
+        <div id="tip3" class="accordion-collapse collapse" aria-labelledby="headingThree"
+          data-bs-parent="#tipsAccordion">
+          <div class="accordion-body">
+            <ol class="list-group list-group-flush list-group-numbered">
+              <li class="list-group-item">
+                Ensure you followed
+                <a href="https://github.com/jabref/jabmap/#running-locally">
+                  running it locally</a>
+                step of the documentation.
+              </li>
+              <li class="list-group-item">
+                Then use the <code>gg.cmd</code> as guided in
+                <a href="https://github.com/jabref/jabmap/#using-ggcmd">
+                  the following step</a>.
+              </li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button id="tryAgainBtn" class="btn btn-primary mt-4">Try Again</button>
+  </div>
+
+</body>
+
+</html>
