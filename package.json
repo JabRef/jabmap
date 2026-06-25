@@ -14,7 +14,7 @@
   },
   "devDependencies": {
     "vite": "^6.4.3",
-    "electron": "^38.1.0",
+    "electron": "^42.5.0",
     "electron-builder": "^26.15.3"
   },
   "scripts": {
