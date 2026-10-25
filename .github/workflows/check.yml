@@ -27,6 +27,8 @@ jobs:
       - run: npm ci
       - run: npm run build
       - name: Deploy to GH pages
+        # Only the branch is live; a tag push must not overwrite the site with an older build
+        if: github.ref == 'refs/heads/main'
         uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4.1.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
