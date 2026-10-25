@@ -18,4 +18,8 @@ In case there is no issue present, the pull request implementing the feature is 
 
 - We changed the "New PDF node" dialog to list only the PDFs linked to the selected BibTeX node; the PDF button is disabled for other nodes. [#56](https://github.com/JabRef/jabmap/issues/56)
 
+### Fixed
+
+- We fixed keyboard shortcuts (e.g. <kbd>Ctrl</kbd> + <kbd>1</kbd>) not working after a toolbar button was clicked or a dropdown menu was open. [#25](https://github.com/JabRef/jabmap/issues/25)
+
 [Unreleased]: https://github.com/JabRef/jabmap/compare/main...HEAD
