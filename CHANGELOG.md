@@ -19,6 +19,7 @@ In case there is no issue present, the pull request implementing the feature is 
 
 ### Fixed
 
+- We fixed an error being logged when the "Add BibTeX entry" dialog is closed without selecting an entry, e.g. with an empty library. [#41](https://github.com/JabRef/jabmap/issues/41)
 - We fixed keyboard shortcuts (e.g. <kbd>Ctrl</kbd> + <kbd>1</kbd>) not working after a toolbar button was clicked or a dropdown menu was open. [#25](https://github.com/JabRef/jabmap/issues/25)
 
 [Unreleased]: https://github.com/JabRef/jabmap/compare/main...HEAD
