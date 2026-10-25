@@ -670,6 +670,23 @@ document.addEventListener("keydown", (e) => {
     isJsMindSelected = document.activeElement.classList.contains('jsmind-inner');
 });
 
+// jsMind listens for shortcuts on its own panel, so they stop working once a toolbar
+// button or a Bootstrap dropdown/modal holds the focus. Hand it back to the map after
+// such interactions. Deferred, because Bootstrap re-focuses the dropdown toggle
+// *after* firing hidden.bs.dropdown.
+function focusMap() {
+    setTimeout(() => jm.view.e_panel.focus());
+}
+topNavBar.addEventListener('click', focusMap);
+document.addEventListener('hidden.bs.dropdown', focusMap);
+document.addEventListener('hidden.bs.modal', focusMap);
+// Bootstrap only handles <Escape> while the toggle has the focus, which is no longer the case
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        document.querySelectorAll('.dropdown-toggle.show').forEach((t) => Dropdown.getInstance(t)?.hide());
+    }
+});
+
 // remove focus from active element upon showing / closing modals
 // due to a 'Blocked aria-hidden' warning
 // * More about it in this answer: https://stackoverflow.com/a/79210442/23515071
