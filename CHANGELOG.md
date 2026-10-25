@@ -13,6 +13,7 @@ In case there is no issue present, the pull request implementing the feature is 
 - We added keyboard shortcuts for moving nodes: <kbd>Ctrl</kbd> + arrow keys reorder, nest, lift or switch sides of the selected node. [#50](https://github.com/JabRef/jabmap/issues/50)
 - We added "Show in JabRef" (<kbd>Ctrl</kbd> + <kbd>J</kbd>) to select a BibTeX node's entry in JabRef. [#46](https://github.com/JabRef/jabmap/issues/46)
 - We added this changelog. It is checked by [heylogs](https://github.com/nbbrd/heylogs) in CI. [#103](https://github.com/JabRef/jabmap/pull/103)
+- We added the name of the library the opened mind map belongs to in the top right corner of the toolbar. [#42](https://github.com/JabRef/jabmap/issues/42)
 - We added autosave: after a mind map was opened, every change, undo and redo is saved to JabRef immediately. The "Autosave" toggle in the toolbar switches it off. A failed save turns the "Save" button red. [#36](https://github.com/JabRef/jabmap/issues/36)
 
 ### Changed

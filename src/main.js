@@ -380,6 +380,7 @@ openSelectedMapBtn.onclick = async function () {
     jm.show(loadedMap);
     jm.resetStack();
     isMapOpened = loadRequest.code === REQUEST_RESULT.Success;
+    currentLibraryLabel.textContent = isMapOpened ? httpClient.currentLibrary : '';
 }
 
 //#endregion
