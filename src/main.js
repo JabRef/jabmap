@@ -704,9 +704,14 @@ document.addEventListener("keydown", (e) => {
 // jsMind listens for shortcuts on its own panel, so they stop working once a toolbar
 // button or a Bootstrap dropdown/modal holds the focus. Hand it back to the map after
 // such interactions. Deferred, because Bootstrap re-focuses the dropdown toggle
-// *after* firing hidden.bs.dropdown.
+// *after* firing hidden.bs.dropdown. Not while a node is being edited: the
+// "new node" buttons open the inline editor, which must keep the focus.
 function focusMap() {
-    setTimeout(() => jm.view.e_panel.focus());
+    setTimeout(() => {
+        if (!jm.view.is_editing()) {
+            jm.view.e_panel.focus();
+        }
+    });
 }
 topNavBar.addEventListener('click', focusMap);
 document.addEventListener('hidden.bs.dropdown', focusMap);
