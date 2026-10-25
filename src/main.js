@@ -449,7 +449,7 @@ newChildBtn.onclick = function () {
 async function getBibNodesProperties() {
     // open cayw window and retrieve selected keys
     let selectedKeys = await httpClient.getCiteKeysWithCAYW();
-    if (!selectedKeys) {
+    if (!selectedKeys?.length) {
         console.warn('There\'re no citation keys to create nodes from ( ,_,)');
         return null;
     }
