@@ -164,6 +164,8 @@ const jm = new jsMind(options);
 jm.add_event_listener((type, data) => {
     if (type === jsMind.event_type.show) {
         addPopoversToBibEntryNodes();
+        // a newly shown map has no selection, so the buttons must follow
+        updateNodeButtons();
 
         redoBtn.disabled = !jm.actionStack.isRedoable;
         undoBtn.disabled = !jm.actionStack.isUndoable;
@@ -180,25 +182,31 @@ jm.add_event_listener((type, data) => {
     }
     if (type === jsMind.event_type.select) {
         hidePopovers();
-
-        // disable nodes' buttons, if no node's selected
-        let selectedNode = jm.get_selected_node();
-        let buttons = [
-            newChildBtn,
-            newSiblingBtn,
-            tagsDropdownMenuButton,
-            BibEntryDropdownMenuButton,
-            PDFDropDownMenuButton
-        ];
-        toggleButtonsEnabled(buttons, !!selectedNode);
-
-        if (selectedNode?.isroot) {
-            toggleButtonsEnabled([newSiblingBtn], false);
-        }
-        // PDFs belong to BibTeX entries, so PDF nodes can only be added to BibEntry nodes
-        toggleButtonsEnabled([PDFDropDownMenuButton], isBibEntryNode(selectedNode));
+        updateNodeButtons();
     }
 });
+
+/**
+ * Enables the node-related toolbar buttons according to the current selection.
+ */
+function updateNodeButtons() {
+    // disable nodes' buttons, if no node's selected
+    let selectedNode = jm.get_selected_node();
+    let buttons = [
+        newChildBtn,
+        newSiblingBtn,
+        tagsDropdownMenuButton,
+        BibEntryDropdownMenuButton,
+        PDFDropDownMenuButton
+    ];
+    toggleButtonsEnabled(buttons, !!selectedNode);
+
+    if (selectedNode?.isroot) {
+        toggleButtonsEnabled([newSiblingBtn], false);
+    }
+    // PDFs belong to BibTeX entries, so PDF nodes can only be added to BibEntry nodes
+    toggleButtonsEnabled([PDFDropDownMenuButton], isBibEntryNode(selectedNode));
+}
 
 /**
  * @param { object } node - A jsMind node (or undefined / null).
@@ -508,6 +516,10 @@ let addPDFModalObject = new ModalObject(
 
 // default insertion mode
 let PDFNodeInsertMode = 'child';
+// the BibEntry node the open modal lists PDFs for; a stale response
+// (modal closed and reopened for another entry) must not fill the list
+let PDFModalNode = null;
+let PDFModalRequestId = 0;
 
 // set the insertion mode when the related buttons are clicked
 addPDFAsSiblingBtn.onclick = function () {
@@ -523,12 +535,16 @@ selectPDFModal.addEventListener('show.bs.modal', async () => {
     ModalDesigner.setLayout(addPDFModalObject, MODAL_LAYOUT.Loading);
 
     // getting the list of PDFs linked to the selected BibEntry
-    const selectedNode = jm.get_selected_node();
-    if (!isBibEntryNode(selectedNode)) {
+    PDFModalNode = jm.get_selected_node();
+    if (!isBibEntryNode(PDFModalNode)) {
         ModalDesigner.setLayout(addPDFModalObject, MODAL_LAYOUT.Failed);
         return;
     }
-    let pdfRequest = await httpClient.getPDFFiles(selectedNode.data.citeKey);
+    const requestId = ++PDFModalRequestId;
+    let pdfRequest = await httpClient.getPDFFiles(PDFModalNode.data.citeKey);
+    if (requestId !== PDFModalRequestId) {
+        return;
+    }
     let pdfList = pdfRequest.value;
 
     // update modal's layout according to retrieved list
@@ -544,8 +560,8 @@ selectPDFModal.addEventListener('show.bs.modal', async () => {
 
 // when the "Add" button is clicked: add selected PDF nodes
 addSelectedPDFBtn.onclick = function () {
-    // get the currently selected node in the mind map
-    const selectedNode = jm.get_selected_node();
+    // the listed PDFs belong to the entry the modal was opened for
+    const selectedNode = PDFModalNode;
     if (!selectedNode) {
         console.warn('Fail: No node\'s selected to add PDFs to :(');
         return;

@@ -264,7 +264,7 @@ class HTTPClient {
      *  for more info on the path, see https://docs.jabref.org/finding-sorting-and-cleaning-entries/filelinks
      */
     async getPDFFiles(citationKey){
-        const url = `libraries/${this.currentLibrary}/entries/${citationKey}/files`;
+        const url = `libraries/${this.currentLibrary}/entries/${encodeURIComponent(citationKey)}/files`;
         const options = {
             method: "GET",
             headers: { "Accept": "application/json" }
