@@ -34,6 +34,10 @@ const DefaultOptions = {
             up: 38, 		            // <Up>
             right: 39, 		            // <Right>
             down: 40, 		            // <Down>
+            moveUp: 4096 + 38,          // <Ctrl> + <Up>
+            moveDown: 4096 + 40,        // <Ctrl> + <Down>
+            moveLeft: 4096 + 37,        // <Ctrl> + <Left>
+            moveRight: 4096 + 39,       // <Ctrl> + <Right>
             undo: 4096 + 90,            // <Ctrl> + <Z>
             redo: 4096 + 1024 + 90,     // <Ctrl> + <Shift> + <Z>
             save: 4096 + 83,            // <Ctrl> + <S>
