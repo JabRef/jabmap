@@ -13,7 +13,7 @@ In case there is no issue present, the pull request implementing the feature is 
 - We added keyboard shortcuts for moving nodes: <kbd>Ctrl</kbd> + arrow keys reorder, nest, lift or switch sides of the selected node. [#50](https://github.com/JabRef/jabmap/issues/50)
 - We added this changelog. It is checked by [heylogs](https://github.com/nbbrd/heylogs) in CI. [#103](https://github.com/JabRef/jabmap/pull/103)
 
-- We added autosave: after a mind map was opened, every change, undo and redo is saved to JabRef immediately. A failed save turns the "Save" button red. [#36](https://github.com/JabRef/jabmap/issues/36)
+- We added autosave: after a mind map was opened, every change, undo and redo is saved to JabRef immediately. The "Autosave" toggle in the toolbar switches it off. A failed save turns the "Save" button red. [#36](https://github.com/JabRef/jabmap/issues/36)
 
 ### Changed
 

@@ -275,8 +275,8 @@ let loadMapModalObject = new ModalObject(
     mapsFailText
 );
 
-// off until a map was opened, so the built-in example map never overwrites a library's map
-let isAutosaveEnabled = false;
+// false until a map was opened, so the built-in example map never overwrites a library's map
+let isMapOpened = false;
 let pendingSave = Promise.resolve();
 
 /**
@@ -299,11 +299,26 @@ for (const method of ['saveState', 'undo', 'redo']) {
     const original = jm[method].bind(jm);
     jm[method] = function () {
         original();
-        if (isAutosaveEnabled) {
+        if (isMapOpened && autosaveCheck.checked) {
             saveMap();
         }
     };
 }
+
+// storage can be unavailable (e.g., private windows), the toggle then just isn't remembered
+try {
+    autosaveCheck.checked = localStorage.getItem('autosave') !== 'false';
+} catch (e) { }
+
+autosaveCheck.onchange = function () {
+    try {
+        localStorage.setItem('autosave', autosaveCheck.checked);
+    } catch (e) { }
+    // switching on saves right away, so changes made while it was off are not left behind
+    if (isMapOpened && autosaveCheck.checked) {
+        saveMap();
+    }
+};
 
 // save - sends mind map's content to JabRef's HTTP server
 saveBtn.onclick = saveMap;
@@ -355,10 +370,10 @@ openSelectedMapBtn.onclick = async function () {
     // display the retrieved mind map
     // * Note: on a failed load the current library is unchanged,
     // * so autosaving the default map would overwrite that library's map
-    isAutosaveEnabled = false;
+    isMapOpened = false;
     jm.show(loadedMap);
     jm.resetStack();
-    isAutosaveEnabled = loadRequest.code === REQUEST_RESULT.Success;
+    isMapOpened = loadRequest.code === REQUEST_RESULT.Success;
 }
 
 //#endregion
