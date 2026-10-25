@@ -56,6 +56,12 @@ export function mergeMaps(base, local, server) {
             continue;
         }
 
+        // a move on exactly one side wins, a move on both sides keeps the local one
+        const position = samePosition(inL, inB) ? inS : inL;
+        if (!samePosition(position, inB) && !samePosition(inL, inB) && !samePosition(inL, inS)) {
+            notes.push(`"${inL.node.topic}" was moved on both sides; kept the local position.`);
+        }
+
         const localChanged = !sameContent(inB.node, inL.node);
         const serverChanged = !sameContent(inB.node, inS.node);
         let node = inL.node;
@@ -64,27 +70,34 @@ export function mergeMaps(base, local, server) {
         } else if (serverChanged && localChanged && !sameContent(inL.node, inS.node)) {
             const copy = { ...inS.node, id: newId() };
             copy.icons = [...new Set([...(copy.icons ?? []), CONFLICT_ICON])];
-            extras.push({ afterId: id, entry: { node: copy, parentId: inL.parentId } });
+            extras.push({ afterId: id, entry: { node: copy, parentId: position.parentId, direction: position.direction } });
             notes.push(`"${inL.node.topic}" was edited on both sides; the server's version was added next to it.`);
         }
-
-        // a move on exactly one side wins, a move on both sides keeps the local one
-        const parentId = inL.parentId === inB.parentId ? inS.parentId : inL.parentId;
-        if (parentId !== inB.parentId && inL.parentId !== inB.parentId && inL.parentId !== inS.parentId) {
-            notes.push(`"${node.topic}" was moved on both sides; kept the local position.`);
-        }
-        merged.set(id, { node, parentId });
+        merged.set(id, { node, parentId: position.parentId, direction: position.direction });
     }
 
-    // sibling order: local order first, server-only nodes appended in server order
+    // sibling order: the side that reordered wins, local wins when both did;
+    // nodes moved in from elsewhere go to the end
     const order = new Map();
     for (const [id, entry] of merged) {
         const siblings = order.get(entry.parentId) ?? [];
         siblings.push(id);
         order.set(entry.parentId, siblings);
     }
-    const rank = (id) => (l.has(id) ? l.get(id).index : s.get(id).index + l.size);
-    for (const siblings of order.values()) {
+    const reordered = (flat, parentId) => {
+        const before = childIds(b, parentId).filter((id) => flat.has(id));
+        return childIds(flat, parentId).filter((id) => b.has(id)).join() !== before.join();
+    };
+    for (const [parentId, siblings] of order) {
+        const serverWins = !reordered(l, parentId) && reordered(s, parentId);
+        const preferred = childIds(serverWins ? s : l, parentId);
+        const other = childIds(serverWins ? l : s, parentId);
+        const rank = (id) => {
+            if (preferred.includes(id)) {
+                return preferred.indexOf(id);
+            }
+            return other.includes(id) ? preferred.length + other.indexOf(id) : Infinity;
+        };
         siblings.sort((x, y) => rank(x) - rank(y));
     }
     for (const { afterId, entry } of extras) {
@@ -100,6 +113,9 @@ export function mergeMaps(base, local, server) {
     const build = (id) => {
         built.add(id);
         const { children, ...node } = merged.get(id).node;
+        if (merged.get(id).direction) {
+            node.direction = merged.get(id).direction;
+        }
         const childIds = (order.get(id) ?? []).filter((c) => !built.has(c));
         if (childIds.length > 0) {
             node.children = childIds.map(build);
@@ -119,20 +135,32 @@ export function mergeMaps(base, local, server) {
 }
 
 /**
- * @returns Map of id -> `{ node, parentId, index }` for every node of the tree.
+ * @returns Map of id -> `{ node, parentId, direction, index }` for every node of the tree.
  */
 function flatten(root) {
     const flat = new Map();
     const visit = (node, parentId, index) => {
-        flat.set(node.id, { node, parentId, index });
+        flat.set(node.id, { node, parentId, direction: node.direction, index });
         (node.children ?? []).forEach((child, i) => visit(child, node.id, i));
     };
     visit(root, null, 0);
     return flat;
 }
 
+function childIds(flat, parentId) {
+    return [...flat.entries()]
+        .filter(([, entry]) => entry.parentId === parentId)
+        .sort(([, x], [, y]) => x.index - y.index)
+        .map(([id]) => id);
+}
+
 function sameNode(a, b) {
-    return a.parentId === b.parentId && sameContent(a.node, b.node);
+    return samePosition(a, b) && sameContent(a.node, b.node);
+}
+
+// a root child's side (direction) is part of its position, like its parent
+function samePosition(a, b) {
+    return a.parentId === b.parentId && (a.direction ?? null) === (b.direction ?? null);
 }
 
 function sameContent(a, b) {

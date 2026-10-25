@@ -68,3 +68,40 @@ test('key order does not count as a change', () => {
     assert.equal(find(merged.data, 'a').topic, 'A theirs');
     assert.deepEqual(notes, []);
 });
+
+test('a conflict copy follows its twin to the server-side parent', () => {
+    const base = map(node('a', 'A'), node('b', 'B', [node('c', 'C')]));
+    const local = map(node('a', 'A'), node('b', 'B', [node('c', 'C mine')]));
+    const server = map(node('a', 'A', [node('c', 'C theirs')]), node('b', 'B')); // edit and move c
+
+    const { map: merged, notes } = mergeMaps(base, local, server);
+    const [mine, theirs] = find(merged.data, 'a').children;
+    assert.equal(mine.topic, 'C mine');
+    assert.equal(theirs.topic, 'C theirs');
+    assert.equal(find(merged.data, 'b').children, undefined);
+    assert.equal(notes.length, 1);
+});
+
+test('a side switch on one side survives an edit on the other', () => {
+    const base = map({ ...node('a', 'A'), direction: 'right' });
+    const local = map({ ...node('a', 'A mine'), direction: 'right' });
+    const server = map({ ...node('a', 'A'), direction: 'left' });
+
+    const { map: merged, notes } = mergeMaps(base, local, server);
+    assert.equal(find(merged.data, 'a').topic, 'A mine');
+    assert.equal(find(merged.data, 'a').direction, 'left');
+    assert.deepEqual(notes, []);
+});
+
+test('a server-side reorder survives a local edit', () => {
+    const base = map(node('a', 'A'), node('b', 'B'), node('c', 'C'));
+    const local = map(node('a', 'A mine'), node('b', 'B'), node('c', 'C'));
+    const server = map(node('c', 'C'), node('a', 'A'), node('b', 'B'));
+
+    const { map: merged } = mergeMaps(base, local, server);
+    assert.deepEqual(ids(merged.data), ['root', 'c', 'a', 'b']);
+
+    // both reordered: local order wins
+    const local2 = map(node('b', 'B'), node('a', 'A'), node('c', 'C'));
+    assert.deepEqual(ids(mergeMaps(base, local2, server).map.data), ['root', 'b', 'a', 'c']);
+});

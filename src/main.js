@@ -297,29 +297,43 @@ let savedMap = null;
  */
 function saveMap() {
     pendingSave = pendingSave.then(async () => {
+        // the user may open another map while this save waits for the server
+        let library = httpClient.currentLibrary;
+        let isCurrent = () => library === httpClient.currentLibrary;
         let mindMap = jm.get_data();
+        let hasFailed = false;
         // ponytail: check-then-write, not an atomic compare-and-set; an ETag on
         // the server closes the remaining millisecond window if it ever matters
         if (savedMap) {
-            let serverRequest = await httpClient.loadMap(httpClient.currentLibrary);
+            let serverRequest = await httpClient.loadMap(library);
             let serverMap = serverRequest.value?.map;
-            NodeExtender.extendNode(serverMap?.data);
-            if (serverRequest.code === REQUEST_RESULT.Success && serverMap &&
-                JSON.stringify(serverMap) !== JSON.stringify(savedMap)) {
+            // a map that cannot be read must not be overwritten blindly
+            hasFailed = serverRequest.code !== REQUEST_RESULT.Success || !serverMap?.data?.id;
+            if (!hasFailed) {
+                NodeExtender.extendNode(serverMap.data);
+            }
+            if (!hasFailed && JSON.stringify(serverMap) !== JSON.stringify(savedMap)) {
                 let { map, notes } = mergeMaps(savedMap, mindMap, serverMap);
                 mindMap = map;
-                jm.show(mindMap);
-                jm.saveState();
-                notes.forEach((note) => console.warn(note));
-                showToast(notes.length > 0 ?
-                    `Merged changes from the server, ${notes.length} needed attention (see console).` :
-                    'Merged changes from the server.');
+                if (isCurrent()) {
+                    // the server's state is now part of the shown map, so it is
+                    // the base from here on, even if the write below fails
+                    savedMap = structuredClone(serverMap);
+                    jm.show(mindMap);
+                    jm.saveState();
+                    notes.forEach((note) => console.warn(note));
+                    showToast(notes.length > 0 ?
+                        `Merged changes from the server, ${notes.length} needed attention (see console).` :
+                        'Merged changes from the server.');
+                }
             }
         }
 
-        let saveRequest = await httpClient.saveMap(mindMap);
-        let hasFailed = saveRequest.code !== REQUEST_RESULT.Success;
         if (!hasFailed) {
+            let saveRequest = await httpClient.saveMap(mindMap, library);
+            hasFailed = saveRequest.code !== REQUEST_RESULT.Success;
+        }
+        if (!hasFailed && isCurrent()) {
             savedMap = structuredClone(mindMap);
         }
         saveBtn.classList.toggle('btn-danger', hasFailed);
