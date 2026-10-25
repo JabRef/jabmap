@@ -275,16 +275,38 @@ let loadMapModalObject = new ModalObject(
     mapsFailText
 );
 
-// save - sends mind map's content to JabRef's HTTP server
-saveBtn.onclick = async function () {
-    let mindMap = jm.get_data();
-    if (!httpClient || !mindMap) {
-        console.error('Error: Cannot save mind map.');
-        return;
-    }
+// off until a map was opened, so the built-in example map never overwrites a library's map
+let isAutosaveEnabled = false;
+let pendingSave = Promise.resolve();
 
-    httpClient.saveMap(mindMap);
-};
+/**
+ * Sends the displayed mind map to JabRef's HTTP server.
+ * Saves run one after another, so an older state never overwrites a newer one.
+ * A failed save turns the save button red until the next successful one.
+ */
+function saveMap() {
+    pendingSave = pendingSave.then(async () => {
+        let saveRequest = await httpClient.saveMap(jm.get_data());
+        let hasFailed = saveRequest.code !== REQUEST_RESULT.Success;
+        saveBtn.classList.toggle('btn-danger', hasFailed);
+        saveBtn.classList.toggle('btn-light', !hasFailed);
+        saveBtn.title = hasFailed ? 'Saving failed. Click to retry.' : 'Save';
+    });
+}
+
+// every change, undo and redo passes through these, so autosave hooks in here
+for (const method of ['saveState', 'undo', 'redo']) {
+    const original = jm[method].bind(jm);
+    jm[method] = function () {
+        original();
+        if (isAutosaveEnabled) {
+            saveMap();
+        }
+    };
+}
+
+// save - sends mind map's content to JabRef's HTTP server
+saveBtn.onclick = saveMap;
 
 // open - opens a dialog to select available mind maps
 openBtn.onclick = async function () {
@@ -331,8 +353,12 @@ openSelectedMapBtn.onclick = async function () {
     NodeExtender.extendNode(loadedMap.data);
 
     // display the retrieved mind map
+    // * Note: on a failed load the current library is unchanged,
+    // * so autosaving the default map would overwrite that library's map
+    isAutosaveEnabled = false;
     jm.show(loadedMap);
     jm.resetStack();
+    isAutosaveEnabled = loadRequest.code === REQUEST_RESULT.Success;
 }
 
 //#endregion
