@@ -244,7 +244,8 @@ class HTTPClient {
     }
 
     /**
-     * Requests a list of all local pdf files from the current library.
+     * Requests the local pdf files linked to one BibEntry of the current library.
+     * @param { string } citationKey - The citation key (identifier) of the entry.
      * @returns A result object of following structure:
      * - code: the status of the request defined by REQUEST_RESULT enum.
      * - value: null in case the request failed
@@ -262,8 +263,8 @@ class HTTPClient {
      *  ```
      *  for more info on the path, see https://docs.jabref.org/finding-sorting-and-cleaning-entries/filelinks
      */
-    async getPDFFiles(){
-        const url = `libraries/${this.currentLibrary}/entries/pdffiles`;
+    async getPDFFiles(citationKey){
+        const url = `libraries/${this.currentLibrary}/entries/${encodeURIComponent(citationKey)}/files`;
         const options = {
             method: "GET",
             headers: { "Accept": "application/json" }
