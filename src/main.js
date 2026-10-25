@@ -145,7 +145,7 @@ function moveSideways(jm, direction) {
             jm.expand_node(prev);
         }
     } else if (node.parent.isroot) {
-        jm.move_node(node.id, null, node.parent.id, direction);
+        jm.move_node(node.id, '_last_', node.parent.id, direction);
     } else {
         let parent = node.parent;
         let after = jm.find_node_after(parent);
