@@ -11,6 +11,7 @@ For these shortcuts, you have to first select a node by clicking on it.
 | <kbd>CTRL</kbd> + <kbd>ENTER</kbd> or <kbd>INSERT</kbd>| Create a new child text node
 | <kbd>CTRL</kbd> + <kbd>B</kbd>| Create a new child BibTeX node
 | <kbd>CTRL</kbd> + <kbd>P</kbd>| Create a new child PDF node (BibTeX node selected)
+| <kbd>CTRL</kbd> + <kbd>J</kbd>| Select the entry in JabRef and bring JabRef to the front (BibTeX node selected)
 |<kbd>ENTER</kbd> | Create a new sibling node
 | <kbd>F2</kbd> or _Double Click_ | Change node topic
 | <kbd>DELETE</kbd> or <kbd>BACKSPACE</kbd>  | Delete node

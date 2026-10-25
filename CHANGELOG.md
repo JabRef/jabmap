@@ -11,6 +11,7 @@ In case there is no issue present, the pull request implementing the feature is 
 ### Added
 
 - We added keyboard shortcuts for moving nodes: <kbd>Ctrl</kbd> + arrow keys reorder, nest, lift or switch sides of the selected node. [#50](https://github.com/JabRef/jabmap/issues/50)
+- We added "Show in JabRef" (<kbd>Ctrl</kbd> + <kbd>J</kbd>) to select a BibTeX node's entry in JabRef. [#46](https://github.com/JabRef/jabmap/issues/46)
 - We added this changelog. It is checked by [heylogs](https://github.com/nbbrd/heylogs) in CI. [#103](https://github.com/JabRef/jabmap/pull/103)
 
 ### Changed
