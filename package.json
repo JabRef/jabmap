@@ -8,14 +8,12 @@
     "@electron-toolkit/utils": "^4.0.0",
     "@popperjs/core": "^2.11.8",
     "bootstrap": "^5.3.6",
-    "bootstrap-icons": "^1.13.2",
-    "concurrently": "^9.2.0",
-    "cross-env": "^7.0.3"
+    "bootstrap-icons": "^1.13.2"
   },
   "devDependencies": {
-    "vite": "^6.4.4",
     "electron": "^44.9.2",
-    "electron-builder": "^26.18.0"
+    "electron-builder": "^26.18.0",
+    "vite": "^6.4.4"
   },
   "scripts": {
     "dev": "vite",
