@@ -100,7 +100,58 @@ options.shortcut.handles = {
         }
         addPDFModalObject.toggle();
         addPDFAsChildBtn.onclick();
+    },
+    'moveUp': function (jm, e) {
+        let node = jm.get_selected_node();
+        if (!node || node.isroot) {
+            return;
+        }
+        let prev = jm.find_node_before(node);
+        if (prev) {
+            jm.move_node(node.id, prev.id, node.parent.id, node.direction);
+        }
+    },
+    'moveDown': function (jm, e) {
+        let node = jm.get_selected_node();
+        if (!node || node.isroot) {
+            return;
+        }
+        let next = jm.find_node_after(node);
+        if (next) {
+            let after = jm.find_node_after(next);
+            jm.move_node(node.id, after ? after.id : '_last_', node.parent.id, node.direction);
+        }
+    },
+    'moveLeft': function (jm, e) {
+        moveSideways(jm, jsMind.direction.left);
+    },
+    'moveRight': function (jm, e) {
+        moveSideways(jm, jsMind.direction.right);
     }
+}
+
+// Moving away from the root nests the node under its previous sibling,
+// moving towards the root lifts it next to its parent.
+// A direct child of the root moving towards the root switches sides instead.
+function moveSideways(jm, direction) {
+    let node = jm.get_selected_node();
+    if (!node || node.isroot) {
+        return;
+    }
+    if (node.direction === direction) {
+        let prev = jm.find_node_before(node);
+        if (prev) {
+            jm.move_node(node.id, '_last_', prev.id, direction);
+            jm.expand_node(prev);
+        }
+    } else if (node.parent.isroot) {
+        jm.move_node(node.id, null, node.parent.id, direction);
+    } else {
+        let parent = node.parent;
+        let after = jm.find_node_after(parent);
+        jm.move_node(node.id, after ? after.id : '_last_', parent.parent.id, parent.direction);
+    }
+    jm.select_node(node);
 }
 // extend the default mind map
 NodeExtender.extendNode(mind.data);
