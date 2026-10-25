@@ -1,6 +1,6 @@
 import '@popperjs/core';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Dropdown, Popover } from 'bootstrap';
+import { Dropdown, Popover, Toast } from 'bootstrap';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 import jsMind from './jsmind/src/jsmind.js';
@@ -16,6 +16,7 @@ import { ModalObject } from './modals/ModalObject.js';
 import { DefaultMap, FelixMap } from './mindPresets/DefaultMindMaps.js';
 import { DefaultOptions, NoEditOptions } from './mindPresets/DefaultMindOptions.js';
 import { NodeExtender } from './mindPresets/NodeExtender.js';
+import { mergeMaps } from './MapMerger.js';
 
 //#region [General Setup]
 // * This region contains declaration of most basic instances
@@ -275,7 +276,11 @@ let loadMapModalObject = new ModalObject(
     mapsFailText
 );
 
-// save - sends mind map's content to JabRef's HTTP server
+// the map as it was last loaded from or saved to the server: the common base
+// for merging in changes someone else saved in the meantime
+let savedMap = null;
+
+// save - merges in what changed on the server, then sends the result
 saveBtn.onclick = async function () {
     let mindMap = jm.get_data();
     if (!httpClient || !mindMap) {
@@ -283,8 +288,43 @@ saveBtn.onclick = async function () {
         return;
     }
 
-    httpClient.saveMap(mindMap);
+    let message = 'Saved.';
+    // ponytail: check-then-write, not an atomic compare-and-set; an ETag on
+    // the server closes the remaining millisecond window if it ever matters
+    if (savedMap) {
+        let serverRequest = await httpClient.loadMap(httpClient.currentLibrary);
+        let serverMap = serverRequest.value?.map;
+        NodeExtender.extendNode(serverMap?.data);
+        if (serverRequest.code === REQUEST_RESULT.Success && serverMap &&
+            JSON.stringify(serverMap) !== JSON.stringify(savedMap)) {
+            let { map, notes } = mergeMaps(savedMap, mindMap, serverMap);
+            mindMap = map;
+            jm.show(mindMap);
+            jm.saveState();
+            notes.forEach((note) => console.warn(note));
+            message = notes.length > 0 ?
+                `Saved. Merged changes from the server, ${notes.length} needed attention (see console).` :
+                'Saved. Merged changes from the server.';
+        }
+    }
+
+    let saveRequest = await httpClient.saveMap(mindMap);
+    if (saveRequest.code !== REQUEST_RESULT.Success) {
+        showToast('Saving failed. Is JabRef running?');
+        return;
+    }
+    savedMap = structuredClone(mindMap);
+    showToast(message);
 };
+
+/**
+ * Shows a short message in the bottom right corner.
+ * @param { string } text - The message.
+ */
+function showToast(text) {
+    saveToast.querySelector('.toast-body').innerText = text;
+    Toast.getOrCreateInstance(saveToast).show();
+}
 
 // open - opens a dialog to select available mind maps
 openBtn.onclick = async function () {
@@ -329,6 +369,7 @@ openSelectedMapBtn.onclick = async function () {
     // if no mind map exists, show the default one
     let loadedMap = loadRequest.value?.map ?? mind;
     NodeExtender.extendNode(loadedMap.data);
+    savedMap = loadRequest.code === REQUEST_RESULT.Success ? structuredClone(loadedMap) : null;
 
     // display the retrieved mind map
     jm.show(loadedMap);
