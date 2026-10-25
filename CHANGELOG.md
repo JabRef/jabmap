@@ -20,6 +20,7 @@ In case there is no issue present, the pull request implementing the feature is 
 ### Fixed
 
 - We fixed keyboard shortcuts (e.g. <kbd>Ctrl</kbd> + <kbd>1</kbd>) not working after a toolbar button was clicked or a dropdown menu was open. [#25](https://github.com/JabRef/jabmap/issues/25)
+- We fixed the published JabMap at GitHub Pages briefly showing builds of unmerged pull requests. [#115](https://github.com/JabRef/jabmap/pull/115)
 
 ## [2025.10.11] - 2025-10-11
 
