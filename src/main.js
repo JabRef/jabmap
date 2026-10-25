@@ -1,6 +1,6 @@
 import '@popperjs/core';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Dropdown, Popover } from 'bootstrap';
+import { Dropdown, Popover, Toast } from 'bootstrap';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 import jsMind from './jsmind/src/jsmind.js';
@@ -289,6 +289,7 @@ let pendingSave = Promise.resolve();
  * Sends the displayed mind map to JabRef's HTTP server.
  * Saves run one after another, so an older state never overwrites a newer one.
  * A failed save turns the save button red until the next successful one.
+ * A successful one is confirmed by a toast, unless autosave is on.
  */
 function saveMap() {
     pendingSave = pendingSave.then(async () => {
@@ -297,6 +298,10 @@ function saveMap() {
         saveBtn.classList.toggle('btn-danger', hasFailed);
         saveBtn.classList.toggle('btn-light', !hasFailed);
         saveBtn.title = hasFailed ? 'Saving failed. Click to retry.' : 'Save';
+        // with autosave on, saves happen constantly and a toast each time would be noise
+        if (!hasFailed && !autosaveCheck.checked) {
+            Toast.getOrCreateInstance(savedToast).show();
+        }
     });
 }
 
