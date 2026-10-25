@@ -272,6 +272,26 @@ class HTTPClient {
 
         return this.#performRequest(url, options);
     }
+
+    /**
+     * Selects a BibEntry in JabRef's GUI and brings JabRef's window to the front.
+     * Needs JabRef's GUI; jabsrv alone rejects these commands.
+     * @param { string } citationKey - The citation key (identifier) of the entry.
+     * @returns A result object of the same structure as other requests (value is always null).
+     */
+    async selectEntryInJabRef(citationKey) {
+        const options = {
+            method: "POST",
+            headers: { "Content-Type": "application/json" }
+        };
+
+        const selectRequest = await this.#performRequest("commands",
+            { ...options, body: JSON.stringify({ command: "selectentries", citationKeys: [citationKey] }) });
+        if (selectRequest.code !== REQUEST_RESULT.Success) {
+            return selectRequest;
+        }
+        return this.#performRequest("commands", { ...options, body: JSON.stringify({ command: "focus" }) });
+    }
 }
 
 const REQUEST_RESULT = Object.freeze({

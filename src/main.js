@@ -94,6 +94,12 @@ options.shortcut.handles = {
         }
         addBibEntryAsChildBtn.onclick();
     },
+    'showInJabRef': function (jm, e) {
+        if (!isBibEntryNode(jm.get_selected_node())) {
+            return;
+        }
+        showInJabRefBtn.onclick();
+    },
     'addPDFChild': function (jm, e) {
         if (!isBibEntryNode(jm.get_selected_node())) {
             return;
@@ -205,7 +211,7 @@ function updateNodeButtons() {
         toggleButtonsEnabled([newSiblingBtn], false);
     }
     // PDFs belong to BibTeX entries, so PDF nodes can only be added to BibEntry nodes
-    toggleButtonsEnabled([PDFDropDownMenuButton], isBibEntryNode(selectedNode));
+    toggleButtonsEnabled([PDFDropDownMenuButton, showInJabRefBtn], isBibEntryNode(selectedNode));
 }
 
 /**
@@ -532,6 +538,14 @@ addBibEntryAsSiblingBtn.onclick = async function () {
             jm.insert_node_after(selectedNode, id, topic, data);
         });
 }
+
+showInJabRefBtn.onclick = async function () {
+    const citeKey = jm.get_selected_node()?.data?.citeKey;
+    const selectRequest = await httpClient.selectEntryInJabRef(citeKey);
+    if (selectRequest.code !== REQUEST_RESULT.Success) {
+        console.warn(`Fail: Could not show ${citeKey} in JabRef ( ,_,)`);
+    }
+};
 
 // disable siblings' option if root's selected
 BibEntryDropdownMenuButton.onclick = function () {
