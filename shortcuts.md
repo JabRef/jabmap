@@ -15,6 +15,8 @@ For these shortcuts, you have to first select a node by clicking on it.
 | <kbd>F2</kbd> or _Double Click_ | Change node topic
 | <kbd>DELETE</kbd> or <kbd>BACKSPACE</kbd>  | Delete node
 | <kbd>↑</kbd> <kbd>←</kbd> <kbd>→</kbd> <kbd>↓</kbd>  | Change selected node
+| <kbd>CTRL</kbd> + <kbd>↑</kbd> / <kbd>↓</kbd>  | Move node up / down among its siblings
+| <kbd>CTRL</kbd> + <kbd>←</kbd> / <kbd>→</kbd>  | Move node away from the root (nest under previous sibling) or towards it (lift next to parent); children of the root switch sides
 | <kbd>CTRL</kbd> + <kbd>1</kbd> … <kbd>9</kbd> | Toggle Tag/Highlight
 
 ## Other
