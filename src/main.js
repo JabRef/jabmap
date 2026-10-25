@@ -95,6 +95,12 @@ options.shortcut.handles = {
         }
         addBibEntryAsChildBtn.onclick();
     },
+    'showInJabRef': function (jm, e) {
+        if (!isBibEntryNode(jm.get_selected_node())) {
+            return;
+        }
+        showInJabRefBtn.onclick();
+    },
     'addPDFChild': function (jm, e) {
         if (!isBibEntryNode(jm.get_selected_node())) {
             return;
@@ -206,7 +212,7 @@ function updateNodeButtons() {
         toggleButtonsEnabled([newSiblingBtn], false);
     }
     // PDFs belong to BibTeX entries, so PDF nodes can only be added to BibEntry nodes
-    toggleButtonsEnabled([PDFDropDownMenuButton], isBibEntryNode(selectedNode));
+    toggleButtonsEnabled([PDFDropDownMenuButton, showInJabRefBtn], isBibEntryNode(selectedNode));
 }
 
 /**
@@ -276,46 +282,80 @@ let loadMapModalObject = new ModalObject(
     mapsFailText
 );
 
+// false until a map was opened, so the built-in example map never overwrites a library's map
+let isMapOpened = false;
+let pendingSave = Promise.resolve();
 // the map as it was last loaded from or saved to the server: the common base
 // for merging in changes someone else saved in the meantime
 let savedMap = null;
 
-// save - merges in what changed on the server, then sends the result
-saveBtn.onclick = async function () {
-    let mindMap = jm.get_data();
-    if (!httpClient || !mindMap) {
-        console.error('Error: Cannot save mind map.');
-        return;
-    }
-
-    let message = 'Saved.';
-    // ponytail: check-then-write, not an atomic compare-and-set; an ETag on
-    // the server closes the remaining millisecond window if it ever matters
-    if (savedMap) {
-        let serverRequest = await httpClient.loadMap(httpClient.currentLibrary);
-        let serverMap = serverRequest.value?.map;
-        NodeExtender.extendNode(serverMap?.data);
-        if (serverRequest.code === REQUEST_RESULT.Success && serverMap &&
-            JSON.stringify(serverMap) !== JSON.stringify(savedMap)) {
-            let { map, notes } = mergeMaps(savedMap, mindMap, serverMap);
-            mindMap = map;
-            jm.show(mindMap);
-            jm.saveState();
-            notes.forEach((note) => console.warn(note));
-            message = notes.length > 0 ?
-                `Saved. Merged changes from the server, ${notes.length} needed attention (see console).` :
-                'Saved. Merged changes from the server.';
+/**
+ * Sends the displayed mind map to JabRef's HTTP server, after merging in
+ * whatever someone else saved there since the map was loaded.
+ * Saves run one after another, so an older state never overwrites a newer one.
+ * A failed save turns the save button red until the next successful one.
+ */
+function saveMap() {
+    pendingSave = pendingSave.then(async () => {
+        let mindMap = jm.get_data();
+        // ponytail: check-then-write, not an atomic compare-and-set; an ETag on
+        // the server closes the remaining millisecond window if it ever matters
+        if (savedMap) {
+            let serverRequest = await httpClient.loadMap(httpClient.currentLibrary);
+            let serverMap = serverRequest.value?.map;
+            NodeExtender.extendNode(serverMap?.data);
+            if (serverRequest.code === REQUEST_RESULT.Success && serverMap &&
+                JSON.stringify(serverMap) !== JSON.stringify(savedMap)) {
+                let { map, notes } = mergeMaps(savedMap, mindMap, serverMap);
+                mindMap = map;
+                jm.show(mindMap);
+                jm.saveState();
+                notes.forEach((note) => console.warn(note));
+                showToast(notes.length > 0 ?
+                    `Merged changes from the server, ${notes.length} needed attention (see console).` :
+                    'Merged changes from the server.');
+            }
         }
-    }
 
-    let saveRequest = await httpClient.saveMap(mindMap);
-    if (saveRequest.code !== REQUEST_RESULT.Success) {
-        showToast('Saving failed. Is JabRef running?');
-        return;
+        let saveRequest = await httpClient.saveMap(mindMap);
+        let hasFailed = saveRequest.code !== REQUEST_RESULT.Success;
+        if (!hasFailed) {
+            savedMap = structuredClone(mindMap);
+        }
+        saveBtn.classList.toggle('btn-danger', hasFailed);
+        saveBtn.classList.toggle('btn-light', !hasFailed);
+        saveBtn.title = hasFailed ? 'Saving failed. Click to retry.' : 'Save';
+    });
+}
+
+// every change, undo and redo passes through these, so autosave hooks in here
+for (const method of ['saveState', 'undo', 'redo']) {
+    const original = jm[method].bind(jm);
+    jm[method] = function () {
+        original();
+        if (isMapOpened && autosaveCheck.checked) {
+            saveMap();
+        }
+    };
+}
+
+// storage can be unavailable (e.g., private windows), the toggle then just isn't remembered
+try {
+    autosaveCheck.checked = localStorage.getItem('autosave') !== 'false';
+} catch (e) { }
+
+autosaveCheck.onchange = function () {
+    try {
+        localStorage.setItem('autosave', autosaveCheck.checked);
+    } catch (e) { }
+    // switching on saves right away, so changes made while it was off are not left behind
+    if (isMapOpened && autosaveCheck.checked) {
+        saveMap();
     }
-    savedMap = structuredClone(mindMap);
-    showToast(message);
 };
+
+// save - sends mind map's content to JabRef's HTTP server
+saveBtn.onclick = saveMap;
 
 /**
  * Shows a short message in the bottom right corner.
@@ -372,8 +412,12 @@ openSelectedMapBtn.onclick = async function () {
     savedMap = loadRequest.code === REQUEST_RESULT.Success ? structuredClone(loadedMap) : null;
 
     // display the retrieved mind map
+    // * Note: on a failed load the current library is unchanged,
+    // * so autosaving the default map would overwrite that library's map
+    isMapOpened = false;
     jm.show(loadedMap);
     jm.resetStack();
+    isMapOpened = loadRequest.code === REQUEST_RESULT.Success;
 }
 
 //#endregion
@@ -532,6 +576,14 @@ addBibEntryAsSiblingBtn.onclick = async function () {
             jm.insert_node_after(selectedNode, id, topic, data);
         });
 }
+
+showInJabRefBtn.onclick = async function () {
+    const citeKey = jm.get_selected_node()?.data?.citeKey;
+    const selectRequest = await httpClient.selectEntryInJabRef(citeKey);
+    if (selectRequest.code !== REQUEST_RESULT.Success) {
+        console.warn(`Fail: Could not show ${citeKey} in JabRef ( ,_,)`);
+    }
+};
 
 // disable siblings' option if root's selected
 BibEntryDropdownMenuButton.onclick = function () {
@@ -740,6 +792,28 @@ document.addEventListener("keydown", (e) => {
         }
         
     isJsMindSelected = document.activeElement.classList.contains('jsmind-inner');
+});
+
+// jsMind listens for shortcuts on its own panel, so they stop working once a toolbar
+// button or a Bootstrap dropdown/modal holds the focus. Hand it back to the map after
+// such interactions. Deferred, because Bootstrap re-focuses the dropdown toggle
+// *after* firing hidden.bs.dropdown. Not while a node is being edited: the
+// "new node" buttons open the inline editor, which must keep the focus.
+function focusMap() {
+    setTimeout(() => {
+        if (!jm.view.is_editing()) {
+            jm.view.e_panel.focus();
+        }
+    });
+}
+topNavBar.addEventListener('click', focusMap);
+document.addEventListener('hidden.bs.dropdown', focusMap);
+document.addEventListener('hidden.bs.modal', focusMap);
+// Bootstrap only handles <Escape> while the toggle has the focus, which is no longer the case
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        document.querySelectorAll('.dropdown-toggle.show').forEach((t) => Dropdown.getInstance(t)?.hide());
+    }
 });
 
 // remove focus from active element upon showing / closing modals

@@ -44,6 +44,7 @@ const DefaultOptions = {
             load: 4096 + 79,            // <Ctrl> + <O>
             addBibChild: 4096 + 66,     // <Ctrl> + <B>
             addPDFChild: 4096 + 80,     // <Ctrl> + <O>
+            showInJabRef: 4096 + 74,    // <Ctrl> + <J>
             toggleTag: [                // <Ctrl> +
                 4096 + 49,              // <1> - Cycle (checkboxes)
                 4096 + 50,              // <2> - Star
