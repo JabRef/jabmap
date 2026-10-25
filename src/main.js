@@ -95,8 +95,6 @@ options.shortcut.handles = {
         addBibEntryAsChildBtn.onclick();
     },
     'showInJabRef': function (jm, e) {
-        // the browser would otherwise open its downloads view
-        e.preventDefault();
         if (!isBibEntryNode(jm.get_selected_node())) {
             return;
         }
@@ -506,7 +504,7 @@ showInJabRefBtn.onclick = async function () {
     if (selectRequest.code !== REQUEST_RESULT.Success) {
         console.warn(`Fail: Could not show ${citeKey} in JabRef ( ,_,)`);
     }
-}
+};
 
 // disable siblings' option if root's selected
 BibEntryDropdownMenuButton.onclick = function () {

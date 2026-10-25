@@ -283,7 +283,7 @@ class HTTPClient {
         const options = {
             method: "POST",
             headers: { "Content-Type": "application/json" }
-        }
+        };
 
         const selectRequest = await this.#performRequest("commands",
             { ...options, body: JSON.stringify({ command: "selectentries", citationKeys: [citationKey] }) });
