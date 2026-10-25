@@ -95,7 +95,7 @@ options.shortcut.handles = {
         addBibEntryAsChildBtn.onclick();
     },
     'addPDFChild': function (jm, e) {
-        if (!jm.get_selected_node()) {
+        if (!isBibEntryNode(jm.get_selected_node())) {
             return;
         }
         addPDFModalObject.toggle();
@@ -144,8 +144,18 @@ jm.add_event_listener((type, data) => {
         if (selectedNode?.isroot) {
             toggleButtonsEnabled([newSiblingBtn], false);
         }
+        // PDFs belong to BibTeX entries, so PDF nodes can only be added to BibEntry nodes
+        toggleButtonsEnabled([PDFDropDownMenuButton], isBibEntryNode(selectedNode));
     }
 });
+
+/**
+ * @param { object } node - A jsMind node (or undefined / null).
+ * @returns true, if the node is a BibEntry node.
+ */
+function isBibEntryNode(node) {
+    return node?.data?.type === 'BibEntry';
+}
 
 // display the initial state and add it to the action stack
 jm.show(mind);
@@ -433,8 +443,8 @@ BibEntryDropdownMenuButton.onclick = function () {
 
 // define PDF modal object (not the bootstrap one)
 // for easier layout switching
-let PDFLoadingText = 'Loading PDFs from current library...';
-let PDFFailText = 'There\'re no PDFs in current library.';
+let PDFLoadingText = 'Loading PDFs of the selected entry...';
+let PDFFailText = 'The selected entry has no linked PDFs.';
 let addPDFModalObject = new ModalObject(
     selectPDFModal,
     SelectPDFModalLabel,
@@ -461,8 +471,13 @@ selectPDFModal.addEventListener('show.bs.modal', async () => {
     // set "loading layout" to the modal
     ModalDesigner.setLayout(addPDFModalObject, MODAL_LAYOUT.Loading);
 
-    // getting the list of available PDFs
-    let pdfRequest = await httpClient.getPDFFiles();
+    // getting the list of PDFs linked to the selected BibEntry
+    const selectedNode = jm.get_selected_node();
+    if (!isBibEntryNode(selectedNode)) {
+        ModalDesigner.setLayout(addPDFModalObject, MODAL_LAYOUT.Failed);
+        return;
+    }
+    let pdfRequest = await httpClient.getPDFFiles(selectedNode.data.citeKey);
     let pdfList = pdfRequest.value;
 
     // update modal's layout according to retrieved list
