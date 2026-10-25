@@ -44,7 +44,9 @@ class HTTPClient {
             result.code = REQUEST_RESULT.Failed;
 
             // If some output is awaited, save it
-            if (options.method !== "PUT") {
+            // * Note: 204 No Content has an empty body, so there is nothing to parse
+            // (e.g. CAYW returns it when no entry was selected)
+            if (options.method !== "PUT" && response.status !== 204) {
                 if (options.headers["Accept"] === 'application/json') {
                     result.value = await response.json();
                 }
@@ -198,7 +200,7 @@ class HTTPClient {
         }
         
         let selectedCiteKeys = [];
-            for (let entry of selectedEntries) {
+            for (let entry of selectedEntries ?? []) {
                 selectedCiteKeys.push(entry.citationKey);
             }
 
