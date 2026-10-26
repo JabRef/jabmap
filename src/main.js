@@ -1,6 +1,6 @@
 import '@popperjs/core';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Dropdown, Popover } from 'bootstrap';
+import { Dropdown, Popover, Toast } from 'bootstrap';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 import jsMind from './jsmind/src/jsmind.js';
@@ -16,6 +16,7 @@ import { ModalObject } from './modals/ModalObject.js';
 import { DefaultMap, FelixMap } from './mindPresets/DefaultMindMaps.js';
 import { DefaultOptions, NoEditOptions } from './mindPresets/DefaultMindOptions.js';
 import { NodeExtender } from './mindPresets/NodeExtender.js';
+import { mergeMaps } from './MapMerger.js';
 
 //#region [General Setup]
 // * This region contains declaration of most basic instances
@@ -284,16 +285,57 @@ let loadMapModalObject = new ModalObject(
 // false until a map was opened, so the built-in example map never overwrites a library's map
 let isMapOpened = false;
 let pendingSave = Promise.resolve();
+// the map as it was last loaded from or saved to the server: the common base
+// for merging in changes someone else saved in the meantime
+let savedMap = null;
 
 /**
- * Sends the displayed mind map to JabRef's HTTP server.
+ * Sends the displayed mind map to JabRef's HTTP server, after merging in
+ * whatever someone else saved there since the map was loaded.
  * Saves run one after another, so an older state never overwrites a newer one.
  * A failed save turns the save button red until the next successful one.
  */
 function saveMap() {
     pendingSave = pendingSave.then(async () => {
-        let saveRequest = await httpClient.saveMap(jm.get_data());
-        let hasFailed = saveRequest.code !== REQUEST_RESULT.Success;
+        // the user may open another map while this save waits for the server
+        let library = httpClient.currentLibrary;
+        let isCurrent = () => library === httpClient.currentLibrary;
+        let mindMap = jm.get_data();
+        let hasFailed = false;
+        // ponytail: check-then-write, not an atomic compare-and-set; an ETag on
+        // the server closes the remaining millisecond window if it ever matters
+        if (savedMap) {
+            let serverRequest = await httpClient.loadMap(library);
+            let serverMap = serverRequest.value?.map;
+            // a map that cannot be read must not be overwritten blindly
+            hasFailed = serverRequest.code !== REQUEST_RESULT.Success || !serverMap?.data?.id;
+            if (!hasFailed) {
+                NodeExtender.extendNode(serverMap.data);
+            }
+            if (!hasFailed && JSON.stringify(serverMap) !== JSON.stringify(savedMap)) {
+                let { map, notes } = mergeMaps(savedMap, mindMap, serverMap);
+                mindMap = map;
+                if (isCurrent()) {
+                    // the server's state is now part of the shown map, so it is
+                    // the base from here on, even if the write below fails
+                    savedMap = structuredClone(serverMap);
+                    jm.show(mindMap);
+                    jm.saveState();
+                    notes.forEach((note) => console.warn(note));
+                    showToast(notes.length > 0 ?
+                        `Merged changes from the server, ${notes.length} needed attention (see console).` :
+                        'Merged changes from the server.');
+                }
+            }
+        }
+
+        if (!hasFailed) {
+            let saveRequest = await httpClient.saveMap(mindMap, library);
+            hasFailed = saveRequest.code !== REQUEST_RESULT.Success;
+        }
+        if (!hasFailed && isCurrent()) {
+            savedMap = structuredClone(mindMap);
+        }
         saveBtn.classList.toggle('btn-danger', hasFailed);
         saveBtn.classList.toggle('btn-light', !hasFailed);
         saveBtn.title = hasFailed ? 'Saving failed. Click to retry.' : 'Save';
@@ -328,6 +370,15 @@ autosaveCheck.onchange = function () {
 
 // save - sends mind map's content to JabRef's HTTP server
 saveBtn.onclick = saveMap;
+
+/**
+ * Shows a short message in the bottom right corner.
+ * @param { string } text - The message.
+ */
+function showToast(text) {
+    saveToast.querySelector('.toast-body').innerText = text;
+    Toast.getOrCreateInstance(saveToast).show();
+}
 
 // open - opens a dialog to select available mind maps
 openBtn.onclick = async function () {
@@ -372,6 +423,7 @@ openSelectedMapBtn.onclick = async function () {
     // if no mind map exists, show the default one
     let loadedMap = loadRequest.value?.map ?? mind;
     NodeExtender.extendNode(loadedMap.data);
+    savedMap = loadRequest.code === REQUEST_RESULT.Success ? structuredClone(loadedMap) : null;
 
     // display the retrieved mind map
     // * Note: on a failed load the current library is unchanged,
