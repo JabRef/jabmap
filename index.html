@@ -79,8 +79,8 @@
 <body>
   <!--Navbar with Buttons-->
   <nav class="navbar bg-body-tertiary" id="topNavBar">
-    <div class="container-fluid">
-      <div class="d-flex align-items-start" style="flex-basis: 33%; max-width: 33%;">
+    <div class="container-fluid row-gap-2">
+      <div class="d-flex align-items-center text-nowrap" style="flex: 1 1 0;">
         <!--JabMap title-->
         <a class="navbar-brand" href="#">JabMap</a>
 
@@ -103,7 +103,7 @@
       </div>
 
       <!--Editor buttons-->
-      <div class="d-flex justify-content-center" style="flex-basis: 33%; max-width: 33%;">
+      <div class="d-flex">
         <!--Button class explanation: class = "btn color theme margin to the right (me-2)"-->
         <!--Undo Button-->
         <button id="undoBtn" class="btn btn-secondary me-2" type="button" data-bs-toggle="tooltip" title="Undo"
@@ -203,7 +203,8 @@
         </div>
 
       </div>
-      <div class="d-flex justify-content-end align-items-center" style="flex-basis: 33%; max-width: 33%;">
+      <!--Same flex as the left group, so the editor buttons stay centred-->
+      <div class="d-flex justify-content-end align-items-center" style="flex: 1 1 0;">
         <span id="currentLibraryLabel" class="navbar-text text-truncate" title="Library of the opened mind map"></span>
       </div>
     </div>
