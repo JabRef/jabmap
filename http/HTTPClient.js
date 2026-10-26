@@ -128,12 +128,13 @@ class HTTPClient {
     /**
      * Sends a mind map to JabRef's server to save next to currently active library.
      * @param { object } mindMap - The mind map to save.
+     * @param { string } library - The library to save next to; the current one by default.
      * @returns A result object of following structure:
      * - code: the status of the request defined by REQUEST_RESULT enum.
      * - value: null.
      */
-    async saveMap(mindMap) {
-        const url = `libraries/${this.currentLibrary}/map`;
+    async saveMap(mindMap, library = this.currentLibrary) {
+        const url = `libraries/${library}/map`;
         const options = {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
