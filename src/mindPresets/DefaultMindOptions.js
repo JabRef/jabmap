@@ -26,7 +26,7 @@ const DefaultOptions = {
         enable: true,                   // Whether to enable shortcut
         mapping: { 			            // Shortcut key mapping
             addchild: [45, 4096 + 13],  // <Insert>, <Ctrl> + <Enter>
-            addbrother: 13,             // <Enter>
+            addBrotherOrChild: 13,      // <Enter>
             editnode: 113, 	            // <F2>
             delnode: [46, 8], 	        // <Delete>
             toggle: 32, 	            // <Space>
