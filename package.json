@@ -20,6 +20,7 @@
     "dev-browser": "vite",
     "dev-desktop": "electron .",
     "build": "vite build",
+    "test": "node --test 'src/*.test.js'",
     "preview": "vite preview",
     "preview-browser": "vite preview",
     "preview-desktop": "electron .",
