@@ -297,6 +297,9 @@ let savedMap = null;
  * A successful one is confirmed by a toast, unless autosave is on.
  */
 function saveMap() {
+    // decided when the save is queued: toggling autosave while a save is in flight
+    // must not change whether that save gets confirmed
+    const confirm = !autosaveCheck.checked;
     pendingSave = pendingSave.then(async () => {
         // the user may open another map while this save waits for the server
         let library = httpClient.currentLibrary;
@@ -341,8 +344,8 @@ function saveMap() {
         saveBtn.classList.toggle('btn-light', !hasFailed);
         saveBtn.title = hasFailed ? 'Saving failed. Click to retry.' : 'Save';
         // with autosave on, saves happen constantly and a toast each time would be noise
-        if (!hasFailed && !autosaveCheck.checked) {
-            Toast.getOrCreateInstance(savedToast).show();
+        if (!hasFailed && confirm) {
+            showToast('Mind map saved to JabRef');
         }
     });
 }
