@@ -20,6 +20,7 @@ In case there is no issue present, the pull request implementing the feature is 
 
 ### Changed
 
+- We changed <kbd>Enter</kbd> on the root node to create a child node instead of doing nothing.
 - We changed the "New PDF node" dialog to list only the PDFs linked to the selected BibTeX node; the PDF button is disabled for other nodes. [#56](https://github.com/JabRef/jabmap/issues/56)
 
 ### Fixed

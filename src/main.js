@@ -54,6 +54,14 @@ let mind = DefaultMap;
 const options = DefaultOptions;
 // adding Named shortcut key event processor
 options.shortcut.handles = {
+    // the root has no siblings, so <Enter> would do nothing there
+    'addBrotherOrChild': function (jm, e) {
+        if (jm.get_selected_node()?.isroot) {
+            this.handle_addchild(jm, e);
+        } else {
+            this.handle_addbrother(jm, e);
+        }
+    },
     'undo': function (jm, e) {
         // display mind map's previous state (undo the last operation)
         hidePopovers();
