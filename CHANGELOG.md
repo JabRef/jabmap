@@ -15,6 +15,7 @@ In case there is no issue present, the pull request implementing the feature is 
 - We added merging on save: changes someone else saved to the same map in the meantime are merged in instead of overwritten. Nodes edited on both sides are kept twice, the server's version tagged with a warning icon. [#44](https://github.com/JabRef/jabmap/issues/44)
 - We added this changelog. It is checked by [heylogs](https://github.com/nbbrd/heylogs) in CI. [#103](https://github.com/JabRef/jabmap/pull/103)
 - We added autosave: after a mind map was opened, every change, undo and redo is saved to JabRef immediately. The "Autosave" toggle in the toolbar switches it off. A failed save turns the "Save" button red. [#36](https://github.com/JabRef/jabmap/issues/36)
+- We added a toast confirming a successful save when autosave is off. [#38](https://github.com/JabRef/jabmap/issues/38)
 
 ### Changed
 
