@@ -7,7 +7,7 @@
     "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",
     "@popperjs/core": "^2.11.8",
-    "bootstrap": "^5.3.6",
+    "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.2"
   },
   "devDependencies": {
